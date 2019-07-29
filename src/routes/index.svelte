@@ -36,7 +36,7 @@
 	<title>Sapper project template</title>
 </svelte:head>
 
-<h1>Great fun!</h1>
+<h1>Great fun again!</h1>
 
 <figure>
 	<img alt='Borat' src='great-success.png'>
