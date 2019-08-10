@@ -12,6 +12,7 @@
     "test": "run-p --race dev cy:run"
   },
   "dependencies": {
+    "@azure/cosmos": "^3.1.0",
     "compression": "^1.7.1",
     "express": "^4.17.1",
     "faye": "^1.2.4",
