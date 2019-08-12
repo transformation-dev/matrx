@@ -13,10 +13,12 @@
   },
   "dependencies": {
     "@azure/cosmos": "^3.1.0",
+    "bootstrap": "^4.3.1",
     "compression": "^1.7.1",
     "express": "^4.17.1",
     "faye": "^1.2.4",
-    "polka": "next",
+    "jquery": "^3.4.1",
+    "popper.js": "^1.15.0",
     "sirv": "^0.4.0"
   },
   "devDependencies": {
