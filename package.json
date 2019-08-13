@@ -1,6 +1,6 @@
 {
-  "name": "TODO",
-  "description": "TODO",
+  "name": "MatrX",
+  "description": "MatrX main application",
   "version": "0.0.1",
   "scripts": {
     "dev": "sapper dev",

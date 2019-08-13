@@ -28,8 +28,6 @@
 <body>
 
 	<script>
-		import 'bootstrap'
-		
 		const pubsubClient = new Faye.Client('pubsub')
 
 		pubsubClient.subscribe('/messages', function(message) {
