@@ -27,7 +27,7 @@ app.use(helmet({
 		directives: {
 			scriptSrc: [
 				"'self'",
-				"'unsafe-eval'",
+				// "'unsafe-eval'",
 				(req, res) => `'nonce-${res.locals.nonce}'`
 			]
 		}
