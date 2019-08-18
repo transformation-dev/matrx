@@ -1,4 +1,4 @@
-import * as sapper from './node_modules.old/@sapper/app'
+import * as sapper from '@sapper/app'
 
 // const pubsubClient = new Faye.Client('pubsub')
 

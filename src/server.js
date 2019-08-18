@@ -1,7 +1,7 @@
 import sirv from 'sirv'
 import express from 'express'
 import compression from 'compression'
-import * as sapper from './node_modules.old/@sapper/server'
+import * as sapper from '@sapper/server'
 import faye from 'faye'
 import http from 'http'
 import uuidv4 from 'uuid/v4'
