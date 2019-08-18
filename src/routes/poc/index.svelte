@@ -1,11 +1,15 @@
 <script>
-  // import { writable } from 'svelte/store'
+  import { writable } from 'svelte/store'
 
-  // const color = writable('blue')
+  const color = writable('blue')
+
+  function handleClick(event) {
+		console.log('clicked')
+	}
 
 </script>
 
 <h1>Hello</h1>
 
-<button class="button is-primary">hello</button>
+<button on:click={handleClick} class="button is-primary">hello</button>
 
