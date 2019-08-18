@@ -1,13 +1,14 @@
-import * as sapper from '@sapper/app'
+import * as sapper from './node_modules.old/@sapper/app'
 
-import 'bootstrap/dist/css/bootstrap.min.css'
-// import 'popper.js'  // Popovers seem to work fine without this import. Maybe it's imported automatically with bootstrap
-import $ from 'jquery'
-import 'bootstrap'
+// const pubsubClient = new Faye.Client('pubsub')
 
-$(function () {
-  $('[data-toggle="popover"]').popover()
-})
+// pubsubClient.subscribe('/messages', function(message) {
+// 	console.log('Got a message: ' + message.text);
+// })
+
+// pubsubClient.publish('/messages', {
+// 	text: 'Hello world'
+// })
 
 sapper.start({
 	target: document.querySelector('#sapper')

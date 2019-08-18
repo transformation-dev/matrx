@@ -8,6 +8,8 @@
 
 <script>
 	export let posts;
+
+	console.log('got here')
 </script>
 
 <style>
