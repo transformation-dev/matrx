@@ -1,9 +1,12 @@
 <script>
   import { writable } from 'svelte/store'
+  import {onMount} from 'svelte'
 
-  pubsubClient.subscribe('/messages', function(message) {
-    console.log('Got a message: ' + message.text);
-  })
+  onMount(async () => {
+    pubsubClient.subscribe('/messages', function(message) {
+      console.log('Got a message: ' + message.text);
+    })
+	})
 
   const color = writable('blue')
 
