@@ -1,10 +1,16 @@
 <script>
   import { writable } from 'svelte/store'
 
+  pubsubClient.subscribe('/messages', function(message) {
+    console.log('Got a message: ' + message.text);
+  })
+
   const color = writable('blue')
 
   function handleClick(event) {
-		console.log('clicked')
+		pubsubClient.publish('/messages', {
+      text: 'Hello world'
+    })
 	}
 
 </script>
