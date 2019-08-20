@@ -1,7 +1,7 @@
 import * as sapper from '@sapper/app'
 
-const pubsubClient = new Faye.Client('pubsub')
-  
+window.pubsubClient = new Faye.Client('pubsub')  // TODO: Find a better way than attaching to window
+
 sapper.start({
 	target: document.querySelector('#sapper')
 })
