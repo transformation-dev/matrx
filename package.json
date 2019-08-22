@@ -3,7 +3,7 @@
   "description": "MatrX main application",
   "version": "0.0.1",
   "scripts": {
-    "dev": "sapper dev",
+    "dev": "npm run css:watch & sapper dev",
     "build": "sapper build",
     "export": "sapper export",
     "start": "node __sapper__/build",
@@ -11,7 +11,7 @@
     "cy:open": "cypress open",
     "test": "run-p --race dev cy:run",
     "css:build": "node-sass --omit-source-map-url src/matrx.scss static/matrx.css",
-    "css:watch": "npm run css-build -- --watch"
+    "css:watch": "npm run css:build -- --watch"
   },
   "dependencies": {
     "@azure/cosmos": "^3.1.0",
