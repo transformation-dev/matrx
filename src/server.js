@@ -29,8 +29,11 @@ app.use(helmet({
 				"'self'",
 				"'unsafe-eval'",
 				(req, res) => `'nonce-${res.locals.nonce}'`
-			]
-		}
+			],
+			objectSrc: ["'none'"],
+			baseUri: ["'self'"]
+		},
+		browserSniff: false
 	}
 }))
 

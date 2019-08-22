@@ -2,7 +2,7 @@
   import { writable } from 'svelte/store'
   import {onMount} from 'svelte'
 
-  onMount(async () => {
+  onMount(() => {
     pubsubClient.subscribe('/messages', function(message) {
       console.log('Got a message: ' + message.text);
     })
