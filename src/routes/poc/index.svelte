@@ -1,16 +1,21 @@
 <script>
   import { writable } from 'svelte/store'
   import {onMount} from 'svelte'
+  import { stores } from '@sapper/app';
+  const { preloading, page, session } = stores()
+  
+  import helpers from '../_helpers'
+
+  const a = writable(0)
+  const b = writable(10)
+  const pageStores = {a, b}
 
   onMount(() => {
-    pubsubClient.subscribe('/messages', function(message) {
-      console.log('Got a message: ' + message.text);
-    })
+    helpers.initializePage(pageStores)
 	})
 
-  const color = writable('blue')
-
   function handleClick(event) {
+    $a += 1
 		pubsubClient.publish('/messages', {
       text: 'Hello world'
     })
@@ -18,7 +23,7 @@
 
 </script>
 
-<h1>Hello</h1>
+<h1>Hello {$a} {$b}</h1>
 
 <button on:click={handleClick} class="button is-primary">hello</button>
 
