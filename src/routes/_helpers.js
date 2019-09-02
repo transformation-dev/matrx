@@ -1,9 +1,6 @@
 import uuidv4 from 'uuid/v4'
 const connectionID = uuidv4()
 
-import realtime from '@matrx/realtime'
-realtime()
-
 import urlComposer from 'url-composer'  // TODO: Fork and make use Sapper convention
 
 async function initializePage(pageStores) {
