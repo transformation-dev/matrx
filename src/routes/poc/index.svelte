@@ -4,14 +4,14 @@
   import { stores } from '@sapper/app';
   const { preloading, page, session } = stores()
   
-  import * as realtime from '@matrx/realtime'
-    
+  import {getClient} from '@matrx/realtime'
+
   const a = writable(0)
   const b = writable(10)
   const pageStores = {a, b}
 
   onMount(() => {
-    const client = realtime.getClient()
+    const client = getClient()
     console.log('in poc/index.svelte', client.path)
 	})
 

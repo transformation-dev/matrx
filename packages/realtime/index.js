@@ -1,14 +1,14 @@
 'use strict';
 
-// import uuidv4 from 'uuid/v4'
-// console.log(uuid)
+const uuidv4 = require('uuid/v4')
+const urlComposer = require('url-composer')
 // import * as urlComposer from 'url-composer'  // TODO: Fork and make use Sapper convention
 
 class Client {
 
   constructor() {
     this.path = 'pubsub/connect'
-    // this.connectionID = uuid.uuidv4()
+    this.connectionID = uuidv4()
     this.eventSource = null
   }
 
@@ -32,11 +32,10 @@ function getClient(path, callback) {
   if (path) {
     client.path = path
   }
-  const connectURL = client.path + '?connectionID=' + client.connectionID
-  // const connectURL = urlComposer.build({
-  //   path: client.path,
-  //   query: {connectionID: client.connectionID},
-  // })
+  const connectURL = urlComposer.build({
+    path: client.path,
+    query: {connectionID: client.connectionID},
+  })
   client.setEventSource(new EventSource(connectURL))
   
   return client
