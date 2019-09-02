@@ -2,6 +2,7 @@
   "name": "matrx",
   "description": "MatrX main application",
   "version": "0.0.1",
+  "private": true,
   "scripts": {
     "dev": "npm run css:watch & sapper dev",
     "build": "sapper build",
@@ -20,6 +21,7 @@
     "express": "^4.17.1",
     "faye-websocket": "^0.11.3",
     "helmet": "^3.20.0",
+    "@matrx/realtime": "^0.0.1",
     "sirv": "^0.4.0",
     "url-composer": "^1.15.0"
   },
