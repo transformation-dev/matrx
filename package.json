@@ -1,7 +1,7 @@
 {
   "name": "matrx",
   "description": "MatrX main application",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "npm run css:watch & sapper dev",
@@ -16,12 +16,12 @@
   },
   "dependencies": {
     "@azure/cosmos": "^3.1.0",
+    "@matrx/realtime": "^0.1.0",
     "body-parser": "^1.19.0",
     "compression": "^1.7.1",
     "express": "^4.17.1",
     "faye-websocket": "^0.11.3",
     "helmet": "^3.20.0",
-    "@matrx/realtime": "^0.0.1",
     "sirv": "^0.4.0",
     "url-composer": "^1.15.0"
   },

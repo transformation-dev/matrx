@@ -1,6 +1,6 @@
 {
   "name": "@matrx/realtime",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Browser-side stores and server-side middleware to building realtime apps",
   "keywords": [
     "realtime",
