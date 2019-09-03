@@ -1,17 +1,27 @@
+import uuidv4 from 'uuid/v4'
+const connectionID = uuidv4()
 
+import urlComposer from 'url-composer'  // TODO: Fork and make use Sapper convention
 
-export default {
-  initializePage: (pageStores) => {
-    console.log('inside initializePage')
-    console.log(pageStores)
-    pageStores.a.set(5)
-    pubsubClient.subscribe('/messages', function(message) {
-      console.log('Got a message: ' + message.text);
-    })
-    // console.log(window.location)
-    // let url = new URL(window.location.href)
-    // url.searchParams.sort()
-    // console.log(url.search)
-    // console.log(url)
-  },
+async function initializePage(pageStores) {
+  pageStores['a'].set(5)
+
+  const connectURL = urlComposer.build({
+    path: 'pubsub/event-source', 
+    query: {connectionID},
+  })
+  const es = new EventSource(connectURL)
+
+  es.onmessage = (message) => {
+    console.log('got message on page', JSON.parse(message.data))
+  }
+
+  es.onopen = () => {
+
+  }
+
+}
+
+export {
+  initializePage,
 }

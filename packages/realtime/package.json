@@ -1,0 +1,37 @@
+{
+  "name": "@matrx/realtime",
+  "version": "0.1.1",
+  "description": "Browser-side stores and server-side middleware to building realtime apps",
+  "keywords": [
+    "realtime",
+    "real-time",
+    "sapper",
+    "svelte",
+    "svelte3",
+    "store"
+  ],
+  "author": "Larry Maccherone <Larry@Maccherone.com>",
+  "homepage": "https://github.com/matrx-transformation/matrx/packages/realtime#readme",
+  "license": "MIT",
+  "main": "index.js",
+  "directories": {
+    "test": "__tests__"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/matrx-transformation/matrx.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "bugs": {
+    "url": "https://github.com/matrx-transformation/matrx/issues"
+  },
+  "dependencies": {
+    "url-composer": "^1.15.0",
+    "uuid": "^3.3.3"
+  }
+}
