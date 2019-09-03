@@ -4,7 +4,7 @@ import {sseConnections} from '../_server-helpers'
 
 function get(req, res, next) {
 	// TODO: Use Cosmos DB's _ts value as EventSource.lastEventID
-	console.log('query from inside event-source.js', req.query)
+	console.log('query from inside connect.js', req.query)
 
 	if (EventSource.isEventSource(req)) {
     let es = new EventSource(req, res, {
@@ -13,7 +13,7 @@ function get(req, res, next) {
 		})
 
 		es.on('open', (data) => {
-    	console.log('Got "open" event inside event-source.js.')
+    	console.log('Got "open" event inside connect.js.')
 		})
 
     // Periodically send messages
@@ -26,7 +26,7 @@ function get(req, res, next) {
 		
 		sseConnections.set(req.query.connectionID, es)
   
-  } else {  // TODO: Throw some error and/or reply with an error
+  } else {
     res.writeHead(400, {'Content-Type': 'text/plain'})
     res.end('This endpoint is meant to be accessed from an EventSource')
 	}

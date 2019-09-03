@@ -1,5 +1,5 @@
 /**
- *	@usage
+ *	@example
  *	
  *	import urlComposer from 'url-composer'
  *	

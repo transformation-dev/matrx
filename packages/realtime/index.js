@@ -1,42 +1,77 @@
-'use strict';
+'use strict'
 
 const uuidv4 = require('uuid/v4')
 const urlComposer = require('url-composer')
-// import * as urlComposer from 'url-composer'  // TODO: Fork and make use Sapper convention
 
 class Client {
 
   constructor() {
-    this.path = 'pubsub/connect'
+    this.pubsubPath = 'pubsub'
     this.connectionID = uuidv4()
     this.eventSource = null
+    this.previouslyOpened = false
+    this.lastEventID = null
   }
 
-  setEventSource(es) {
-    es.onmessage = (message) => {
+  init(pubsubPath, callback) {  // TODO: Upgrade this to an async function or an EventEmitter
+    if (pubsubPath) {
+      this.pubsubPath = pubsubPath
+    }
+
+    const connectURL = urlComposer.build({
+      path: this.pubsubPath + '/connect',
+      query: {connectionID: this.connectionID},
+    })
+    this.eventSource = new EventSource(connectURL)
+
+    this.eventSource.onmessage = (message) => {
+      this.lastEventID = message.lastEventID
       console.log('got message on page', JSON.parse(message.data))
     }
   
-    es.onopen = () => {
-      console.log('es is open inside new Client class')
+    this.eventSource.onopen = (e) => {
+      if (this.previouslyOpened) {
+        // TODO: Replay to catch up
+      } else {
+        this.previouslyOpened = true  
+      }
+      if (callback) {
+        return callback(null, e)
+      }
     }
-  }
 
-  yes() {
-    console.log('inside client')
+    this.eventSource.onerror = (e) => {
+      if (callback) {
+        return callback( e)
+      } else {
+        throw new Error(e)
+      }
+    }
   }
 
 }
 
+/**
+ * [getClient description]
+ *
+ * @param   {[string]}    pubsubPath   [pubsubPath description]
+ * @param   {[function]}  callback     [callback description]
+ *
+ * @return  {[Client]}                 [return description]
+ * 
+ * @example
+ * 
+ * const client = getClient('path/to/pubsub', (err, res) => {
+ *   if (err) {
+ *     console.error(err)
+ *   } else {
+ *     console.log(res)
+ *   }
+ * })
+ * 
+ */
 function getClient(path, callback) {
-  if (path) {
-    client.path = path
-  }
-  const connectURL = urlComposer.build({
-    path: client.path,
-    query: {connectionID: client.connectionID},
-  })
-  client.setEventSource(new EventSource(connectURL))
+  client.init(path, callback)
   
   return client
 }
@@ -45,4 +80,4 @@ function getServer() {}
 
 const client = new Client()
 
-module.exports = {getClient}
+module.exports = {getClient, getServer}
