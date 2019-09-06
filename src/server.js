@@ -32,6 +32,7 @@ app.use(helmet({
 }))
 
 app.use(bodyParser.json())
+app.use(bodyParser.text())
 
 app.use(
 	compression({ threshold: 0 }),

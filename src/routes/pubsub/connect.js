@@ -4,12 +4,13 @@ import {sseConnections} from '../_server-helpers'
 
 function get(req, res, next) {
 	// TODO: Use Cosmos DB's _ts value as EventSource.lastEventID
-	console.log('query from inside connect.js', req.query)
 
 	if (EventSource.isEventSource(req)) {
+		const {connectionID} = req.query
+	
     let es = new EventSource(req, res, {
-			ping:    20,
-			retry:   15
+			ping:    15,
+			retry:   10
 		})
 
 		es.on('open', (data) => {
@@ -17,14 +18,18 @@ function get(req, res, next) {
 		})
 
     // Periodically send messages
-    // let loop = setInterval(function() { es.send(JSON.stringify({here: 'is my message'})) }, 1000);
+    // let loop = setInterval(function() { 
+		// 	es.send(JSON.stringify({here: 'is my message'})) 
+		// }, 10000)
     
     es.on('close', function() {
-      // clearInterval(loop)
+			// clearInterval(loop)
+			console.log('got close event')
+			// TODO: Remove from sseSubscriptions and sseConnections before closing
       es = null
 		})
-		
-		sseConnections.set(req.query.connectionID, es)
+
+		sseConnections.set(connectionID, es)
   
   } else {
     res.writeHead(400, {'Content-Type': 'text/plain'})

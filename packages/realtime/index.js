@@ -11,6 +11,8 @@ class Client {
     this.eventSource = null
     this.previouslyOpened = false
     this.lastEventID = null
+    this._retryIn = 1000
+    this.connectURL = ''
   }
 
   init(pubsubPath, callback) {  // TODO: Upgrade this to an async function or an EventEmitter
@@ -18,11 +20,12 @@ class Client {
       this.pubsubPath = pubsubPath
     }
 
-    const connectURL = urlComposer.build({
+    this.connectURL = urlComposer.build({
       path: this.pubsubPath + '/connect',
       query: {connectionID: this.connectionID},
     })
-    this.eventSource = new EventSource(connectURL)
+
+    this.eventSource = new EventSource(this.connectURL)
 
     this.eventSource.onmessage = (message) => {
       this.lastEventID = message.lastEventID
@@ -30,6 +33,7 @@ class Client {
     }
   
     this.eventSource.onopen = (e) => {
+      this._retryIn = 1000
       if (this.previouslyOpened) {
         // TODO: Replay to catch up
       } else {
@@ -41,10 +45,13 @@ class Client {
     }
 
     this.eventSource.onerror = (e) => {
-      if (callback) {
-        return callback( e)
-      } else {
-        throw new Error(e)
+      if (this.eventSource.readyState === 2) {
+        this.init()  // TODO: delay by this.retryIn
+      } else if (! this.eventSource.readyState === 0) {
+        console.log('eventSource.readyState', this.eventSource.readyState)
+        console.log('Inside eventSource.onerror')
+        console.log('e:', e)
+        throw e
       }
     }
   }
