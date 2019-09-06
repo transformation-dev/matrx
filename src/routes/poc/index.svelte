@@ -24,13 +24,13 @@
   	})
   	fetch(url, { 
   		method: 'POST',
-  		// body: JSON.stringify({
-      //   connectionID: pubsubClient.connectionID,
-      //   type: 'syncable',
-      //   // TODO: When we move this into the store, we'll be passing in a app-wide uique string for this store
-      //   channelID: 'poc.a',  // TODO: Find some way to autopopulate this on build. Might require writing a rollup plugin
+  		body: JSON.stringify({
+        connectionID: pubsubClient.connectionID,
+        type: 'syncable',
+        // TODO: When we move this into the store, we'll be passing in a app-wide uique string for this store
+        channelID: 'poc.a',  // TODO: Find some way to autopopulate this on build. Might require writing a rollup plugin
         
-      // }),
+      }),
   		headers:{
   			'Content-Type': 'application/json',
   		},
