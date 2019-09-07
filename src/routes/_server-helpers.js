@@ -89,6 +89,51 @@ class PubsubServer {
       return res.status(200).end()
     }
   }
+
+  publish(channelID, message, fromConnectionID) {
+    console.log('inside publish. fromConnectionID', fromConnectionID)
+    console.log('channelID', channelID)
+    if (fromConnectionID) {
+      for (let connectionID of this.sseSubscriptions.get(channelID)) {
+        console.log(connectionID, fromConnectionID)
+        if (fromConnectionID !== connectionID) {
+          console.log('not the same')
+          this.sendMessage(connectionID, message)
+        }
+      }
+    } else {
+      for (let connectionID of this.sseSubscriptions.get(channelID)) {
+        this.sendMessage(connectionID, message)
+      }
+    }
+  }
+
+  /**
+   *	@example
+   *	
+   *	import urlComposer from 'url-composer'
+   *	
+   *	const url = urlComposer.build({
+   *		path: 'pubsub/publish/:channelID', 
+   *		params: {channelID},
+   *	})
+   *	const res = fetch(url, {
+   *		method: 'POST',
+   *		body: JSON.stringify({msg: 'from publish'}),
+   *		headers:{
+   *			'Content-Type': 'application/json',
+   *		},
+   *	})
+   */
+  publishPOST(req, res, next) {
+    this.publish(req.params.channelID, req.body, req.params.connectionID)
+    if (false) {  // TODO: Base status on results of .send()
+      return next(err)
+    } else {
+      return res.status(200).end()
+    }
+  }
+
 }
 
 function getPubsubServer() {

@@ -15,10 +15,10 @@
 
   onMount(() => {
     pubsubClient = getClient()
+    subscribe()
 	})
 
-  function handleSubscribe(event) {
-    $a += 1
+  function subscribe() {
   	const url = urlComposer.build({
   		path: 'pubsub/subscribe', 
   	})
@@ -29,7 +29,6 @@
         type: 'syncable',
         // TODO: When we move this into the store, we'll be passing in a app-wide uique string for this store
         channelID: 'poc.a',  // TODO: Find some way to autopopulate this on build. Might require writing a rollup plugin maybe with this: https://github.com/jetiny/rollup-plugin-re
-        
       }),
   		headers:{
   			'Content-Type': 'application/json',
@@ -56,11 +55,40 @@
   			'Content-Type': 'application/json',
   		},
     })
-	}
+  }
+  
+  function handlePublish(event) {
+   	const url = urlComposer.build({
+   		path: 'pubsub/publish/:channelID', 
+   		params: {channelID: 'poc.a'},
+   	})
+   	const res = fetch(url, {
+   		method: 'POST',
+   		body: JSON.stringify({msg: 'from publish'}),
+   		headers:{
+   			'Content-Type': 'application/json',
+   		},
+   	})
+  }
+
+  function handlePublishFrom(event) {
+   	const url = urlComposer.build({
+   		path: 'pubsub/publish/:channelID/from/:connectionID', 
+   		params: {channelID: 'poc.a', connectionID: pubsubClient.connectionID},
+   	})
+   	const res = fetch(url, {
+   		method: 'POST',
+   		body: JSON.stringify({msg: 'from publish'}),
+   		headers:{
+   			'Content-Type': 'application/json',
+   		},
+   	})
+  }
 
 </script>
 
 <h1>Hello {$a} {$b}</h1>
 
-<button on:click={handleSubscribe} class="button is-primary">Subscribe</button>
 <button on:click={handleMessage} class="button">Message</button>
+<button on:click={handlePublish} class="button">Publish</button>
+<button on:click={handlePublishFrom} class="button">Publish From</button>
