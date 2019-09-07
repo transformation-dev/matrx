@@ -28,7 +28,7 @@
         connectionID: pubsubClient.connectionID,
         type: 'syncable',
         // TODO: When we move this into the store, we'll be passing in a app-wide uique string for this store
-        channelID: 'poc.a',  // TODO: Find some way to autopopulate this on build. Might require writing a rollup plugin
+        channelID: 'poc.a',  // TODO: Find some way to autopopulate this on build. Might require writing a rollup plugin maybe with this: https://github.com/jetiny/rollup-plugin-re
         
       }),
   		headers:{

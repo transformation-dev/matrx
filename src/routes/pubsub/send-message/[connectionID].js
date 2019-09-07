@@ -20,7 +20,7 @@ import { sseConnections } from '../../_server-helpers'
 
 export function post(req, res, next) {
 	sseConnections.get(req.params.connectionID).send(JSON.stringify(req.body))
-	if (false) {  // TODO: Base status on results of .sent()
+	if (false) {  // TODO: Base status on results of .send()
 		return next(err)
 	} else {
 		return res.status(200).end()

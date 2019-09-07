@@ -44,6 +44,12 @@ class Client {
       }
     }
 
+    this.eventSource.addEventListener("ping", (e) => {
+      const time = JSON.parse(e.data).time
+      console.log(time)
+      console.log(JSON.parse(e.data))
+    })
+
     this.eventSource.onerror = (e) => {
       if (this.eventSource.readyState === 2) {
         this.init()  // TODO: delay by this.retryIn

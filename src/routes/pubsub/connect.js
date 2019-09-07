@@ -32,8 +32,7 @@ function get(req, res, next) {
 		sseConnections.set(connectionID, es)
   
   } else {
-    res.writeHead(400, {'Content-Type': 'text/plain'})
-    res.end('This endpoint is meant to be accessed from an EventSource')
+    res.status(400).send('This endpoint is meant to be accessed from an EventSource')
 	}
 }
 
