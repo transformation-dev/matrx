@@ -8,8 +8,7 @@ class PubsubServer {
   }
 
   connectGET(req, res, next) {
-    // TODO: Use Cosmos DB's _ts value as EventSource.lastEventID
-
+    console.log('connectGET called')
     if (EventSource.isEventSource(req)) {
       const {connectionID} = req.query
     
@@ -18,8 +17,11 @@ class PubsubServer {
         retry:   10
       })
 
-      es.on('open', (data) => {
+      this.sseConnections.set(connectionID, es)
+
+      es.on('open', (event) => {
         console.log('Got "open" event inside connect.js.')
+        // console.log('res', res)
       })
 
       // Periodically send messages
@@ -29,12 +31,16 @@ class PubsubServer {
       
       es.on('close', function() {
         // clearInterval(loop)
-        console.log('got close event')
+        console.log('got close event', connectionID)
         // TODO: Remove from sseSubscriptions and sseConnections before closing
-        es = null
+        // es = null
       })
 
-      this.sseConnections.set(connectionID, es)
+      es.on('error', function(e, e2) {
+        console.log(e, e2)
+      })
+
+      return next()
     
     } else {
       res.status(400).send('This endpoint is meant to be accessed from an EventSource')
@@ -42,7 +48,11 @@ class PubsubServer {
   }
 
   sendMessage(connectionID, message) {
-    this.sseConnections.get(connectionID).send(JSON.stringify(message))
+    const se = this.sseConnections.get(connectionID)
+    console.log(connectionID, se.readyState)
+    if (se.readyState === 1) {
+      se.send(JSON.stringify(message))
+    }
   }
 
   /**
