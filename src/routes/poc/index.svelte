@@ -4,15 +4,21 @@
 
 	import io from 'socket.io-client'
 	
-  // import {getClient} from '@matrx/realtime'
-	// let pubsubClient 
+	import {getClient} from '@matrx/svelte-realtime-store'
 	
 	let socket
+	let realtimeClient
 
   onMount(() => {
-		// pubsubClient = getClient()
+		realtimeClient = getClient()
+		console.log(realtimeClient._namespace)
+		// a = realtime()
+		// $a = 100
+		// console.log($a)
+
 		socket = io()
 		socket.on('connect', function(e){
+			// Join rooms here. That way they'll be rejoined once reconnected
 			console.log('connected', e)
 		})
   	socket.on('event', function(data){
