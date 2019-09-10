@@ -1,7 +1,6 @@
+import http from 'http'
 import sirv from 'sirv'
 import express from 'express'
-import http from 'http'
-// import polka from 'polka'
 import socketIO from 'socket.io'
 import compression from 'compression'
 import * as sapper from '@sapper/server'
@@ -12,7 +11,6 @@ import bodyParser from 'body-parser'
 const { PORT, NODE_ENV } = process.env
 const dev = NODE_ENV === 'development'
 
-// const app = polka(server)
 const app = express()
 const server = http.createServer(app)
 const io = socketIO(server)
@@ -64,6 +62,5 @@ app.use(
 )
 
 server.listen(PORT, err => {
-// app.listen(PORT, err => {
 	if (err) console.log('error', err);
 })
