@@ -40,14 +40,18 @@ class Client {
         this.previouslyOpened = true  
       }
       if (callback) {
+        console.log('there was a callback')
         return callback(null, e)
       }
     }
 
     this.eventSource.onerror = (e) => {
-      if (this.eventSource.readyState === 2) {
-        this.init()  // TODO: delay by this.retryIn
-      } else if (! this.eventSource.readyState === 0) {
+      console.log('got error. readyState', this.eventSource.readyState, e)
+      if (this.eventSource.readyState == 2) {
+        this.eventSource.close()
+        // this.eventSource = null
+        setTimeout(this.init, this._retryIn)  // TODO: delay by this.retryIn
+      } else if (this.eventSource.readyState !== 0) {
         console.log('eventSource.readyState', this.eventSource.readyState)
         console.log('Inside eventSource.onerror')
         console.log('e:', e)
@@ -78,7 +82,7 @@ class Client {
  * 
  */
 function getClient(path, callback) {
-  client.init(path, callback)
+  client.init(path, callback)  // TODO: Need to gate this so it's only called once per instance
   
   return client
 }
