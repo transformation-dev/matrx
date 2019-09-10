@@ -24,8 +24,7 @@
     "helmet": "^3.20.0",
     "sirv": "^0.4.0",
     "socket.io": "^2.2.0",
-    "socket.io-client": "^2.2.0",
-    "url-composer": "^1.15.0"
+    "socket.io-client": "^2.2.0"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",

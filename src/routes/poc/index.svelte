@@ -2,8 +2,6 @@
   import { writable } from 'svelte/store'
   import {onMount} from 'svelte'
 
-  import urlComposer from 'url-composer'
-	
 	import io from 'socket.io-client'
 	
   // import {getClient} from '@matrx/realtime'
