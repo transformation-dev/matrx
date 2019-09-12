@@ -1,4 +1,7 @@
-'use strict'
+const io = require('socket.io-client')
+const socket = io()
+
+
 
 // From svelte
 const subscriber_queue = []
@@ -10,19 +13,25 @@ function safe_not_equal(a, b) {
 class Client { 
 
   constructor(namespace) {
-    // super()
-    this._namespace = 'MatrX'
+    this._namespace = namespace || Client.DEFAULT_NAMESPACE
+
+    socket.on('connect', function(e){
+      // Join rooms here. That way they'll be rejoined once reconnected
+      console.log('connected', e)
+    })
+    socket.on('event', function(data){
+      console.log('web socket event', data)
+    })
+    socket.on('disconnect', function(e){
+      console.log('disconnected', e)
+    })
   }
 
-  init(namespace) {
-    this._namespace = namespace || this._namespace
+  emit(...args) {
+    socket.emit(...args)
   }
 
-  // realtime(id, startingValue) {
-  //   let start = noop
-  //   let value = startingValue
   realtime(id, value, start = noop) {
-
     let stop
     const subscribers = []
 
@@ -77,13 +86,17 @@ class Client {
 
 }
 
+Client.DEFAULT_NAMESPACE = 'svelte-realtime-store'
+
 function getClient(namespace) {
-  client.init(namespace)
+  if (! client) {
+    client = new Client(namespace)
+  }
   return client
 }
 
-function getServer() {}
+let client
 
-const client = new Client()
+function getServer() {}
 
 module.exports = {getClient, getServer}
