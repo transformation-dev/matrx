@@ -11,23 +11,24 @@
 	
 	const realtimeClient = getClient()
 	const a = realtimeClient.realtime(JSON.stringify($page) + '.a', 1000)
+	const b = realtimeClient.realtime(JSON.stringify($page) + '.b', 2000)
 
   onMount(() => {
-		$a = 150
+		// $a = 100
+		// $b = 200
 	})
-  
-  function handleMessage(event) {
-		console.log('inside handleMessage')
-  	a.emit('set', {say: 'something'})
+	
+	function handleA(event) {
+		$a = $a + 1
 	}
 	
-	function handleClick(event) {
-		$a = $a + 1
+	function handleB(event) {
+		$b++
   }
   
-
 </script>
 
 <h1>{$a}</h1>
-<button on:click={handleMessage} class="button">Message</button>
-<button on:click={handleClick} class="button">Click me</button>
+<button on:click={handleA} class="button">a++</button>
+<h2>{$b}</h2>
+<button on:click={handleB} class="button">b++</button>

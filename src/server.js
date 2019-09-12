@@ -15,22 +15,26 @@ const app = express()
 const server = http.createServer(app)
 const io = socketIO(server)
 const nsp = io.of('/svelte-realtime-store')  // TODO: Make this be configurable
+const cachedValues = new Map()
 
 nsp.on('connection', socket => {
 	console.log('got socket.io connection event')
-  socket.on('event', data => { 
-		console.log('got event', data)
-	})
   socket.on('disconnect', () => { 
 		console.log('got disconnect')
 	})
-	socket.on('join', room => {
-		console.log('\non server got join event:', room)
-		socket.join(room)
+	socket.on('join', (storeID, value) => {
+		console.log('\non server got join event:', storeID, value)
+		socket.join(storeID)
+		const cachedValue = cachedValues.get(storeID)
+		if (cachedValue) {
+			value = cachedValue
+		}
+		socket.to(storeID).emit('set', value)
 	})
-	socket.on('set', (id, value) => {
-		console.log('got set on server', id, value)
-		socket.to(id).emit('set', value)
+	socket.on('set', (storeID, value) => {
+		console.log('got set on server', storeID, value)
+		cachedValues.set(storeID, value)  // TODO: Need to delete values when everyone is disconnected
+		socket.to(storeID).emit('set', value)
 	})
 })
 

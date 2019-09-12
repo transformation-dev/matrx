@@ -26,7 +26,7 @@ class Client {
     socket.on('connect', function(){
       // Join rooms here. That way they'll be rejoined once reconnected
       console.log('connected')
-      socket.emit('join', id)
+      socket.emit('join', id, value)
     })
     socket.on('set', function(value){
       console.log('got set event', value)
@@ -75,6 +75,8 @@ class Client {
       if (subscribers.length === 1) {
         stop = start(set) || noop;
       }
+
+      // Fetch cached value from server before calling run()
       run(value);
   
       return () => {
