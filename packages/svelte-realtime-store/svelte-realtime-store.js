@@ -17,7 +17,8 @@ class Client {
     this.socket.emit(...args)
   }
 
-  realtime(id, value, start = noop) {
+  realtime(storeID, default_value, start = noop) {
+    let value
     let stop
     const subscribers = []
 
@@ -25,11 +26,12 @@ class Client {
 
     socket.on('connect', function(){
       // Join rooms here. That way they'll be rejoined once reconnected
-      console.log('connected')
-      socket.emit('join', id, value)
+      console.log('socket.on("connect") value, default_value', value, default_value)
+      socket.emit('join', storeID, value)
     })
     socket.on('set', function(value){
-      console.log('got set event', value)
+      console.log('socket.on("set") value, default_value', value, default_value)
+      // console.log('got set event', value)
       _set(value)
     })
     socket.on('disconnect', function(msg){
@@ -37,15 +39,19 @@ class Client {
     })
 
     function set(new_value) {
+      console.log('set(new_value) value, default_value, new_value', value, default_value, new_value)
+      
       if (safe_not_equal(value, new_value)) {
         if (stop) { // store is ready
-          socket.emit('set', id, new_value)
+          socket.emit('set', storeID, new_value)
           _set(new_value)
         }
       }
     }
 
     function _set(new_value) {
+      console.log('_set(new_value) value, default_value, new_value', value, default_value, new_value)
+      
       if (safe_not_equal(value, new_value)) {
         value = new_value;
         if (stop) { // store is ready
@@ -77,7 +83,15 @@ class Client {
       }
 
       // Fetch cached value from server before calling run()
-      run(value);
+      console.log('subscribe() value, default_value', value, default_value)
+      if (! value) {
+        value = default_value
+      }
+      socket.emit('get', storeID, value, default_value, (got_value) => {
+        value = got_value
+        run(value)
+      })
+      // run(value);
   
       return () => {
         const index = subscribers.indexOf(subscriber);

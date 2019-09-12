@@ -36,6 +36,12 @@ nsp.on('connection', socket => {
 		cachedValues.set(storeID, value)  // TODO: Need to delete values when everyone is disconnected
 		socket.to(storeID).emit('set', value)
 	})
+	socket.on('get', (storeID, value, default_value, callback) => {
+		console.log('got get event on server', storeID, value, default_value, callback)
+		const cachedValue = cachedValues.get(storeID)
+		value = cachedValue || value || default_value
+		return callback(value)
+	})
 })
 
 app.use((req, res, next) => {
