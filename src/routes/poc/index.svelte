@@ -22,7 +22,7 @@
 	}
 	
 	function handleClick(event) {
-		$a++
+		$a = $a + 1
   }
   
 

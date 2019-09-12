@@ -30,7 +30,7 @@ class Client {
     })
     socket.on('set', function(value){
       console.log('got set event', value)
-      set(value)
+      _set(value)
     })
     socket.on('disconnect', function(msg){
       console.log('disconnected', msg)  // TODO: Update something on the screen to show you are offline
@@ -38,9 +38,17 @@ class Client {
 
     function set(new_value) {
       if (safe_not_equal(value, new_value)) {
+        if (stop) { // store is ready
+          socket.emit('set', id, new_value)
+          _set(new_value)
+        }
+      }
+    }
+
+    function _set(new_value) {
+      if (safe_not_equal(value, new_value)) {
         value = new_value;
         if (stop) { // store is ready
-          socket.emit('set', id, value)
           const run_queue = !subscriber_queue.length;
           for (let i = 0; i < subscribers.length; i += 1) {
             const s = subscribers[i];

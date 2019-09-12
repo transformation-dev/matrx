@@ -26,10 +26,6 @@ nsp.on('connection', socket => {
 	})
 	socket.on('join', room => {
 		console.log('\non server got join event:', room)
-		// socket.broadcast.emit('event', {
-		// 	username: socket.username,
-		// 	message: data
-		// })
 		socket.join(room)
 	})
 	socket.on('set', (id, value) => {
