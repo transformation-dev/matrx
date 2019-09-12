@@ -1,7 +1,4 @@
-const io = require('socket.io-client')
-const socket = io()
-
-
+const io = require('socket.io-client')  // TODO: change this to import once it's no longer experimental in node.js
 
 // From svelte
 const subscriber_queue = []
@@ -14,33 +11,36 @@ class Client {
 
   constructor(namespace) {
     this._namespace = namespace || Client.DEFAULT_NAMESPACE
-
-    socket.on('connect', function(e){
-      // Join rooms here. That way they'll be rejoined once reconnected
-      console.log('connected', e)
-    })
-    socket.on('event', function(data){
-      console.log('web socket event', data)
-    })
-    socket.on('disconnect', function(e){
-      console.log('disconnected', e)
-    })
   }
 
   emit(...args) {
-    socket.emit(...args)
+    this.socket.emit(...args)
   }
 
   realtime(id, value, start = noop) {
     let stop
     const subscribers = []
 
-    function connect(){}
-  
+    const socket = io(this._namespace)
+
+    socket.on('connect', function(){
+      // Join rooms here. That way they'll be rejoined once reconnected
+      console.log('connected')
+      socket.emit('join', id)
+    })
+    socket.on('set', function(value){
+      console.log('got set event', value)
+      set(value)
+    })
+    socket.on('disconnect', function(msg){
+      console.log('disconnected', msg)  // TODO: Update something on the screen to show you are offline
+    })
+
     function set(new_value) {
       if (safe_not_equal(value, new_value)) {
         value = new_value;
         if (stop) { // store is ready
+          socket.emit('set', id, value)
           const run_queue = !subscriber_queue.length;
           for (let i = 0; i < subscribers.length; i += 1) {
             const s = subscribers[i];
@@ -86,7 +86,7 @@ class Client {
 
 }
 
-Client.DEFAULT_NAMESPACE = 'svelte-realtime-store'
+Client.DEFAULT_NAMESPACE = '/svelte-realtime-store'
 
 function getClient(namespace) {
   if (! client) {
@@ -99,4 +99,4 @@ let client
 
 function getServer() {}
 
-module.exports = {getClient, getServer}
+module.exports = {getClient, getServer}  // TODO: Eventually change this to export once supported

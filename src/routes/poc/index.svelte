@@ -18,11 +18,11 @@
   
   function handleMessage(event) {
 		console.log('inside handleMessage')
-  	realtimeClient.emit('my broadcast', {say: 'something'})
+  	a.emit('set', {say: 'something'})
 	}
 	
 	function handleClick(event) {
-  	$a++
+		$a++
   }
   
 

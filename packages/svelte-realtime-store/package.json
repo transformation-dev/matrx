@@ -16,6 +16,7 @@
   "homepage": "https://github.com/matrx-transformation/matrx/packages/svelte-realtime-store#readme",
   "license": "MIT",
   "main": "svelte-realtime-store.js",
+  "type": "module",
   "directories": {
     "test": "__tests__"
   },

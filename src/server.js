@@ -14,21 +14,27 @@ const dev = NODE_ENV === 'development'
 const app = express()
 const server = http.createServer(app)
 const io = socketIO(server)
+const nsp = io.of('/svelte-realtime-store')  // TODO: Make this be configurable
 
-io.on('connection', socket => {
+nsp.on('connection', socket => {
 	console.log('got socket.io connection event')
   socket.on('event', data => { 
 		console.log('got event', data)
 	})
-	socket.on('my broadcast', data => {
-		console.log('\non server inside my broadcast:', data)
-		socket.broadcast.emit('event', {
-			username: socket.username,
-			message: data
-		})
-	})
   socket.on('disconnect', () => { 
 		console.log('got disconnect')
+	})
+	socket.on('join', room => {
+		console.log('\non server got join event:', room)
+		// socket.broadcast.emit('event', {
+		// 	username: socket.username,
+		// 	message: data
+		// })
+		socket.join(room)
+	})
+	socket.on('set', (id, value) => {
+		console.log('got set on server', id, value)
+		socket.to(id).emit('set', value)
 	})
 })
 
