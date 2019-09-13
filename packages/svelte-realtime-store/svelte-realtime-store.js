@@ -121,6 +121,4 @@ function getClient(namespace) {
 
 let client
 
-function getServer() {}
-
-module.exports = {getClient, getServer}  // TODO: Eventually change this to export once supported
+module.exports = {getClient}  // TODO: Eventually change this to export once supported

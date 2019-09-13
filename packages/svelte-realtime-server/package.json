@@ -1,7 +1,7 @@
 {
-  "name": "@matrx/svelte-realtime-store",
+  "name": "@matrx/svelte-realtime-server",
   "version": "0.1.1",
-  "description": "Browser-side stores and server-side middleware to building realtime apps",
+  "description": "Server-side middleware to building realtime apps",
   "keywords": [
     "realtime",
     "real-time",
@@ -15,7 +15,7 @@
   "author": "Larry Maccherone <Larry@Maccherone.com>",
   "homepage": "https://github.com/matrx-transformation/matrx/packages/svelte-realtime-store#readme",
   "license": "MIT",
-  "main": "svelte-realtime-store.js",
+  "main": "svelte-realtime-server.js",
   "type": "module",
   "directories": {
     "test": "__tests__"
@@ -34,7 +34,7 @@
     "url": "https://github.com/matrx-transformation/matrx/issues"
   },
   "dependencies": {
-    "socket.io-client": "^2.2.0",
+    "socket.io": "^2.2.0",
     "svelte": "^3.12.0"
   }
 }
