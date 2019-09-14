@@ -1,6 +1,6 @@
 {
   "name": "@matrx/svelte-realtime-server",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Server-side middleware to building realtime apps",
   "keywords": [
     "realtime",
