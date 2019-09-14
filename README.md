@@ -1,8 +1,19 @@
+
+# `@matrx/matrx`
+
+This is the repository for the [MatrX](https://matrx.co) product.
+
+## Licence
+
+All of the components found in the packages folder are open sourced under the MIT license but this main project is not open source licensed... eventhough the source is currently "open". For now, feel free to look at the code in this main project as an example for how to use the open sourced components and of course, we'd love for you to use the open sourced components. Please contact us if you wish to use this parent project for commercial purposes.
+
+## Notes for development
+
+### Developing on a Chromebook
+
 On the Chromebook, I needed to hack the node_modules/sapper/sapper-dev-client.js by commenting out the entire contents of the connect function. This disables live reload but it didn't work anyway and this way we don't get an error message every few seconds.
 
-Consult [sapper.svelte.dev](https://sapper.svelte.dev) for help getting started.
-
-## Using external components
+### Using external components
 
 When using Svelte components installed from npm, such as [@sveltejs/svelte-virtual-list](https://github.com/sveltejs/svelte-virtual-list), Svelte needs the original component source (rather than any precompiled JavaScript that ships with the component). This allows the component to be rendered server-side, and also keeps your client-side app smaller.
 

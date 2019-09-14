@@ -1,4 +1,5 @@
 const io = require('socket.io-client')  // TODO: change this to import once it's no longer experimental in node.js
+const {readable} = require('svelte/store')
 
 // From svelte
 const subscriber_queue = []
@@ -12,6 +13,15 @@ class Client {
   constructor(namespace) {
     this._namespace = namespace || Client.DEFAULT_NAMESPACE
     this.socket = io(this._namespace)
+    this.connected = readable(false, (set) => {
+      this.socket.on('disconnect', () => {
+        set(false)
+      })
+      this.socket.on('connect', () => {
+        set(true)
+      })
+      return noop  // I think noop is OK here because I don't think I need to unregister the handlers above, but maybe?
+    })
   }
 
   realtime(storeID, default_value, start = noop) {
@@ -20,7 +30,6 @@ class Client {
     const subscribers = []
 
     const socket = io(this._namespace)
-    // socket.storeID = storeID
 
     socket.on('connect', function(){
       // Join rooms here. That way they'll be rejoined once reconnected
@@ -70,11 +79,12 @@ class Client {
         stop = start(set) || noop;
       }
 
-      // Fetch cached value from server before calling run()
       if (! value) {
         value = default_value
       }
-      socket.emit('initialize', storeID, value, (got_value) => {
+
+      // Fetch cached value from server before calling run()
+      socket.emit('initialize', storeID, value, (got_value) => {  // TODO: What should we do if initialize is never called back?
         value = got_value
         run(value)
       })

@@ -18,10 +18,8 @@
 	realtimeClient.socket.on('connect', () => {
 		console.log('You are now connected!')
 	})
-	realtimeClient.socket.on('reconnect', () => {
-		console.log('You have reconnected!')
-	})
-	
+
+	const connected = realtimeClient.connected
 	
 	function handleA(event) {
 		$a = $a + 1
@@ -33,6 +31,7 @@
   
 </script>
 
+<h1>{$connected}</h1>
 <h1>{$a}</h1>
 <button on:click={handleA} class="button">a++</button>
 <h2>{$b}</h2>
