@@ -11,10 +11,7 @@ class Client {
 
   constructor(namespace) {
     this._namespace = namespace || Client.DEFAULT_NAMESPACE
-  }
-
-  emit(...args) {
-    this.socket.emit(...args)
+    this.socket = io(this._namespace)
   }
 
   realtime(storeID, default_value, start = noop) {
@@ -23,24 +20,17 @@ class Client {
     const subscribers = []
 
     const socket = io(this._namespace)
+    // socket.storeID = storeID
 
     socket.on('connect', function(){
       // Join rooms here. That way they'll be rejoined once reconnected
-      console.log('socket.on("connect") value, default_value', value, default_value)
       socket.emit('join', storeID, value)
     })
     socket.on('set', function(value){
-      console.log('socket.on("set") value, default_value', value, default_value)
-      // console.log('got set event', value)
       _set(value)
-    })
-    socket.on('disconnect', function(msg){
-      console.log('disconnected', msg)  // TODO: Update something on the screen to show you are offline
     })
 
     function set(new_value) {
-      console.log('set(new_value) value, default_value, new_value', value, default_value, new_value)
-      
       if (safe_not_equal(value, new_value)) {
         if (stop) { // store is ready
           socket.emit('set', storeID, new_value)
@@ -50,8 +40,6 @@ class Client {
     }
 
     function _set(new_value) {
-      console.log('_set(new_value) value, default_value, new_value', value, default_value, new_value)
-      
       if (safe_not_equal(value, new_value)) {
         value = new_value;
         if (stop) { // store is ready
@@ -83,15 +71,13 @@ class Client {
       }
 
       // Fetch cached value from server before calling run()
-      console.log('subscribe() value, default_value', value, default_value)
       if (! value) {
         value = default_value
       }
-      socket.emit('get', storeID, value, default_value, (got_value) => {
+      socket.emit('initialize', storeID, value, (got_value) => {
         value = got_value
         run(value)
       })
-      // run(value);
   
       return () => {
         const index = subscribers.indexOf(subscriber);

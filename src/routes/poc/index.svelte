@@ -4,19 +4,24 @@
 	import { stores } from '@sapper/app'
 	const { preloading, page, session } = stores()
 
-	// import io from 'socket.io-client'
-	// let socket
-
 	import {getClient} from '@matrx/svelte-realtime-store'
 	
 	const realtimeClient = getClient()
 	const a = realtimeClient.realtime(JSON.stringify($page) + '.a', 1000)
 	const b = realtimeClient.realtime(JSON.stringify($page) + '.b', 2000)
 
-  onMount(() => {
-		// $a = 100
-		// $b = 200
+	// onMount(() => {})
+	
+	realtimeClient.socket.on('disconnect', () => {
+		console.log('You are no longer connected!')
 	})
+	realtimeClient.socket.on('connect', () => {
+		console.log('You are now connected!')
+	})
+	realtimeClient.socket.on('reconnect', () => {
+		console.log('You have reconnected!')
+	})
+	
 	
 	function handleA(event) {
 		$a = $a + 1

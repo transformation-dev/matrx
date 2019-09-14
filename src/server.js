@@ -8,7 +8,6 @@ import helmet from 'helmet'
 import bodyParser from 'body-parser'
 
 import {getServer} from '@matrx/svelte-realtime-server'
-console.log('getServer', getServer)
 
 const { PORT, NODE_ENV } = process.env
 const dev = NODE_ENV === 'development'
