@@ -14,7 +14,7 @@ const dev = NODE_ENV === 'development'
 
 const app = express()
 const server = http.createServer(app)
-const nsp = getServer(server)
+const nsp = getServer(server)  // TODO: Use nsp to publish changes that come in over REST API
   
 
 app.use((req, res, next) => {

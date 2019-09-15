@@ -84,7 +84,7 @@ class Client {
       }
 
       // Fetch cached value from server before calling run()
-      socket.emit('initialize', storeID, value, (got_value) => {  // TODO: What should we do if initialize is never called back?
+      socket.emit('initialize', storeID, value, (got_value) => {  // TODO: What should we do if this callback is never called?
         value = got_value
         run(value)
       })
