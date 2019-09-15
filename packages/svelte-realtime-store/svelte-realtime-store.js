@@ -25,6 +25,7 @@ class Client {
   }
 
   realtime(storeID, default_value, start = noop) {
+    storeID = typeof(storeID)=="string" ? storeID : JSON.stringify(storeID)
     let value
     let stop
     const subscribers = []
