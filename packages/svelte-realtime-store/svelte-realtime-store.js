@@ -107,7 +107,7 @@ class Client {
 
 }
 
-Client.DEFAULT_NAMESPACE = '/svelte-realtime-store'
+Client.DEFAULT_NAMESPACE = '/svelte-realtime'
 
 function getClient(namespace) {
   if (! client) {

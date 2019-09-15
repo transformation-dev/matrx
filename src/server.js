@@ -8,13 +8,17 @@ import helmet from 'helmet'
 import bodyParser from 'body-parser'
 
 import {getServer} from '@matrx/svelte-realtime-server'
+import {getAdapter} from '@matrx/svelte-realtime-adapter-cosmos-db'
+import {getCoordinator} from '@matrx/svelte-realtime-coordinator'
 
 const { PORT, NODE_ENV } = process.env
 const dev = NODE_ENV === 'development'
 
 const app = express()
 const server = http.createServer(app)
-const nsp = getServer(server)  // TODO: Use nsp to publish changes that come in over REST API
+const nsp = getServer(server)
+const adapter = getAdapter()
+const coordinator = getCoordinator(server, nsp, adapter)
   
 
 app.use((req, res, next) => {
