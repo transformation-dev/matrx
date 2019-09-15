@@ -1,6 +1,6 @@
 const socketIO = require('socket.io')
 
-const DEFAULT_NAMESPACE = '/svelte-realtime-store'
+const DEFAULT_NAMESPACE = '/svelte-realtime'
 
 function getServer(server, namespace) {
   const io = socketIO(server)
