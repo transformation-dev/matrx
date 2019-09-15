@@ -1,7 +1,7 @@
 {
   "name": "matrx",
   "description": "MatrX main application",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "scripts": {
     "dev": "npm run css:watch & sapper dev",
@@ -16,8 +16,8 @@
   },
   "dependencies": {
     "@azure/cosmos": "^3.1.0",
-    "@matrx/svelte-realtime-server": "^0.2.0",
-    "@matrx/svelte-realtime-store": "^0.2.0",
+    "@matrx/svelte-realtime-server": "^0.3.0",
+    "@matrx/svelte-realtime-store": "^0.3.0",
     "body-parser": "^1.19.0",
     "compression": "^1.7.1",
     "express": "^4.17.1",
