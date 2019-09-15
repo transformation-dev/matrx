@@ -1,7 +1,7 @@
 {
   "name": "@matrx/svelte-realtime-store",
   "version": "0.2.0",
-  "description": "Browser-side stores and server-side middleware to building realtime apps",
+  "description": "Browser-side stores and server-side middleware for building realtime Svelte apps",
   "keywords": [
     "realtime",
     "real-time",
@@ -13,7 +13,7 @@
     "websocket"
   ],
   "author": "Larry Maccherone <Larry@Maccherone.com>",
-  "homepage": "https://github.com/matrx-transformation/matrx/packages/svelte-realtime-store#readme",
+  "homepage": "https://github.com/matrx-transformation/matrx/tree/master/packages/svelte-realtime-store#readme",
   "license": "MIT",
   "main": "svelte-realtime-store.js",
   "type": "module",
@@ -25,7 +25,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/matrx-transformation/matrx.git"
+    "url": "https://github.com/matrx-transformation/matrx/tree/master/packages/svelte-realtime-store"
   },
   "scripts": {
     "test": "echo \"Error: run tests from root\" && exit 1"
