@@ -7,32 +7,17 @@
 	import {getClient} from '@matrx/svelte-realtime-store'
 	
 	const realtimeClient = getClient()
-	const a = realtimeClient.realtime(JSON.stringify($page) + '.a', 1000)
-	const b = realtimeClient.realtime(JSON.stringify($page) + '.b', 2000)
+	const a = realtimeClient.realtimeSaver({_entityID: 'ABC123'}, 2000)
 
 	// onMount(() => {})
-	
-	realtimeClient.socket.on('disconnect', () => {
-		console.log('You are no longer connected!')
-	})
-	realtimeClient.socket.on('connect', () => {
-		console.log('You are now connected!')
-	})
 
 	const connected = realtimeClient.connected
 	
 	function handleA(event) {
 		$a = $a + 1
 	}
-	
-	function handleB(event) {
-		$b++
-  }
   
 </script>
 
-<h1>{$connected}</h1>
 <h1>{$a}</h1>
-<button on:click={handleA} class="button">a++</button>
-<h2>{$b}</h2>
-<button on:click={handleB} class="button">b++</button>
+<button on:click={handleA} class="button" disabled="{!$connected}">a++</button>

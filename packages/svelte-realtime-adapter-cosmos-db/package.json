@@ -38,5 +38,6 @@
     "url": "https://github.com/matrx-transformation/matrx/issues"
   },
   "dependencies": {
+    "@azure/cosmos": "^3.2.0"
   }
 }

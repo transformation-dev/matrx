@@ -16,11 +16,10 @@ const dev = NODE_ENV === 'development'
 
 const app = express()
 const server = http.createServer(app)
-const nsp = getServer(server)
 const adapter = getAdapter()
+const nsp = getServer(server)
 const coordinator = getCoordinator(server, nsp, adapter)
   
-
 app.use((req, res, next) => {
 	res.locals.nonce = uuidv4()
 	next()
