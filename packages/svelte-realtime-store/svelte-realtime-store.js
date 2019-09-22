@@ -10,19 +10,29 @@ function safe_not_equal(a, b) {
 
 class Client { 
 
-  constructor(namespace) {
-    this._namespace = namespace || Client.DEFAULT_NAMESPACE
+  constructor(namespace = Client.DEFAULT_NAMESPACE) {
+    this._namespace = namespace
+    this._username = null
+    this._password = null
     this.socket = io(this._namespace)
     this.connected = readable(false, (set) => {
-      this.socket.on('disconnect', () => {
-        set(false)
-      })
-      this.socket.on('connect', () => {
-        set(true)
-      })
+      // if (this.socket) {
+        this.socket.on('disconnect', () => {
+          set(false)
+        })
+        this.socket.on('connect', () => {
+          set(true)
+        })
+      // }
       return noop  // I think noop is OK here because I don't think I need to unregister the handlers above, but maybe?
     })
   }
+
+  // connect(username, password) {
+  //   this._username = username
+  //   this._password = password
+  //   this.socket = io(this._namespace)
+  // }
 
   realtime(storeConfig, default_value, component = null, debounceDelay = 0, start = noop) {
     // TODO: Debounce changes such that we don't attempt the save until after debounceDelay
@@ -33,9 +43,9 @@ class Client {
 
     const socket = io(this._namespace)
 
-    socket.on('connect', function(){
+    socket.on('connect', function(){  // TODO: Need to join rooms in two places. Once when the store is intialized. Again on reconnect like here.
       // Join rooms here. That way they'll be rejoined once reconnected
-      socket.emit('join', storeID, value)
+      socket.emit('join', storeID, value)  // TODO: Switch this to storeConfig
     })
     socket.on('set', function(value){
       _set(value)
