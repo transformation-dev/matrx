@@ -1,7 +1,7 @@
 {
-  "name": "@matrx/svelte-realtime-adapter-cosmos-db",
+  "name": "@matrx/svelte-realtime-adapter-cosmos-db-temporal",
   "version": "0.3.2",
-  "description": "Cosmos DB database adapter for svelte-realtime-coordinator and svelte-realtime-store",
+  "description": "Cosmos DB database adapter (temporal) for svelte-realtime-store/server",
   "keywords": [
     "realtime",
     "real-time",
@@ -19,7 +19,7 @@
   "author": "Larry Maccherone <Larry@Maccherone.com>",
   "homepage": "https://github.com/matrx-transformation/matrx/tree/master/packages/svelte-realtime-adapter-cosmos-db#readme",
   "license": "MIT",
-  "main": "svelte-realtime-adapter-cosmos-db.js",
+  "main": "svelte-realtime-adapter-cosmos-db-temporal.js",
   "type": "module",
   "directories": {
     "test": "__tests__"
@@ -29,7 +29,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/matrx-transformation/matrx/tree/master/packages/svelte-realtime-adapter-cosmos-db"
+    "url": "https://github.com/matrx-transformation/matrx/tree/master/packages/svelte-realtime-adapter-cosmos-db-temporal"
   },
   "scripts": {
     "test": "echo \"Error: run tests from root\" && exit 1"

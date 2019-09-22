@@ -17,8 +17,7 @@
   "dependencies": {
     "@matrx/svelte-realtime-server": "^0.3.2",
     "@matrx/svelte-realtime-store": "^0.3.3",
-    "@matrx/svelte-realtime-coordinator": "^0.3.2",
-    "@matrx/svelte-realtime-adapter-cosmos-db": "^0.3.2",
+    "@matrx/svelte-realtime-adapter-cosmos-db-temporal": "^0.3.2",
     "body-parser": "^1.19.0",
     "compression": "^1.7.1",
     "express": "^4.17.1",
