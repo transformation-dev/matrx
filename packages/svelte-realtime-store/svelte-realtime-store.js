@@ -24,8 +24,9 @@ class Client {
     })
   }
 
-  realtime(storeID, default_value, start = noop) {
-    storeID = typeof(storeID)=="string" ? storeID : JSON.stringify(storeID)
+  realtime(storeConfig, default_value, component = null, debounceDelay = 0, start = noop) {
+    // TODO: Debounce changes such that we don't attempt the save until after debounceDelay
+    const storeID = storeConfig.storeID || JSON.stringify(storeConfig)
     let value
     let stop
     const subscribers = []

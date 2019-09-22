@@ -7,7 +7,7 @@
 	import {getClient} from '@matrx/svelte-realtime-store'
 	
 	const realtimeClient = getClient()
-	const a = realtimeClient.realtimeSaver({_entityID: 'ABC123'}, 2000)
+	const a = realtimeClient.realtime({_entityID: 'ABC123'}, 2000)
 
 	// onMount(() => {})
 

@@ -8,17 +8,36 @@ import helmet from 'helmet'
 import bodyParser from 'body-parser'
 
 import {getServer} from '@matrx/svelte-realtime-server'
-import {getAdapter} from '@matrx/svelte-realtime-adapter-cosmos-db'
-import {getCoordinator} from '@matrx/svelte-realtime-coordinator'
+const adapters = {
+	'cosmos-db-temporal': require('@matrx/svelte-realtime-adapter-cosmos-db-temporal')
+}
 
 const { PORT, NODE_ENV } = process.env
 const dev = NODE_ENV === 'development'
 
+function authenticate(socket, data, callback) {
+  var username = data.username
+	var password = data.password
+	const user = {hashedPassword: 'abc', salt: '123'}
+	function hash(password, salt) {
+		return 'abc'
+	}
+	if (!user) return callback(new Error('User not found'))
+	if (err) return callback(err)
+	return callback(null, user.hashedPassword === hash(password, user.salt))
+  // db.findUser('User', {username:username}, function(err, user) {
+  //   if (err || !user) return callback(new Error("User not found"))
+  //   return callback(null, user.password == password)
+  // })
+}
+
+function postAuthenticate(socket, data) {
+  socket.client.username = data.username
+}
+
 const app = express()
 const server = http.createServer(app)
-const adapter = getAdapter()
-const nsp = getServer(server)
-const coordinator = getCoordinator(server, nsp, adapter)
+const nsp = getServer(server, adapters, {authenticate, postAuthenticate})
   
 app.use((req, res, next) => {
 	res.locals.nonce = uuidv4()

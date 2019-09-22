@@ -2,9 +2,9 @@ const socketIO = require('socket.io')
 
 const DEFAULT_NAMESPACE = '/svelte-realtime'
 
-function getServer(server, namespace) {
+function getServer(server, adapters, authConfig, namespace = DEFAULT_NAMESPACE) {
   const io = socketIO(server)
-  const nsp = io.of(namespace || DEFAULT_NAMESPACE)
+  const nsp = io.of(namespace)
 
   nsp.on('connection', socket => {
     // socket.on('disconnect', () => {})
