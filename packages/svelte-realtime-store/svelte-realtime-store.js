@@ -1,5 +1,5 @@
 const io = require('socket.io-client')  // TODO: change this to import once it's no longer experimental in node.js
-const {readable} = require('svelte/store')
+const { writable, readable } = require('svelte/store')
 
 // From svelte
 const subscriber_queue = []
@@ -12,27 +12,51 @@ class Client {
 
   constructor(namespace = Client.DEFAULT_NAMESPACE) {
     this._namespace = namespace
-    this._username = null
-    this._password = null
-    this.socket = io(this._namespace)
-    this.connected = readable(false, (set) => {
-      // if (this.socket) {
-        this.socket.on('disconnect', () => {
-          set(false)
-        })
-        this.socket.on('connect', () => {
-          set(true)
-        })
-      // }
-      return noop  // I think noop is OK here because I don't think I need to unregister the handlers above, but maybe?
-    })
+    this.credentials = {}
+    // this.socket = io(this._namespace)
+    this.connected = writable(false)
+    this.authenticated = writable(false)
+    // this.connected = readable(false, (set) => {
+    //   // if (this.socket) {
+    //     this.socket.on('disconnect', () => {
+    //       set(false)
+    //     })
+    //     this.socket.on('connect', () => {
+    //       set(true)
+    //     })
+    //   // }
+    //   return noop  // I think noop is OK here because I don't think I need to unregister the handlers above, but maybe?
+    // })
   }
 
-  // connect(username, password) {
-  //   this._username = username
-  //   this._password = password
-  //   this.socket = io(this._namespace)
-  // }
+  authenticate(credentials) {
+    if (credentials) this.credentials = credentials
+    console.log(this.credentials)
+    this.socket = io(this._namespace)
+    socket.on('connect', function(){
+      socket.emit('authentication', this.credentials);
+      socket.on('authenticated', function() {
+        this.authenticated.set(true)
+        this.connected.set(true)
+      })
+    }
+   
+    // this.authenticated = writable(false)
+   
+    // this.connected = writable(false)
+
+    // this.connected = readable(false, (set) => {
+    //   // if (this.socket) {
+    //     this.socket.on('disconnect', () => {
+    //       set(false)
+    //     })
+    //     this.socket.on('connect', () => {
+    //       set(true)
+    //     })
+    //   // }
+    //   return noop  // I think noop is OK here because I don't think I need to unregister the handlers above, but maybe?
+    // })
+  }
 
   realtime(storeConfig, default_value, component = null, debounceDelay = 0, start = noop) {
     // TODO: Debounce changes such that we don't attempt the save until after debounceDelay
@@ -43,7 +67,7 @@ class Client {
 
     const socket = io(this._namespace)
 
-    socket.on('connect', function(){  // TODO: Need to join rooms in two places. Once when the store is intialized. Again on reconnect like here.
+    socket.on('connect', function(){ 
       // Join rooms here. That way they'll be rejoined once reconnected
       socket.emit('join', storeID, value)  // TODO: Switch this to storeConfig
     })
