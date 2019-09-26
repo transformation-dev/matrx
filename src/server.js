@@ -16,6 +16,7 @@ const { PORT, NODE_ENV } = process.env
 const dev = NODE_ENV === 'development'
 
 function authenticate(socket, data, callback) {
+	console.log('got here')
   var username = data.username
 	var password = data.password
 	const user = {hashedPassword: 'abc', salt: '123'}
@@ -23,7 +24,7 @@ function authenticate(socket, data, callback) {
 		return 'abc'
 	}
 	if (!user) return callback(new Error('User not found'))
-	if (err) return callback(err)
+	// if (err) return callback(err)
 	return callback(null, user.hashedPassword === hash(password, user.salt))
   // db.findUser('User', {username:username}, function(err, user) {
   //   if (err || !user) return callback(new Error("User not found"))
@@ -31,13 +32,9 @@ function authenticate(socket, data, callback) {
   // })
 }
 
-function postAuthenticate(socket, data) {
-  socket.client.username = data.username
-}
-
 const app = express()
 const server = http.createServer(app)
-const nsp = getServer(server, adapters, {authenticate, postAuthenticate})
+const nsp = getServer(server, adapters, authenticate)
   
 app.use((req, res, next) => {
 	res.locals.nonce = uuidv4()

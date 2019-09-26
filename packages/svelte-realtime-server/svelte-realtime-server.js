@@ -3,12 +3,11 @@ const socketIOAuth = require('socketio-auth')
 
 const DEFAULT_NAMESPACE = '/svelte-realtime'
 
-function getServer(server, adapters, authConfig, namespace = DEFAULT_NAMESPACE) {
+function getServer(server, adapters, authenticate, namespace = DEFAULT_NAMESPACE) {
   const io = socketIO(server)
   const nsp = io.of(namespace)
-  socketIOAuth(nsp, authConfig)
-
-  nsp.on('connection', socket => {
+  
+  function postAuthenticate(socket) {
     // socket.on('disconnect', () => {})
     socket.on('join', (storeID, value) => {
       socket.join(storeID)
@@ -52,7 +51,9 @@ function getServer(server, adapters, authConfig, namespace = DEFAULT_NAMESPACE) 
       }
       return callback(value)
     })
-  })
+  }
+
+  socketIOAuth(nsp, { authenticate, postAuthenticate })
 
   return nsp
 }

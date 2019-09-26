@@ -12,7 +12,7 @@
 
 	// onMount(() => {})
 
-	const connected = realtimeClient.connected
+	// const connected = realtimeClient.connected
 	
 	function handleLogin(event) {
 		realtimeClient.authenticate({username: 'username', password: 'password'})
