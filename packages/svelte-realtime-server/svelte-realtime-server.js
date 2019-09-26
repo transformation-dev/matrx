@@ -1,10 +1,12 @@
 const socketIO = require('socket.io')
+const socketIOAuth = require('socketio-auth')
 
 const DEFAULT_NAMESPACE = '/svelte-realtime'
 
 function getServer(server, adapters, authConfig, namespace = DEFAULT_NAMESPACE) {
   const io = socketIO(server)
   const nsp = io.of(namespace)
+  socketIOAuth(nsp, authConfig)
 
   nsp.on('connection', socket => {
     // socket.on('disconnect', () => {})

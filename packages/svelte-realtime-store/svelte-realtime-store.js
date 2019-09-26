@@ -16,46 +16,29 @@ class Client {
     // this.socket = io(this._namespace)
     this.connected = writable(false)
     this.authenticated = writable(false)
-    // this.connected = readable(false, (set) => {
-    //   // if (this.socket) {
-    //     this.socket.on('disconnect', () => {
-    //       set(false)
-    //     })
-    //     this.socket.on('connect', () => {
-    //       set(true)
-    //     })
-    //   // }
-    //   return noop  // I think noop is OK here because I don't think I need to unregister the handlers above, but maybe?
-    // })
   }
 
   authenticate(credentials) {
-    if (credentials) this.credentials = credentials
+    if (credentials) this.credentials = credentials  // This is an if in case we call this later
     console.log(this.credentials)
-    this.socket = io(this._namespace)
+    this.socket = io(this._namespace)  // TODO: Confirm this works when we log out and back in again. The worry is that the page will have a handle to the old this.socket. As long as we redirect to the login page, we should be OK. We'll have to define the pattern on the page to sense when authenticated is changed. Maybe that's in _layout?
     socket.on('connect', function(){
-      socket.emit('authentication', this.credentials);
+      this.connected.set(true)
+      socket.emit('authentication', this.credentials)
       socket.on('authenticated', function() {
         this.authenticated.set(true)
-        this.connected.set(true)
       })
-    }
-   
-    // this.authenticated = writable(false)
-   
-    // this.connected = writable(false)
-
-    // this.connected = readable(false, (set) => {
-    //   // if (this.socket) {
-    //     this.socket.on('disconnect', () => {
-    //       set(false)
-    //     })
-    //     this.socket.on('connect', () => {
-    //       set(true)
-    //     })
-    //   // }
-    //   return noop  // I think noop is OK here because I don't think I need to unregister the handlers above, but maybe?
-    // })
+      socket.on('disconnect', () => {
+        this.connected.set(false)
+        this.authenticated.set(false)  // When you are disconnected, you are automatically unauthenticated
+      })
+      socket.on('unathenticated', () => {  // Not sure this is needed. When someone is being kicked out from the server, we'll just disconnect which will unauthenticate them
+        this.authenticated.set(false)
+      })
+      socket.on('unauthorized', function(err){  // This is for when there is an error
+        console.log(err.message)
+      })
+    })
   }
 
   realtime(storeConfig, default_value, component = null, debounceDelay = 0, start = noop) {
