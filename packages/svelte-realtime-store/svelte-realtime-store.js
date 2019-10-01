@@ -15,7 +15,6 @@ class Client {
     this.credentials = {}
     this.connected = writable(false)
     this.authenticated = false
-    // this.socket = {emit: function(){console.log('got emit')}}
     this.socket = null
     this.stores = {}
   }
@@ -27,22 +26,14 @@ class Client {
       this.connected.set(true)
       this.socket.emit('authentication', this.credentials)
       this.socket.on('authenticated', () => {
-        console.log('authenticated inside of login()!!!')
-
         this.socket.on('set', function(storeID, value){
           client.stores[storeID]._set(value)
         })
-
-        this.socket.emit('join', Object.keys(this.stores))
-
-        // for (const storeID in this.stores) {
-        //   console.log(storeID, this.stores[storeID])
-        //   // Join rooms here. That way they'll be rejoined once reconnected
-        //   this.socket.emit('join', storeID)
-        //   this.socket.on('set', function(value){
-        //     client.stores[storeID]._set(value)
-        //   })
-        // }
+        const storesReshaped = []
+        for (let storeID in client.stores) {
+          storesReshaped.push({storeID, value: client.stores[storeID].get()})
+        }
+        this.socket.emit('join', storesReshaped)
         this.authenticated = true
         callback(null)
       })
@@ -50,11 +41,12 @@ class Client {
         this.connected.set(false)
         this.authenticated = false  // When you are disconnected, you are automatically unauthenticated
       })
-      // this.socket.on('unathenticated', () => {  // Not sure this is needed. When someone is being kicked out from the server, we'll just disconnect which will unauthenticate them
+      // this.socket.on('unathenticated', () => {  // Pretty sure we don't need this. When someone is being kicked out from the server, we'll just disconnect which will unauthenticate them
       //   this.authenticated = false
       // })
       this.socket.on('unauthorized', (err) => {  // This is for when there is an error
-        console.log(err.message)
+        this.authenticated = false
+        this.connected.set(false)
         callback(new Error('unauthorized'))
       })
     })
@@ -76,6 +68,10 @@ class Client {
           _set(new_value)
         }
       }
+    }
+
+    function get() {
+      return value
     }
 
     function _set(new_value) {
@@ -113,12 +109,7 @@ class Client {
         value = default_value
       }
 
-      // Fetch cached value from server before calling run()
-      // socket.emit('initialize', storeID, value, (got_value) => {  // TODO: What should we do if this callback is never called?
-      //   value = got_value
-      //   run(value)
-      // })
-      run(value)
+      run(value)  // Note, this could be quickly overwritten if there is a cached value on the server
   
       return () => {
         const index = subscribers.indexOf(subscriber);
@@ -132,8 +123,8 @@ class Client {
       };
     }
   
-    client.stores[storeID] = { set, _set, update, subscribe }
-    return { set, update, subscribe }
+    client.stores[storeID] = { get, set, _set, update, subscribe }
+    return { get, set, update, subscribe }
   }
 
   realtimeEntitySaver(_entityID, default_value, component = null, debounceDelay = 0, start = noop) {
@@ -164,9 +155,6 @@ class Client {
       if (safe_not_equal(value, new_value)) {
         if (stop) { // store is ready
           _set(new_value)  // Latency compensation
-          // The below POST can be fire and forget because there will be "revert" and "saved" events that come back down later
-          // TODO: Compose this POST to the operations endpoint. Send socket.sessionid.
-          // fetch()  // TODO: Add delay with setInterval or rather the other Javascript function to delay execution          
         }
       }
     }
@@ -211,8 +199,6 @@ class Client {
       socket.emit('initialize', storeID, value, (got_value) => {  // TODO: What should we do if this callback is never called?
         value = got_value
         run(value)  // TODO: Confirm that value stays undefined until fetch. This should only be non-null if it's already cached
-        // This POST is fire and forget since the set event will come down over web-sockets
-        // fetch(_entityID, default_value)  // TODO: Compose this fetch
       })
   
       return () => {

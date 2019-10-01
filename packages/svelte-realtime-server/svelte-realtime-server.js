@@ -8,47 +8,27 @@ function getServer(server, adapters, authenticate, namespace = DEFAULT_NAMESPACE
   const nsp = io.of(namespace)
   
   function postAuthenticate(socket) {
-    // socket.on('disconnect', () => {})
+    // socket.on('disconnect', () => {})  // Since we're storing everything in the nsp's socket or room, we shouldn't need any additional cleanup
 
-    // socket.on('join', (storeID, value) => {
-    //   socket.join(storeID)
-    //   const room = nsp.adapter.rooms[storeID]
-    //   if (room) {  // There should always be a room but better safe
-    //     const cachedValue = room.cachedValue
-    //     if (cachedValue) {
-    //       value = cachedValue
-    //       return socket.emit('set', storeID, value)
-    //     } else {
-    //       room.cachedValue = value
-    //       return socket.to(storeID).emit('set', storeID, value)
-    //     }
-    //   }
-    //   socket.to(storeID).emit('set', storeID, value)  // I don't think we need this but leaving it just in case
-    // })
-
-    socket.on('join', (storeIDs) => {
-      for (const storeID of storeIDs) {
+    socket.on('join', (stores) => {
+      for (const {storeID, value} of stores) {
         socket.join(storeID)
-      }
-      return
-      socket.join(storeID)
-      const room = nsp.adapter.rooms[storeID]
-      if (room) {  // There should always be a room but better safe
-        const cachedValue = room.cachedValue
-        if (cachedValue) {
-          value = cachedValue
-          return socket.emit('set', storeID, value)
+        const room = nsp.adapter.rooms[storeID]
+        if (room) {  // There should always be a room but better safe
+          const cachedValue = room.cachedValue
+          if (cachedValue) {
+            socket.emit('set', storeID, cachedValue)
+          } else {
+            room.cachedValue = value
+            socket.to(storeID).emit('set', storeID, value)
+          }
         } else {
-          room.cachedValue = value
-          return socket.to(storeID).emit('set', storeID, value)
+          throw new Error('No room for storeID: ' + storeID)
         }
       }
-      socket.to(storeID).emit('set', storeID, value)  // I don't think we need this but leaving it just in case
     })
 
-
     socket.on('set', (storeID, value) => {
-      console.log('got set for ', storeID)
       let room = nsp.adapter.rooms[storeID]
       if (!room) {
         socket.join(storeID)
@@ -58,22 +38,6 @@ function getServer(server, adapters, authenticate, namespace = DEFAULT_NAMESPACE
         room.cachedValue = value
       }
       socket.to(storeID).emit('set', storeID, value)
-    })
-    socket.on('initialize', (storeID, value, callback) => {
-      let room = nsp.adapter.rooms[storeID]
-      if (!room) {
-        socket.join(storeID)
-        room = nsp.adapter.rooms[storeID]
-      }
-      if (room) {  // There should always be a room here now
-        const cachedValue = room.cachedValue
-        if (cachedValue) {
-          value = cachedValue
-        } else {
-          room.cachedValue = value
-        }
-      }
-      return callback(value)
     })
   }
 
