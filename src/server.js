@@ -26,6 +26,7 @@ function authenticate(socket, data, callback) {
 	if (!user) return callback(new Error('User not found'))
 	// if (err) return callback(err)
 	return callback(null, user.hashedPassword === hash(password, user.salt))
+	// return callback(null, false)
   // db.findUser('User', {username:username}, function(err, user) {
   //   if (err || !user) return callback(new Error("User not found"))
   //   return callback(null, user.password == password)

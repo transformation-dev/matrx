@@ -13,33 +13,49 @@ class Client {
   constructor(namespace = Client.DEFAULT_NAMESPACE) {
     this._namespace = namespace
     this.credentials = {}
-    // this.socket = io(this._namespace)
     this.connected = writable(false)
-    console.log('this.connected', this.connected)
-    this.authenticated = writable(false)
+    this.authenticated = false
+    // this.socket = {emit: function(){console.log('got emit')}}
+    this.socket = null
+    this.stores = {}
   }
 
-  authenticate(credentials) {
+  login(credentials, callback) {
     if (credentials) this.credentials = credentials  // This is an if in case we call this later
-    console.log(this.credentials)
     this.socket = io(this._namespace)  // TODO: Confirm this works when we log out and back in again. The worry is that the page will have a handle to the old this.socket. As long as we redirect to the login page, we should be OK. We'll have to define the pattern on the page to sense when authenticated is changed. Maybe that's in _layout?
     this.socket.on('connect',() => {
-      console.log('this.connected', this.connected)
       this.connected.set(true)
       this.socket.emit('authentication', this.credentials)
       this.socket.on('authenticated', () => {
-        console.log('authenticated!!!')
-        this.authenticated.set(true)
+        console.log('authenticated inside of login()!!!')
+
+        this.socket.on('set', function(storeID, value){
+          client.stores[storeID]._set(value)
+        })
+
+        this.socket.emit('join', Object.keys(this.stores))
+
+        // for (const storeID in this.stores) {
+        //   console.log(storeID, this.stores[storeID])
+        //   // Join rooms here. That way they'll be rejoined once reconnected
+        //   this.socket.emit('join', storeID)
+        //   this.socket.on('set', function(value){
+        //     client.stores[storeID]._set(value)
+        //   })
+        // }
+        this.authenticated = true
+        callback(null)
       })
       this.socket.on('disconnect', () => {
         this.connected.set(false)
-        this.authenticated.set(false)  // When you are disconnected, you are automatically unauthenticated
+        this.authenticated = false  // When you are disconnected, you are automatically unauthenticated
       })
-      this.socket.on('unathenticated', () => {  // Not sure this is needed. When someone is being kicked out from the server, we'll just disconnect which will unauthenticate them
-        this.authenticated.set(false)
-      })
+      // this.socket.on('unathenticated', () => {  // Not sure this is needed. When someone is being kicked out from the server, we'll just disconnect which will unauthenticate them
+      //   this.authenticated = false
+      // })
       this.socket.on('unauthorized', (err) => {  // This is for when there is an error
         console.log(err.message)
+        callback(new Error('unauthorized'))
       })
     })
   }
@@ -51,20 +67,12 @@ class Client {
     let stop
     const subscribers = []
 
-    const socket = io(this._namespace)
-
-    socket.on('connect', function(){ 
-      // Join rooms here. That way they'll be rejoined once reconnected
-      socket.emit('join', storeID, value)  // TODO: Switch this to storeConfig
-    })
-    socket.on('set', function(value){
-      _set(value)
-    })
+    client.stores[storeID] = this
 
     function set(new_value) {
       if (safe_not_equal(value, new_value)) {
         if (stop) { // store is ready
-          socket.emit('set', storeID, new_value)
+          client.socket.emit('set', storeID, new_value)
           _set(new_value)
         }
       }
@@ -106,10 +114,11 @@ class Client {
       }
 
       // Fetch cached value from server before calling run()
-      socket.emit('initialize', storeID, value, (got_value) => {  // TODO: What should we do if this callback is never called?
-        value = got_value
-        run(value)
-      })
+      // socket.emit('initialize', storeID, value, (got_value) => {  // TODO: What should we do if this callback is never called?
+      //   value = got_value
+      //   run(value)
+      // })
+      run(value)
   
       return () => {
         const index = subscribers.indexOf(subscriber);
@@ -123,7 +132,8 @@ class Client {
       };
     }
   
-    return { set, update, subscribe };
+    client.stores[storeID] = { set, _set, update, subscribe }
+    return { set, update, subscribe }
   }
 
   realtimeEntitySaver(_entityID, default_value, component = null, debounceDelay = 0, start = noop) {
