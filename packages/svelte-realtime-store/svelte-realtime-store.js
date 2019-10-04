@@ -12,30 +12,57 @@ class Client {
 
   constructor(namespace = Client.DEFAULT_NAMESPACE) {
     this._namespace = namespace
-    this.credentials = {}
     this.connected = writable(false)
     this.authenticated = false
     this.socket = null
-    this.stores = {}
+    this.stores = {}  // {storeID: store}
+    this.components = {}  // {storeID: component}
+  }
+
+  afterAuthenticatedOrSessionRestored(callback) {
+    this.socket.on('new-session', function(sessionID) {
+      console.log('got new session', sessionID)  // TODO: Save this to SessionStorage
+    })
+    this.socket.on('set', function(storeID, value){
+      client.stores[storeID]._set(value)
+    })
+    this.socket.on('revert', function(storeID, value){
+      // TODO: Send "revert" event to component
+      client.stores[storeID]._set(value)
+    })
+    this.socket.on('saved', function(storeID){
+      // TODO: Send "saved" event to component
+    })
+    const storesReshaped = []
+    for (let storeID in client.stores) {
+      storesReshaped.push({storeID, value: client.stores[storeID].get()})
+    }
+    this.socket.emit('join', storesReshaped)
+    this.connected.set(true)
+    this.authenticated = true
+    callback(null)
+  }
+
+  restoreSession(callback) {
+    // TODO: Look up sessionID in SessionStorage
+    const sessionID = 'something strange'
+    if (sessionID) {
+      this.socket = io(this._namespace)  // TODO: Confirm this works when we log out and back in again. The worry is that the page will have a handle to the old this.socket. As long as we redirect to the login page, we should be OK. We'll have to define the pattern on the page to sense when authenticated is changed. Maybe that's in _layout?
+      const sessionRestored = false
+      if (sessionRestored) {
+        this.afterAuthenticatedOrSessionRestored(callback)
+      } else {
+        callback('session-failed-to-restore')
+      }
+    }
   }
 
   login(credentials, callback) {
-    if (credentials) this.credentials = credentials  // This is an if in case we call this later
     this.socket = io(this._namespace)  // TODO: Confirm this works when we log out and back in again. The worry is that the page will have a handle to the old this.socket. As long as we redirect to the login page, we should be OK. We'll have to define the pattern on the page to sense when authenticated is changed. Maybe that's in _layout?
     this.socket.on('connect',() => {
-      this.connected.set(true)
-      this.socket.emit('authentication', this.credentials)
+      this.socket.emit('authentication', credentials)
       this.socket.on('authenticated', () => {
-        this.socket.on('set', function(storeID, value){
-          client.stores[storeID]._set(value)
-        })
-        const storesReshaped = []
-        for (let storeID in client.stores) {
-          storesReshaped.push({storeID, value: client.stores[storeID].get()})
-        }
-        this.socket.emit('join', storesReshaped)
-        this.authenticated = true
-        callback(null)
+        this.afterAuthenticatedOrSessionRestored(callback)
       })
       this.socket.on('disconnect', () => {
         this.connected.set(false)
@@ -58,8 +85,6 @@ class Client {
     let value
     let stop
     const subscribers = []
-
-    client.stores[storeID] = this
 
     function set(new_value) {
       if (safe_not_equal(value, new_value)) {
@@ -123,97 +148,9 @@ class Client {
       };
     }
   
+    if (component) client.components[storeID] = component
     client.stores[storeID] = { get, set, _set, update, subscribe }
     return { get, set, update, subscribe }
-  }
-
-  realtimeEntitySaver(_entityID, default_value, component = null, debounceDelay = 0, start = noop) {
-    // TODO: Debounce changes such that we don't attempt the save until after debounceDelay
-    const storeID = JSON.stringify({_entityID})
-    let value
-    let stop
-    const subscribers = []
-
-    const socket = io(this._namespace)
-
-    socket.on('connect', function(){
-      // Join rooms here. That way they'll be rejoined once reconnected
-      socket.emit('join', storeID, value)
-    })
-    socket.on('set', function(value){
-      _set(value)
-    })
-    socket.on('revert', function(value){
-      // TODO: Send "revert" event to component
-      _set(value)
-    })
-    socket.on('saved', function(){
-      // TODO: Send "saved" event to component
-    })
-
-    function set(new_value) {
-      if (safe_not_equal(value, new_value)) {
-        if (stop) { // store is ready
-          _set(new_value)  // Latency compensation
-        }
-      }
-    }
-
-    function _set(new_value) {
-      if (safe_not_equal(value, new_value)) {
-        value = new_value;
-        if (stop) { // store is ready
-          const run_queue = !subscriber_queue.length;
-          for (let i = 0; i < subscribers.length; i += 1) {
-            const s = subscribers[i];
-            s[1]();
-            subscriber_queue.push(s, value);
-          }
-          if (run_queue) {
-            for (let i = 0; i < subscriber_queue.length; i += 2) {
-              subscriber_queue[i][0](subscriber_queue[i + 1]);
-            }
-            subscriber_queue.length = 0;
-          }
-        }
-      }
-    }
-  
-    function update(fn) {
-      set(fn(value))
-    }
-  
-    function subscribe(run, invalidate = noop) {
-      const subscriber = [run, invalidate];
-      subscribers.push(subscriber);
-      if (subscribers.length === 1) {
-        stop = start(set) || noop;
-      }
-
-      // The below is left over from the realtime store. I don't think we need it here. Better for it to stay null or undefined until the initial fetch
-      // if (! value) {
-      //   value = default_value
-      // }
-
-      // Fetch cached value from server before calling run()
-      socket.emit('initialize', storeID, value, (got_value) => {  // TODO: What should we do if this callback is never called?
-        value = got_value
-        run(value)  // TODO: Confirm that value stays undefined until fetch. This should only be non-null if it's already cached
-      })
-  
-      return () => {
-        const index = subscribers.indexOf(subscriber);
-        if (index !== -1) {
-          subscribers.splice(index, 1);
-        }
-        if (subscribers.length === 0) {
-          stop();
-          stop = null;
-        }
-      };
-    }
-  
-    return { set, update, subscribe };
   }
 
 }
@@ -229,4 +166,4 @@ function getClient(namespace) {
 
 let client
 
-module.exports = {getClient}  // TODO: Eventually change this to export once supported
+module.exports = { getClient }  // TODO: Eventually change this to export once supported

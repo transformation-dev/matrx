@@ -16,7 +16,6 @@ const { PORT, NODE_ENV } = process.env
 const dev = NODE_ENV === 'development'
 
 function authenticate(socket, data, callback) {
-	console.log('got here')
   var username = data.username
 	var password = data.password
 	const user = {hashedPassword: 'abc', salt: '123'}

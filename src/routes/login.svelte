@@ -1,17 +1,22 @@
 <script>
-	// import {onMount} from 'svelte'
+  import {onMount} from 'svelte'
 	import { stores, goto } from '@sapper/app'
 	const { preloading, page, session } = stores()
-	// import { hrefFromPath } from '../utils.js'
 	import {getClient} from '@matrx/svelte-realtime-store'
 	
-	// const origin = hrefFromPath($page.query.origin)
 	const origin = $page.query.origin
 	const realtimeClient = getClient()
 
-	// onMount(() => {})
-
-	// const connected = realtimeClient.connected
+	onMount(() => {
+		realtimeClient.restoreSession(async (err) => {
+			if (err) {
+				console.log('session failed to restore')
+			} else {
+				console.log('session restored. returning you to', origin)
+				await goto(origin)
+			}
+		})
+	})
 	
 	function handleLogin(event) {
 		realtimeClient.login({username: 'username', password: 'password'}, async (err) => {

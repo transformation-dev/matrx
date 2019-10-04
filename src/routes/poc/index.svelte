@@ -27,8 +27,6 @@
 	})
 
 	const connected = realtimeClient.connected
-
-	if (!connected) {console.log('not connected')}
 	
 	function handleA(event) {
 		$a = $a + 1
