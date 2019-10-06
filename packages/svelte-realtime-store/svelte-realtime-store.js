@@ -44,14 +44,6 @@ class Client {
     callback(null)
   }
 
-  restoreSession(callback) {
-    const sessionID = window.localStorage.getItem('sessionID')
-    const username = window.localStorage.getItem('username')
-    if (sessionID) {
-      this.login({sessionID, username}, callback)
-    }
-  }
-
   login(credentials, callback) {
     this.socket = io(this._namespace)  // TODO: Confirm this works when we log out and back in again. The worry is that the page will have a handle to the old this.socket. As long as we redirect to the login page, we should be OK. We'll have to define the pattern on the page to sense when authenticated is changed. Maybe that's in _layout?
     this.socket.on('connect',() => {
@@ -72,6 +64,21 @@ class Client {
         callback(new Error('unauthorized'))
       })
     })
+  }
+
+  restoreSession(callback) {
+    const sessionID = window.localStorage.getItem('sessionID')
+    const username = window.localStorage.getItem('username')
+    if (sessionID) {
+      this.login({sessionID, username}, callback)
+    }
+  }
+
+  logout(callback) {
+    window.localStorage.removeItem('sessionID')
+    this.socket = io(this._namespace)
+    this.socket.disconnect()
+    callback()
   }
 
   realtime(storeConfig, default_value, component = null, debounceDelay = 0, start = noop) {

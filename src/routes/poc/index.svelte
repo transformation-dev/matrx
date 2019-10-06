@@ -47,4 +47,3 @@
 <button on:click={handleA} class="button" disabled="{!$connected}">a++</button>
 <h1>{$b}</h1>
 <button on:click={handleB} class="button" disabled="{!$connected}">b++</button>
-

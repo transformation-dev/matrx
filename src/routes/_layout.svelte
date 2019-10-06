@@ -1,7 +1,16 @@
 <script>
-	import Nav from '../components/Nav.svelte';
+	import { goto } from '@sapper/app'
+	import Nav from '../components/Nav.svelte'
+	import { getClient } from '@matrx/svelte-realtime-store'
+	const realtimeClient = getClient()
 
-	export let segment;
+	function handleLogout(event) {
+		realtimeClient.logout(() => {
+			goto('/login?origin=/')
+		})
+	}
+
+	export let segment
 </script>
 
 <style>
@@ -16,6 +25,8 @@
 </style>
 
 <Nav {segment}/>
+
+<button on:click={handleLogout}>Logout</button>
 
 <main>
 	<slot></slot>
