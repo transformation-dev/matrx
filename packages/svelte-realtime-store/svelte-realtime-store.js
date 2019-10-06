@@ -19,7 +19,7 @@ class Client {
     this.components = {}  // {storeID: component}
   }
 
-  afterAuthenticatedOrSessionRestored(callback) {
+  afterAuthenticated(callback) {
     this.socket.on('new-session', function(sessionID, username) {
       window.localStorage.setItem('sessionID', sessionID)
       window.localStorage.setItem('username', username)
@@ -57,7 +57,7 @@ class Client {
     this.socket.on('connect',() => {
       this.socket.emit('authentication', credentials)
       this.socket.on('authenticated', () => {
-        this.afterAuthenticatedOrSessionRestored(callback)
+        this.afterAuthenticated(callback)
       })
       this.socket.on('disconnect', () => {
         this.connected.set(false)
@@ -129,8 +129,14 @@ class Client {
         value = default_value
       }
 
-      run(value)  // Note, this could be quickly overwritten if there is a cached value on the server
-  
+      if (client.socket) {
+        client.socket.emit('initialize', storeID, value, (value) => {
+          run(value)
+        })
+      } else {
+        run(value)
+      }
+      
       return () => {
         const index = subscribers.indexOf(subscriber);
         if (index !== -1) {

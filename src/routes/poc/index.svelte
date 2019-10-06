@@ -17,16 +17,21 @@
 
 	import {getClient} from '@matrx/svelte-realtime-store'
 	const realtimeClient = getClient()
+	const connected = realtimeClient.connected
+
+	// let a = writable()
+	// let b = writable()
 	const a = realtimeClient.realtime({_entityID: 'A'}, 2000)
 	const b = realtimeClient.realtime({_entityID: 'B'}, 4000)
 
 	onMount(() => {
 		if (! realtimeClient.authenticated) {
 		  return goto('login?origin=' + window.location.href)
+		} else {
+			// a = realtimeClient.realtime({_entityID: 'A'}, 2000)
+	    // b = realtimeClient.realtime({_entityID: 'B'}, 4000)
 		}
 	})
-
-	const connected = realtimeClient.connected
 	
 	function handleA(event) {
 		$a = $a + 1

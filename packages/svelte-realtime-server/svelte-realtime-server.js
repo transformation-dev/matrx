@@ -26,7 +26,6 @@ function getServer(server, adapters, authenticate, namespace = DEFAULT_NAMESPACE
   function postAuthenticate(socket, data) {  // TODO: How do we get the user into this function?
     // socket.on('disconnect', () => {})  // Since we're storing everything in the nsp's socket or room, we shouldn't need any additional cleanup
 
-    console.log('in postAuthenticate', data)
     const user = {username: 'username'}  // TODO: Get the real user data somehow
     // const user = {username: 'username', sessionID: 'sessionID'}
     if (! data.sessionID) {
@@ -66,6 +65,16 @@ function getServer(server, adapters, authenticate, namespace = DEFAULT_NAMESPACE
       }
       socket.to(storeID).emit('set', storeID, value)
     })
+
+    socket.on('initialize', (storeID, defaultValue, callback) => {
+      let room = nsp.adapter.rooms[storeID]
+      if (room && room.cachedValue) {
+        callback(room.cachedValue)
+      } else {
+        callback(defaultValue)
+      }
+    })
+
   }
 
   socketIOAuth(nsp, { authenticate: wrappedAuthenticate, postAuthenticate })
