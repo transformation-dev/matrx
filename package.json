@@ -1,7 +1,7 @@
 {
   "name": "matrx",
   "description": "MatrX main application",
-  "version": "0.3.3",
+  "version": "0.4.0",
   "private": true,
   "scripts": {
     "dev": "npm run css:watch & sapper dev",
@@ -15,9 +15,9 @@
     "css:watch": "npm run css:build -- --watch"
   },
   "dependencies": {
-    "@matrx/svelte-realtime-adapter-cosmos-db-temporal": "^0.3.2",
-    "@matrx/svelte-realtime-server": "^0.3.2",
-    "@matrx/svelte-realtime-store": "^0.3.3",
+    "@matrx/svelte-realtime-adapter-cosmos-db-temporal": "^0.4.0",
+    "@matrx/svelte-realtime-server": "^0.4.0",
+    "@matrx/svelte-realtime-store": "^0.4.0",
     "body-parser": "^1.19.0",
     "compression": "^1.7.1",
     "express": "^4.17.1",
