@@ -1,6 +1,7 @@
 // const crypto = require('crypto')
 const socketIO = require('socket.io')
 const socketIOAuth = require('socketio-auth')
+const uuidv4 = require('uuid/v4')
 
 const DEFAULT_NAMESPACE = '/svelte-realtime'
 
@@ -8,17 +9,31 @@ function getServer(server, adapters, authenticate, namespace = DEFAULT_NAMESPACE
   const io = socketIO(server)
   const nsp = io.of(namespace)
   const sessions = {}
+
+  function wrappedAuthenticate(socket, data, callback) {
+    if (data.sessionID) {
+      const session = sessions[data.sessionID]
+      if (session) {
+        return callback(null, true)
+      } else {
+        authenticate(socket, data, callback)
+      }
+    } else {
+      authenticate(socket, data, callback)
+    }
+  }
   
-  function postAuthenticate(socket) {  // TODO: How do we get the user into this function?
+  function postAuthenticate(socket, data) {  // TODO: How do we get the user into this function?
     // socket.on('disconnect', () => {})  // Since we're storing everything in the nsp's socket or room, we shouldn't need any additional cleanup
 
-    // const user = {username: 'username'}
-    // // const user = {username: 'username', sessionID: 'sessionID'}
-    // if (! user.sessionID) {
-    //   const sessionID = 'some GUID'  // TODO: Really generate a GUID
-    //   sessions[sessionID] = user
-    //   socket.emit('new-session', sessionID)
-    // }
+    console.log('in postAuthenticate', data)
+    const user = {username: 'username'}  // TODO: Get the real user data somehow
+    // const user = {username: 'username', sessionID: 'sessionID'}
+    if (! data.sessionID) {
+      const sessionID = uuidv4()
+      sessions[sessionID] = user
+      socket.emit('new-session', sessionID, user.username)
+    }
 
     socket.on('join', (stores) => {
       for (const {storeID, value} of stores) {
@@ -53,7 +68,7 @@ function getServer(server, adapters, authenticate, namespace = DEFAULT_NAMESPACE
     })
   }
 
-  socketIOAuth(nsp, { authenticate, postAuthenticate })
+  socketIOAuth(nsp, { authenticate: wrappedAuthenticate, postAuthenticate })
 
   return nsp
 }

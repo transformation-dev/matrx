@@ -20,8 +20,9 @@ class Client {
   }
 
   afterAuthenticatedOrSessionRestored(callback) {
-    this.socket.on('new-session', function(sessionID) {
-      console.log('got new session', sessionID)  // TODO: Save this to SessionStorage
+    this.socket.on('new-session', function(sessionID, username) {
+      window.localStorage.setItem('sessionID', sessionID)
+      window.localStorage.setItem('username', username)
     })
     this.socket.on('set', function(storeID, value){
       client.stores[storeID]._set(value)
@@ -44,16 +45,10 @@ class Client {
   }
 
   restoreSession(callback) {
-    // TODO: Look up sessionID in SessionStorage
-    const sessionID = 'something strange'
+    const sessionID = window.localStorage.getItem('sessionID')
+    const username = window.localStorage.getItem('username')
     if (sessionID) {
-      this.socket = io(this._namespace)  // TODO: Confirm this works when we log out and back in again. The worry is that the page will have a handle to the old this.socket. As long as we redirect to the login page, we should be OK. We'll have to define the pattern on the page to sense when authenticated is changed. Maybe that's in _layout?
-      const sessionRestored = false
-      if (sessionRestored) {
-        this.afterAuthenticatedOrSessionRestored(callback)
-      } else {
-        callback('session-failed-to-restore')
-      }
+      this.login({sessionID, username}, callback)
     }
   }
 
