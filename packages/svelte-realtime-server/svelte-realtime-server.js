@@ -8,12 +8,13 @@ const DEFAULT_NAMESPACE = '/svelte-realtime'
 function getServer(server, adapters, authenticate, namespace = DEFAULT_NAMESPACE) {
   const io = socketIO(server)
   const nsp = io.of(namespace)
-  const sessions = {}
+  const sessions = {}  // {sessionID: {sessionID, user, sockets: Set()}}
 
   function wrappedAuthenticate(socket, data, callback) {
     if (data.sessionID) {
       const session = sessions[data.sessionID]
       if (session) {
+        session.sockets.add(socket)
         return callback(null, true)
       } else {
         authenticate(socket, data, callback)
@@ -30,7 +31,8 @@ function getServer(server, adapters, authenticate, namespace = DEFAULT_NAMESPACE
     // const user = {username: 'username', sessionID: 'sessionID'}
     if (! data.sessionID) {
       const sessionID = uuidv4()
-      sessions[sessionID] = user
+      const session = {sessionID, user, sockets: new Set([socket])}
+      sessions[sessionID] = session
       socket.emit('new-session', sessionID, user.username)
     }
 
@@ -73,6 +75,13 @@ function getServer(server, adapters, authenticate, namespace = DEFAULT_NAMESPACE
       } else {
         callback(defaultValue)
       }
+    })
+
+    socket.on('logout', (sessionID) => {
+      const session = sessions[sessionID]
+      session.sockets.forEach((socket) => {
+        socket.disconnect()
+      })
     })
 
   }

@@ -75,10 +75,9 @@ class Client {
   }
 
   logout(callback) {
+    const sessionID = window.localStorage.getItem('sessionID')
     window.localStorage.removeItem('sessionID')
-    this.socket = io(this._namespace)
-    this.socket.disconnect()
-    callback()
+    this.socket.emit('logout', sessionID)
   }
 
   realtime(storeConfig, default_value, component = null, debounceDelay = 0, start = noop) {
