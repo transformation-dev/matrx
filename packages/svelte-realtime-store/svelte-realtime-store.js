@@ -1,6 +1,6 @@
 // const io = require('socket.io-client')  // This was not working with rollup for my SPA so I now load it from the server in my index.html
 
-const {writable, readable} = require('svelte/store')
+const {writable} = require('svelte/store')
 
 // From svelte
 const subscriber_queue = []
