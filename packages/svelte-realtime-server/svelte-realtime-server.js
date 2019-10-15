@@ -1,4 +1,5 @@
 // const crypto = require('crypto')
+
 const socketIO = require('socket.io')
 const socketIOAuth = require('socketio-auth')
 const uuidv4 = require('uuid/v4')
@@ -9,6 +10,12 @@ function getServer(server, adapters, authenticate, namespace = DEFAULT_NAMESPACE
   const io = socketIO(server)
   const nsp = io.of(namespace)
   const sessions = {}  // {sessionID: {sessionID, user, sockets: Set()}}
+
+  if (! authenticate) {
+    authenticate = function(socket, data, callback) {
+      return callback(null, true)
+    }
+  }
 
   function wrappedAuthenticate(socket, data, callback) {
     if (data.sessionID) {
@@ -24,19 +31,17 @@ function getServer(server, adapters, authenticate, namespace = DEFAULT_NAMESPACE
     }
   }
   
-  function postAuthenticate(socket, data) {  // TODO: How do we get the user into this function?
+  function postAuthenticate(socket, user) {  // TODO: How do we get the user into this function?
     // socket.on('disconnect', () => {})  // Since we're storing everything in the nsp's socket or room, we shouldn't need any additional cleanup
 
-    const user = {username: 'username'}  // TODO: Get the real user data somehow
-    // const user = {username: 'username', sessionID: 'sessionID'}
-    if (! data.sessionID) {
+    if (! user.sessionID) {
       const sessionID = uuidv4()
       const session = {sessionID, user, sockets: new Set([socket])}
       sessions[sessionID] = session
       socket.emit('new-session', sessionID, user.username)
     }
 
-    socket.on('join', (stores) => {
+    socket.on('join', (stores) => {  // TODO: Check access control before joining
       for (const {storeID, value} of stores) {
         socket.join(storeID)
         const room = nsp.adapter.rooms[storeID]

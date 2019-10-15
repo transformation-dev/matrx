@@ -17,7 +17,6 @@ import http from 'http'
 import sirv from 'sirv'
 import express from 'express'
 import compression from 'compression'
-import * as sapper from '@sapper/server'
 import uuidv4 from 'uuid/v4'
 
 // Look here
@@ -35,7 +34,6 @@ const nsp = getServer(server)
 app.use(
 	compression({ threshold: 0 }),
 	sirv('static', { dev }),
-	sapper.middleware()
 )
 
 server.listen(PORT, err => {
@@ -43,3 +41,7 @@ server.listen(PORT, err => {
 })
 
 ```
+
+### Authentication
+
+### Access control

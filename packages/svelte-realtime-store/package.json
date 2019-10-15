@@ -33,7 +33,7 @@
   "bugs": {
     "url": "https://github.com/matrx-transformation/matrx/issues"
   },
-  "dependencies": {
+  "devDependencies": {
     "socket.io-client": "^2.2.0",
     "svelte": "^3.12.0"
   }

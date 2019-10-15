@@ -1,4 +1,5 @@
-const io = require('socket.io-client')  // TODO: change this to import once it's no longer experimental in node.js
+// const io = require('socket.io-client')  // This was not working with rollup for my SPA so I now load it from the server in my index.html
+
 const { writable, readable } = require('svelte/store')
 
 // From svelte
@@ -44,8 +45,9 @@ class Client {
     callback(null)
   }
 
-  login(credentials, callback) {
+  login(credentials, callback) {  // TODO: Force a browser reload if the client changed
     this.socket = io(this._namespace)  // TODO: Confirm this works when we log out and back in again. The worry is that the page will have a handle to the old this.socket. As long as we redirect to the login page, we should be OK. We'll have to define the pattern on the page to sense when authenticated is changed. Maybe that's in _layout?
+    this.socket.removeAllListeners()
     this.socket.on('connect',() => {
       this.socket.emit('authentication', credentials)
       this.socket.on('authenticated', () => {
@@ -54,6 +56,10 @@ class Client {
       this.socket.on('disconnect', () => {
         this.connected.set(false)
         this.authenticated = false  // When you are disconnected, you are automatically unauthenticated
+        this.socket.removeAllListeners()  
+        this.socket.on('reconnect', () => {
+          this.login(credentials, callback)
+        })
       })
       // this.socket.on('unathenticated', () => {  // Pretty sure we don't need this. When someone is being kicked out from the server, we'll just disconnect which will unauthenticate them
       //   this.authenticated = false
@@ -71,6 +77,8 @@ class Client {
     const username = window.localStorage.getItem('username')
     if (sessionID) {
       this.login({sessionID, username}, callback)
+    } else {
+      callback(new Error('failed to restore session'))
     }
   }
 
@@ -78,6 +86,7 @@ class Client {
     const sessionID = window.localStorage.getItem('sessionID')
     window.localStorage.removeItem('sessionID')
     this.socket.emit('logout', sessionID)
+    this.socket.removeAllListeners()
   }
 
   realtime(storeConfig, default_value, component = null, debounceDelay = 0, start = noop) {

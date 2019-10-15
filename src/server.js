@@ -1,19 +1,18 @@
-import http from 'http'
-import sirv from 'sirv'
-import express from 'express'
-import compression from 'compression'
-import * as sapper from '@sapper/server'
-import uuidv4 from 'uuid/v4'
-import helmet from 'helmet'
-import bodyParser from 'body-parser'
+const http = require('http')
+const serveStatic = require('serve-static')
+const express = require('express')
+const compression = require('compression')
+const uuidv4 = require('uuid/v4')
+const helmet = require('helmet')
 
-import {getServer} from '@matrx/svelte-realtime-server'
+const { getServer } = require('@matrx/svelte-realtime-server')
 const adapters = {
 	'cosmos-db-temporal': require('@matrx/svelte-realtime-adapter-cosmos-db-temporal')
 }
 
-const { PORT, NODE_ENV } = process.env
-const dev = NODE_ENV === 'development'
+const PORT = process.env.PORT || 8080
+const { NODE_ENV } = process.env
+// const dev = NODE_ENV === 'development'
 
 function authenticate(socket, data, callback) {
   var username = data.username
@@ -34,7 +33,8 @@ function authenticate(socket, data, callback) {
 
 const app = express()
 const server = http.createServer(app)
-const nsp = getServer(server, adapters, authenticate)
+// const nsp = getServer(server, adapters, authenticate)
+const nsp = getServer(server)  // TODO: Restore the above line with a real authenticate and adapters
   
 app.use((req, res, next) => {
 	res.locals.nonce = uuidv4()
@@ -56,15 +56,15 @@ app.use(helmet({
 	}
 }))
 
-app.use(bodyParser.json())
-app.use(bodyParser.text())
-
 app.use(
-	compression({ threshold: 0 }),
-	sirv('static', { dev }),
-	sapper.middleware()
+  compression({ threshold: 0 }),
+  serveStatic('dist')
 )
 
 server.listen(PORT, err => {
-	if (err) console.log('error', err);
+	if (err) {
+    console.log('error', err)
+  } else {
+    console.log('server running on', PORT)
+  }
 })
