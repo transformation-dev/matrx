@@ -1,6 +1,6 @@
 {
   "name": "matrx",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "MatrX main application",
   "main": "src/server.js",
   "svelte": "src/App.svelte",
@@ -41,8 +41,8 @@
   "author": "The MatrX team",
   "license": "UNLICENSED",
   "dependencies": {
-    "@matrx/svelte-realtime-adapter-cosmos-db-temporal": "^0.4.0",
-    "@matrx/svelte-realtime-server": "^0.4.0",
+    "@matrx/svelte-realtime-adapter-cosmos-db-temporal": "^0.4.1",
+    "@matrx/svelte-realtime-server": "^0.4.1",
     "compression": "^1.7.1",
     "express": "^4.17.1",
     "helmet": "^3.21.1",
@@ -52,7 +52,7 @@
     "uuid": "^3.3.3"
   },
   "devDependencies": {
-    "@matrx/svelte-realtime-store": "^0.4.0",
+    "@matrx/svelte-realtime-store": "^0.4.1",
     "bulma": "^0.7.5",
     "bulmaswatch": "^0.7.5",
     "chromedriver": "^76.0.0",
