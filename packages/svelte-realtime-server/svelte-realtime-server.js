@@ -11,7 +11,7 @@ function getServer(server, adapters, authenticate, namespace = DEFAULT_NAMESPACE
   const nsp = io.of(namespace)
   const sessions = {}  // {sessionID: {sessionID, user, sockets: Set()}}
 
-  if (! authenticate) {
+  if (!authenticate) {
     authenticate = function(socket, data, callback) {
       return callback(null, true)
     }
@@ -34,7 +34,7 @@ function getServer(server, adapters, authenticate, namespace = DEFAULT_NAMESPACE
   function postAuthenticate(socket, user) {  // TODO: How do we get the user into this function?
     // socket.on('disconnect', () => {})  // Since we're storing everything in the nsp's socket or room, we shouldn't need any additional cleanup
 
-    if (! user.sessionID) {
+    if (!user.sessionID) {
       const sessionID = uuidv4()
       const session = {sessionID, user, sockets: new Set([socket])}
       sessions[sessionID] = session
@@ -74,7 +74,7 @@ function getServer(server, adapters, authenticate, namespace = DEFAULT_NAMESPACE
     })
 
     socket.on('initialize', (storeID, defaultValue, callback) => {
-      let room = nsp.adapter.rooms[storeID]
+      const room = nsp.adapter.rooms[storeID]
       if (room && room.cachedValue) {
         callback(room.cachedValue)
       } else {
@@ -91,7 +91,7 @@ function getServer(server, adapters, authenticate, namespace = DEFAULT_NAMESPACE
 
   }
 
-  socketIOAuth(nsp, { authenticate: wrappedAuthenticate, postAuthenticate })
+  socketIOAuth(nsp, {authenticate: wrappedAuthenticate, postAuthenticate})
 
   return nsp
 }

@@ -1,9 +1,9 @@
 <script>
   import Router from 'svelte-spa-router'
-  import { link, push, pop, replace, location, querystring } from 'svelte-spa-router'  // TODO: remove the ones I don't use
+  import {link, push, pop, replace, location, querystring} from 'svelte-spa-router'  // TODO: remove the ones I don't use
   import active from 'svelte-spa-router/active'
-  import { derived } from 'svelte/store'
-  import { getClient } from '@matrx/svelte-realtime-store'
+  import {derived} from 'svelte/store'
+  import {getClient} from '@matrx/svelte-realtime-store'
 
   import routes from './routes'
 
@@ -23,7 +23,7 @@
   ])
 
   origin.subscribe((value) => {
-    if (! allowUnathenticated.has($location)) {
+    if (!allowUnathenticated.has($location)) {
       realtimeClient.restoreSession((err) => {
         if (err) {
           push('/login?origin=' + value)    

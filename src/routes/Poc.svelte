@@ -7,11 +7,11 @@
 	const b = realtimeClient.realtime({_entityID: 'B'}, 4000)
 	
 	function handleA(event) {
-		$a = $a + 1
+	  $a = $a + 1
 	}
 
 	function handleB(event) {
-		$b++
+	  $b++
 	}
   
 </script>

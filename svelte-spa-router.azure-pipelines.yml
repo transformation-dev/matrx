@@ -12,7 +12,7 @@ pool:
 steps:
   - task: NodeTool@0
     inputs:
-      versionSpec: '10.x'
+      versionSpec: '12.x'
     displayName: 'Install Node.js'
 
   - bash: |
@@ -20,8 +20,8 @@ steps:
     displayName: 'Install dependencies from npm'
 
   - bash: |
-      npm run build-example
-    displayName: 'Build example project'
+      npm run build
+    displayName: 'Build project'
 
   - bash: |
       set -e

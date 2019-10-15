@@ -29,6 +29,9 @@ module.exports = {
             ]
         }
     },
+    "globals": {
+      "io": "readonly"
+    },
     rules: {
         'indent': [
             'error',
@@ -59,7 +62,7 @@ module.exports = {
             'warn'
         ],
         'no-unused-vars': [
-            'error',
+            'warn',
             {
                 args: 'none'
             }
@@ -165,7 +168,7 @@ module.exports = {
         'no-multiple-empty-lines': [
             'error',
             {
-                max: 1
+                max: 2
             }
         ],
         'operator-linebreak': [
