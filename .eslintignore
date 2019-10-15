@@ -1,5 +1,10 @@
 # Compiled files
 dist
 
-# Vendored dependencies
-vendor
+# node_modules
+node_modules
+
+# tests
+__tests__/
+test/
+nightwatch.conf.js

@@ -32,7 +32,7 @@ module.exports = {
     rules: {
         'indent': [
             'error',
-            4,
+            2,
             {
                 SwitchCase: 1,
                 MemberExpression: 1,
@@ -43,10 +43,6 @@ module.exports = {
         'linebreak-style': [
             'error',
             'unix'
-        ],
-        'quotes': [
-            'error',
-            'single'
         ],
         'semi': [
             'error',
@@ -70,7 +66,7 @@ module.exports = {
         ],
         'brace-style': [
             'error',
-            'stroustrup',
+            '1tbs',
             {
                 allowSingleLine: false
             }
