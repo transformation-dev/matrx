@@ -8,7 +8,7 @@
   import routes from './routes'
 
   function isActive(node, path) {
-    return active(node, path, 'active')  // TODO: Change to 'is-active' when for Bulma
+    return active(node, path, 'is-active')  // TODO: Change to 'is-active' when for Bulma
   }
 
   const realtimeClient = getClient()

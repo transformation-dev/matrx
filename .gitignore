@@ -1,7 +1,6 @@
 # Dist
-example/dist/bundle*
 dist/bundle*
-static/bundle*
+dist/global.css
 
 ### Linux ###
 *~

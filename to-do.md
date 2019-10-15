@@ -6,8 +6,8 @@
 * [X] Get the login and poc pages workings
 * [X] Uninstall uneeded servers (express, serve, sirv, live-server, etc.)
 * [X] Will notion work in off-line mode? Yes, as an android app
+* [X] Add our custom theme Lux and test the build functionality
 
-* [ ] Add our custom theme Lux and test the build functionality
 * [ ] Azure pipeline and/or GitHub actions
 * [ ] Create a test comparing routes.js results with contents of src/routes
 * [ ] Write one test for MatrX using cypress (or nightwatch?)
