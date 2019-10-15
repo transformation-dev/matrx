@@ -9,11 +9,9 @@ describe('window', function() {
 
     it('title', (browser) => {
         browser
-          .url('http://localhost:8080/#/')
+          .url('http://localhost:8080/#/poc')
           .getTitle((title) => {
-            console.log(title)
             assert.ok(title.includes("MatrX"))
-
           })
     })
 })

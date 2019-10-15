@@ -27,6 +27,7 @@ module.exports = {
             desiredCapabilities: {
                 browserName: 'chrome',
                 chromeOptions: {
+                    binary: "node_modules/chromium/lib/chromium/chrome-linux/chrome",
                     args: [
                         '--headless',
                         '--no-sandbox',
