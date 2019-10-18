@@ -2,6 +2,9 @@
 dist/bundle*
 dist/global.css
 
+# Cypress
+cypress/videos
+
 ### Linux ###
 *~
 

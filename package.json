@@ -20,7 +20,8 @@
     "eslint": "npx eslint -c .eslintrc.js --ext .js,.svelte,.html .",
     "lint": "npm run eslint",
     "nightwatch": "nightwatch",
-    "test": "start-server-and-test start http://localhost:8080 nightwatch",
+    "cypress": "cypress run",
+    "test": "start-server-and-test start http://localhost:8080 cypress",
     "css:build": "node-sass --omit-source-map-url src/matrx.scss dist/global.css",
     "css:watch": "npm run css:build -- --watch"
   },
