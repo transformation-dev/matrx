@@ -48,10 +48,11 @@ function getServer(server, adapters, authenticate, namespace = DEFAULT_NAMESPACE
         if (room) {  // There should always be a room but better safe
           const cachedValue = room.cachedValue
           if (cachedValue) {
-            socket.emit('set', storeID, cachedValue)
+            socket.emit('set', storeID, cachedValue)  // This sends only the originator
           } else {
             room.cachedValue = value
-            socket.to(storeID).emit('set', storeID, value)
+            // socket.to(storeID).emit('set', storeID, value)  // This sends to all clients except the originating client
+            nsp.in(storeID).emit('set', storeID, value)  // This sends to all clients including the originator
           }
         } else {
           throw new Error('Unexpected condition. There should be one but there is no room for storeID: ' + storeID)
@@ -70,7 +71,8 @@ function getServer(server, adapters, authenticate, namespace = DEFAULT_NAMESPACE
       } else {
         throw new Error('Unexpected condition. There should be one but there is no room for storeID: ' + storeID)
       }
-      socket.to(storeID).emit('set', storeID, value)
+      // socket.to(storeID).emit('set', storeID, value)  // This sends to all clients except the originating client
+      nsp.in(storeID).emit('set', storeID, value)  // This sends to all clients including the originator
     })
 
     socket.on('initialize', (storeID, defaultValue, callback) => {

@@ -23,4 +23,4 @@
   
 </script>
 
-<button on:click={handleLogin}>Login</button>
+<button id="login" on:click={handleLogin}>Login</button>
