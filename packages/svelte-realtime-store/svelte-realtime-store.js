@@ -1,6 +1,7 @@
 // const io = require('socket.io-client')  // This was not working with rollup for my SPA so I now load it from the server in my index.html
 
-const { writable, readable } = require('svelte/store')
+const {writable, readable} = require('svelte/store')
+const {debounce} = require('lodash')
 
 // From svelte
 const subscriber_queue = []
@@ -93,14 +94,16 @@ class Client {
     this.socket.removeAllListeners()
   }
 
-  realtime(storeConfig, default_value, component = null, debounceDelay = 0, start = noop) {
-    // TODO: Debounce changes such that we don't attempt the save until after debounceDelay
+  realtime(storeConfig, default_value, component = null, start = noop) {
     const storeID = storeConfig.storeID || JSON.stringify(storeConfig)
+    const debounceWait = storeConfig.debounceWait || 0
     let value
     let stop
     const subscribers = []
 
-    function set(new_value) {
+    const set = debounce(bouncySet, debounceWait)
+
+    function bouncySet(new_value) {
       if (safe_not_equal(value, new_value)) {
         if (stop) { // store is ready
           client.socket.emit('set', storeID, new_value)
