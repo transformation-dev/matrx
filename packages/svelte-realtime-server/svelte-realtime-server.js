@@ -51,6 +51,7 @@ function getServer(server, adapters, authenticate, namespace = DEFAULT_NAMESPACE
             socket.emit('set', storeID, cachedValue)  // This sends only the originator
           } else {
             room.cachedValue = value
+            // TODO: Make the below be used if there is client-side synchronization of multiple stores
             // socket.to(storeID).emit('set', storeID, value)  // This sends to all clients except the originating client
             nsp.in(storeID).emit('set', storeID, value)  // This sends to all clients including the originator
           }
@@ -71,6 +72,7 @@ function getServer(server, adapters, authenticate, namespace = DEFAULT_NAMESPACE
       } else {
         throw new Error('Unexpected condition. There should be one but there is no room for storeID: ' + storeID)
       }
+      // TODO: Make the below be used if there is client-side synchronization of multiple stores
       // socket.to(storeID).emit('set', storeID, value)  // This sends to all clients except the originating client
       nsp.in(storeID).emit('set', storeID, value)  // This sends to all clients including the originator
     })
