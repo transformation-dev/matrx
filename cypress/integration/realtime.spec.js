@@ -2,24 +2,13 @@
 
 context('Realtime', () => {
   beforeEach(() => {
-    cy.visit('localhost:8080/#/login?origin=/poc')
+    cy.visit('localhost:8080/#/login?origin=/test-jig')
       .get("#login")
       .click()
-      // .next()
-      // .should()
-
-    cy.wait(1000)
   })
 
-  it('cy.window() - get the global window object', () => {
-    cy.window().should('have.property', 'top')
+  it('Keeps stores synchronized', () => {
+    cy.get('button[id=a]')
   })
 
-  it('cy.document() - get the document object', () => {
-    cy.document().should('have.property', 'charset').and('eq', 'UTF-8')
-  })
-
-  it('cy.title() - get the title', () => {
-    cy.title().should('include', 'MatrX')
-  })
 })

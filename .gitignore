@@ -4,6 +4,7 @@ dist/global.css
 
 # Cypress
 cypress/videos
+cypress/screenshots
 
 ### Linux ###
 *~

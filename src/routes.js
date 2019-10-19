@@ -4,6 +4,7 @@ import Wild from './routes/Wild.svelte'
 import NotFound from './routes/NotFound.svelte'
 import Login from './routes/Login.svelte'
 import Poc from './routes/Poc.svelte'
+import TestJig from './routes/TestJig.svelte'
 
 const routes = {
   '/': Home,
@@ -13,6 +14,7 @@ const routes = {
   '/hello/:first/:last?': Name,  // Using named parameters, with last being optional
   '/wild': Wild,
   '/wild/*': Wild,  // Wildcard parameter
+  '/test-jig': TestJig,
   '*': NotFound,  // Catch-all, must be last
 }
 
