@@ -44,9 +44,7 @@ Modify your .svelte files to look something like this
 <button on:click={handleA} class="button" disabled="{!$connected}">a++</button>
 ```
 
-That's all there really is to it.
-
-A few notes:
+### Notes
 
 * Notice how I've used the provided `realtimeClient.connected` store to disable the button when the window is disconnected. This is recommended unless you implement your own offline mode (including conflict resolution upon reconnection).
 * The first parameter of `realtimeClient.realtime()` is a unique identifier for the store which corresponds exactly to the name of the "room" in socket.io parlance.
@@ -54,6 +52,18 @@ A few notes:
 * However, for multi-tenancy or other cases where you want the `a` variable for one page/user/tenant to be isolated from the `a` variable for another, you'll need to provide a different id for each seperate instance. I usually do this by prepending the variable identifier with the URL of the current page which specifies the uniqueness. If you pass in something other than a string, it'll run JSON.stringify() on it so something like this works using the Sapper-provided page store: `realtimeClient.realtime({page, variable: 'a'}, 1000)`. If you are not using Sapper and don't have to worry about server-side rendering (SSR), you can just do: `realtimeClient.realtime({page: window.location.href, variable: 'a'})`
 * The second parameter of `realtimeClient.realtime()` is now the _default_ value rather than the _initial_ value. What this means is that if the server has cached a value for this store, it'll start with that value rather than the one you provide. 
 * Keep in mind that socket.io is very efficient at cleaning up "rooms" when there are no clients. So, the value will be flushed from the cache when all clients disconnect. The default or last browser update value will repopulate the cache upon reconnection.
+
+### API
+
+```js
+realtime(storeConfig, default_value, component = null, start = noop)
+```
+
+#### storeConfig options
+
+__storeConfig__ can be a string like in the simple example above or it can be an object. If, it's an object and it contains a __storeID__ field, that will be the name of the socket.io room used to identify other stores to synchronize to. If there is no __storeID__ field, the results of `JSON.stringify(storeConfig)` will be used as the storeID.
+
+The __debounceWait__ field if present is the number of milliseconds to wait before sending the changed value to the server for synchronization. Use this for text input fields or any other incrementally altered field to prevent your application from being overly chatty.
 
 ## Advanced usage
 
@@ -76,4 +86,3 @@ For instance, under the covers, the `realtimeClient.connected` store is maintain
 * __Beta.__ As of this writing, this package is under active development and using semver conventions for beta projects. Minor-level upgrades may be backward breaking while patch-level upgrades will be used for changes that are not backward breaking.
 * __Svelte 3 only.__ Unless I'm mistaken, the store API is completely different in Svelte 2.
 * __Session ID stored in LocalStorage.__ I understand this is not ideal from a security perspective. It's better to store them in an HttpOnly cookie, but I haven't figured out how to do that yet with this all being based upon socket.io. That said, the MatrX application that is driving this has a very restrictive content security policy (CSP) which essentially blocks all XSS attacks where the primary risk of session stealing is triggered.
-* __No automated tests.__ This is the only (of over a dozen) open source projects that I've published that does not have close to 100% automated test coverage. It has none as of this writing. Automated tests for async network code is hard but this is an order of magnitude more difficult. I'd need to stand up a server and two clients and drive them all simultaneously. I've done a lot of manual testing and I'm relying upon the mature socket.io room functionality for the most tricky parts so I think the risk is low but I'd gladly take advice (or better yet pull requests) showing me how to test this. Maybe I'll riff off of [this](https://github.com/agconti/socket.io.tests/blob/master/test/test.js).

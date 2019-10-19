@@ -101,12 +101,14 @@ class Client {
     let stop
     const subscribers = []
 
-    const set = debounce(bouncySet, debounceWait)
-
-    function bouncySet(new_value) {
+    function set(new_value) {
+      function emitSet(storeID, new_value) {
+        client.socket.emit('set', storeID, new_value)
+      }
+      const debouncedEmit = debounce(emitSet, debounceWait)
       if (safe_not_equal(value, new_value)) {
         if (stop) { // store is ready
-          client.socket.emit('set', storeID, new_value)
+          debouncedEmit(storeID, new_value)
           _set(new_value)
         }
       }
