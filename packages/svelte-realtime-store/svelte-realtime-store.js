@@ -1,5 +1,7 @@
-const io = require('socket.io-client')  // TODO: change this to import once it's no longer experimental in node.js
-const {readable} = require('svelte/store')
+// const io = require('socket.io-client')  // This was not working with rollup for my SPA so I now load it from the server in my index.html
+
+const {writable, readable} = require('svelte/store')
+const {debounce} = require('lodash')
 
 // From svelte
 const subscriber_queue = []
@@ -10,43 +12,110 @@ function safe_not_equal(a, b) {
 
 class Client { 
 
-  constructor(namespace) {
-    this._namespace = namespace || Client.DEFAULT_NAMESPACE
-    this.socket = io(this._namespace)
-    this.connected = readable(false, (set) => {
+  constructor(namespace = Client.DEFAULT_NAMESPACE) {
+    this._namespace = namespace
+    this.connected = writable(false)
+    this.authenticated = false
+    this.socket = null
+    this.stores = {}  // {storeID: [store]}
+    this.components = {}  // {storeID: component}
+  }
+
+  afterAuthenticated(callback) {
+    this.socket.on('new-session', function(sessionID, username) {
+      window.localStorage.setItem('sessionID', sessionID)
+      window.localStorage.setItem('username', username)
+    })
+    this.socket.on('set', function(storeID, value){
+      client.stores[storeID].forEach((store) => {
+        store._set(value)
+      })
+    })
+    this.socket.on('revert', function(storeID, value){
+      client.stores[storeID].forEach((store) => {
+        store._set(value)
+        // TODO: Send "revert" event to each component
+      })
+    })
+    this.socket.on('saved', function(storeID){
+      // TODO: Send "saved" event to each component
+    })
+    const storesReshaped = []
+    for (let storeID in client.stores) {
+      storesReshaped.push({storeID, value: client.stores[storeID][0].get()})
+    }
+    this.socket.emit('join', storesReshaped)
+    this.connected.set(true)
+    this.authenticated = true
+    callback(null)
+  }
+
+  login(credentials, callback) { 
+    this.socket = io(this._namespace)  
+    this.socket.removeAllListeners()
+    this.socket.on('connect',() => {
+      this.socket.emit('authentication', credentials)
+      this.socket.on('authenticated', () => {
+        this.afterAuthenticated(callback)
+      })
       this.socket.on('disconnect', () => {
-        set(false)
+        this.connected.set(false)
+        this.authenticated = false  // When you are disconnected, you are automatically unauthenticated
+        this.socket.removeAllListeners()  
+        this.socket.on('reconnect', () => {
+          this.login(credentials, callback)
+        })
       })
-      this.socket.on('connect', () => {
-        set(true)
+      // this.socket.on('unathenticated', () => {  // Pretty sure we don't need this. When someone is being kicked out from the server, we'll just disconnect which will unauthenticate them
+      //   this.authenticated = false
+      // })
+      this.socket.on('unauthorized', (err) => {  // This is for when there is an error
+        this.authenticated = false
+        this.connected.set(false)
+        callback(new Error('unauthorized'))
       })
-      return noop  // I think noop is OK here because I don't think I need to unregister the handlers above, but maybe?
     })
   }
 
-  realtime(storeID, default_value, start = noop) {
-    storeID = typeof(storeID)=="string" ? storeID : JSON.stringify(storeID)
+  restoreSession(callback) {
+    const sessionID = window.localStorage.getItem('sessionID')
+    const username = window.localStorage.getItem('username')
+    if (sessionID) {
+      this.login({sessionID, username}, callback)
+    } else {
+      callback(new Error('failed to restore session'))
+    }
+  }
+
+  logout(callback) {
+    const sessionID = window.localStorage.getItem('sessionID')
+    window.localStorage.removeItem('sessionID')
+    this.socket.emit('logout', sessionID)
+    this.socket.removeAllListeners()
+  }
+
+  realtime(storeConfig, default_value, component = null, start = noop) {
+    const storeID = storeConfig.storeID || JSON.stringify(storeConfig)
+    const debounceWait = storeConfig.debounceWait || 0
     let value
     let stop
     const subscribers = []
 
-    const socket = io(this._namespace)
-
-    socket.on('connect', function(){
-      // Join rooms here. That way they'll be rejoined once reconnected
-      socket.emit('join', storeID, value)
-    })
-    socket.on('set', function(value){
-      _set(value)
-    })
-
     function set(new_value) {
+      function emitSet(storeID, new_value) {
+        client.socket.emit('set', storeID, new_value)
+      }
+      const debouncedEmit = debounce(emitSet, debounceWait)
       if (safe_not_equal(value, new_value)) {
         if (stop) { // store is ready
-          socket.emit('set', storeID, new_value)
+          debouncedEmit(storeID, new_value)
           _set(new_value)
         }
       }
+    }
+
+    function get() {
+      return value
     }
 
     function _set(new_value) {
@@ -84,12 +153,14 @@ class Client {
         value = default_value
       }
 
-      // Fetch cached value from server before calling run()
-      socket.emit('initialize', storeID, value, (got_value) => {  // TODO: What should we do if this callback is never called?
-        value = got_value
+      if (client.socket) {
+        client.socket.emit('initialize', storeID, value, (value) => {
+          run(value)
+        })
+      } else {
         run(value)
-      })
-  
+      }
+      
       return () => {
         const index = subscribers.indexOf(subscriber);
         if (index !== -1) {
@@ -102,101 +173,12 @@ class Client {
       };
     }
   
-    return { set, update, subscribe };
-  }
-
-  realtimeEntitySaver(_entityID, default_value, component = null, debounceDelay = 0, start = noop) {
-    // TODO: Debounce changes such that we don't attempt the save until after debounceDelay
-    const storeID = JSON.stringify({_entityID})
-    let value
-    let stop
-    const subscribers = []
-
-    const socket = io(this._namespace)
-
-    socket.on('connect', function(){
-      // Join rooms here. That way they'll be rejoined once reconnected
-      socket.emit('join', storeID, value)
-    })
-    socket.on('set', function(value){
-      _set(value)
-    })
-    socket.on('revert', function(value){
-      // TODO: Send "revert" event to component
-      _set(value)
-    })
-    socket.on('saved', function(){
-      // TODO: Send "saved" event to component
-    })
-
-    function set(new_value) {
-      if (safe_not_equal(value, new_value)) {
-        if (stop) { // store is ready
-          _set(new_value)  // Latency compensation
-          // The below POST can be fire and forget because there will be "revert" and "saved" events that come back down later
-          // TODO: Compose this POST to the operations endpoint. Send socket.sessionid.
-          // fetch()  // TODO: Add delay with setInterval or rather the other Javascript function to delay execution          
-        }
-      }
+    if (component) client.components[storeID] = component
+    if (! client.stores[storeID]) {
+      client.stores[storeID] = []
     }
-
-    function _set(new_value) {
-      if (safe_not_equal(value, new_value)) {
-        value = new_value;
-        if (stop) { // store is ready
-          const run_queue = !subscriber_queue.length;
-          for (let i = 0; i < subscribers.length; i += 1) {
-            const s = subscribers[i];
-            s[1]();
-            subscriber_queue.push(s, value);
-          }
-          if (run_queue) {
-            for (let i = 0; i < subscriber_queue.length; i += 2) {
-              subscriber_queue[i][0](subscriber_queue[i + 1]);
-            }
-            subscriber_queue.length = 0;
-          }
-        }
-      }
-    }
-  
-    function update(fn) {
-      set(fn(value))
-    }
-  
-    function subscribe(run, invalidate = noop) {
-      const subscriber = [run, invalidate];
-      subscribers.push(subscriber);
-      if (subscribers.length === 1) {
-        stop = start(set) || noop;
-      }
-
-      // The below is left over from the realtime store. I don't think we need it here. Better for it to stay null or undefined until the initial fetch
-      // if (! value) {
-      //   value = default_value
-      // }
-
-      // Fetch cached value from server before calling run()
-      socket.emit('initialize', storeID, value, (got_value) => {  // TODO: What should we do if this callback is never called?
-        value = got_value
-        run(value)  // TODO: Confirm that value stays undefined until fetch. This should only be non-null if it's already cached
-        // This POST is fire and forget since the set event will come down over web-sockets
-        // fetch(_entityID, default_value)  // TODO: Compose this fetch
-      })
-  
-      return () => {
-        const index = subscribers.indexOf(subscriber);
-        if (index !== -1) {
-          subscribers.splice(index, 1);
-        }
-        if (subscribers.length === 0) {
-          stop();
-          stop = null;
-        }
-      };
-    }
-  
-    return { set, update, subscribe };
+    client.stores[storeID].push({get, set, _set, update, subscribe})
+    return {get, set, update, subscribe}
   }
 
 }
@@ -212,4 +194,4 @@ function getClient(namespace) {
 
 let client
 
-module.exports = {getClient}  // TODO: Eventually change this to export once supported
+module.exports = { getClient }  // TODO: Eventually change this to export once supported

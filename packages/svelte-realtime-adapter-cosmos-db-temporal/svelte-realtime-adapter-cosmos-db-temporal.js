@@ -29,7 +29,7 @@ class Adapter {
     const spFolder = path.join(__dirname, 'stored-procedures')
     const filenames = fs.readdirSync(spFolder)
     console.log(filenames)
-    for (let filename of filenames) {
+    for (const filename of filenames) {
       const fullPath = path.join(spFolder, filename)
       console.log(fullPath)
       const body = require(fullPath)
@@ -107,7 +107,7 @@ class Adapter {
 }
 
 function getAdapter() {  // TODO: Allow authentication to be passed in to overide the default of getting it from environment variables
-  if (! adapter) {
+  if (!adapter) {
     adapater = new Adapter()
   }
   return adapater
@@ -154,7 +154,7 @@ class Coordinator {
     // the original sender as specified by socketID
     const socketLookup = namespace + '#' + socketSessionID
     const socket = nsp.sockets[socketLookup]
-    for (let operation in operationsSpec) {
+    for (const operation in operationsSpec) {
       // TODO: Check access control (cached?) before this latency compensation
       if (operation.operationType === 'delete') {
 
@@ -175,7 +175,7 @@ class Coordinator {
       const result = await this._adapter.operations(operationsSpec)
       // TODO: Send "saved" event to component
     } catch { // If fail, send revert event to all subscribed
-      for (let operation in operationsSpec) {
+      for (const operation in operationsSpec) {
         if (operation.operationType === 'delete') {
 
         } else {  // operationType is 'create' or 'update'
@@ -197,7 +197,7 @@ class Coordinator {
 Coordinator.DEFAULT_NAMESPACE = '/svelte-realtime'
 
 function getCoordinator(server, nsp, adapter, namespace) {  // TODO: Allow authentication to be passed in to overide the default of getting it from environment variables
-  if (! coordinator) {
+  if (!coordinator) {
     coordinator = new Coordinator()
   }
   return coordinator
