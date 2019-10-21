@@ -3,7 +3,7 @@
 	const realtimeClient = getClient()
 	const connected = realtimeClient.connected
 
-	const a = realtimeClient.realtime({_entityID: 'A'}, 2000)
+	const a = realtimeClient.realtime({_entityID: 'A', debounceWait: 1000}, 2000)
 	const aPrime = realtimeClient.realtime({_entityID: 'A'}, 2000)
 	const b = realtimeClient.realtime({_entityID: 'B'}, 4000)
 	

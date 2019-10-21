@@ -27,6 +27,7 @@ class Client {
       window.localStorage.setItem('username', username)
     })
     this.socket.on('set', (storeID, value) => {
+      console.log('got set', value)
       client.stores[storeID].forEach((store) => {
         store._set(value)
       })
@@ -95,20 +96,23 @@ class Client {
   }
 
   realtime(storeConfig, default_value, component = null, start = noop) {
-    const storeID = storeConfig.storeID || JSON.stringify(storeConfig)
+    const storeID = storeConfig.storeID || storeConfig._entityID || JSON.stringify(storeConfig)
     const debounceWait = storeConfig.debounceWait || 0
     let value
     let stop
     const subscribers = []
+    let lastNewValue
+
+    function emitSet() {
+      client.socket.emit('set', storeID, lastNewValue)
+    }
+    const debouncedEmit = debounce(emitSet, debounceWait)
 
     function set(new_value) {
-      function emitSet(storeID, new_value) {
-        client.socket.emit('set', storeID, new_value)
-      }
-      const debouncedEmit = debounce(emitSet, debounceWait)
+      lastNewValue = new_value
       if (safe_not_equal(value, new_value)) {
         if (stop) { // store is ready
-          debouncedEmit(storeID, new_value)
+          debouncedEmit()
           _set(new_value)
         }
       }
