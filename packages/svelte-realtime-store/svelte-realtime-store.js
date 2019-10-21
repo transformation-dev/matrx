@@ -7,7 +7,7 @@ const {debounce} = require('lodash')
 const subscriber_queue = []
 function noop() {}
 function safe_not_equal(a, b) {
-	return a != a ? b == b : a !== b || ((a && typeof a === 'object') || typeof a === 'function')
+  return a != a ? b == b : a !== b || ((a && typeof a === 'object') || typeof a === 'function')
 }
 
 class Client { 
@@ -22,26 +22,26 @@ class Client {
   }
 
   afterAuthenticated(callback) {
-    this.socket.on('new-session', function(sessionID, username) {
+    this.socket.on('new-session', (sessionID, username) => {
       window.localStorage.setItem('sessionID', sessionID)
       window.localStorage.setItem('username', username)
     })
-    this.socket.on('set', function(storeID, value){
+    this.socket.on('set', (storeID, value) => {
       client.stores[storeID].forEach((store) => {
         store._set(value)
       })
     })
-    this.socket.on('revert', function(storeID, value){
+    this.socket.on('revert', (storeID, value) => {
       client.stores[storeID].forEach((store) => {
         store._set(value)
         // TODO: Send "revert" event to each component
       })
     })
-    this.socket.on('saved', function(storeID){
+    this.socket.on('saved', (storeID) => {
       // TODO: Send "saved" event to each component
     })
     const storesReshaped = []
-    for (let storeID in client.stores) {
+    for (const storeID in client.stores) {
       storesReshaped.push({storeID, value: client.stores[storeID][0].get()})
     }
     this.socket.emit('join', storesReshaped)
@@ -53,7 +53,7 @@ class Client {
   login(credentials, callback) { 
     this.socket = io(this._namespace)  
     this.socket.removeAllListeners()
-    this.socket.on('connect',() => {
+    this.socket.on('connect', () => {
       this.socket.emit('authentication', credentials)
       this.socket.on('authenticated', () => {
         this.afterAuthenticated(callback)
@@ -120,19 +120,19 @@ class Client {
 
     function _set(new_value) {
       if (safe_not_equal(value, new_value)) {
-        value = new_value;
+        value = new_value
         if (stop) { // store is ready
-          const run_queue = !subscriber_queue.length;
+          const run_queue = !subscriber_queue.length
           for (let i = 0; i < subscribers.length; i += 1) {
-            const s = subscribers[i];
-            s[1]();
-            subscriber_queue.push(s, value);
+            const s = subscribers[i]
+            s[1]()
+            subscriber_queue.push(s, value)
           }
           if (run_queue) {
             for (let i = 0; i < subscriber_queue.length; i += 2) {
-              subscriber_queue[i][0](subscriber_queue[i + 1]);
+              subscriber_queue[i][0](subscriber_queue[i + 1])
             }
-            subscriber_queue.length = 0;
+            subscriber_queue.length = 0
           }
         }
       }
@@ -143,13 +143,13 @@ class Client {
     }
   
     function subscribe(run, invalidate = noop) {
-      const subscriber = [run, invalidate];
-      subscribers.push(subscriber);
+      const subscriber = [run, invalidate]
+      subscribers.push(subscriber)
       if (subscribers.length === 1) {
-        stop = start(set) || noop;
+        stop = start(set) || noop
       }
 
-      if (! value) {
+      if (!value) {
         value = default_value
       }
 
@@ -162,19 +162,21 @@ class Client {
       }
       
       return () => {
-        const index = subscribers.indexOf(subscriber);
+        const index = subscribers.indexOf(subscriber)
         if (index !== -1) {
-          subscribers.splice(index, 1);
+          subscribers.splice(index, 1)
         }
         if (subscribers.length === 0) {
-          stop();
-          stop = null;
+          stop()
+          stop = null
         }
-      };
+      }
     }
   
-    if (component) client.components[storeID] = component
-    if (! client.stores[storeID]) {
+    if (component) {
+      client.components[storeID] = component
+    }
+    if (!client.stores[storeID]) {
       client.stores[storeID] = []
     }
     client.stores[storeID].push({get, set, _set, update, subscribe})
@@ -186,7 +188,7 @@ class Client {
 Client.DEFAULT_NAMESPACE = '/svelte-realtime'
 
 function getClient(namespace) {
-  if (! client) {
+  if (!client) {
     client = new Client(namespace)
   }
   return client
@@ -194,4 +196,4 @@ function getClient(namespace) {
 
 let client
 
-module.exports = { getClient }  // TODO: Eventually change this to export once supported
+module.exports = {getClient}  // TODO: Eventually change this to export once supported

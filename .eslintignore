@@ -6,5 +6,3 @@ node_modules
 
 # tests
 __tests__/
-test/
-nightwatch.conf.js

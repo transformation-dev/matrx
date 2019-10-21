@@ -7,7 +7,7 @@ context('Realtime', () => {
       .click()
   })
 
-  it('Keeps stores synchronized', () => {
+  it('keeps stores synchronized', () => {
     cy.get('#a-value')
       .contains("2000")
 

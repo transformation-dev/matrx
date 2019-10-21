@@ -9,9 +9,9 @@
 	
 	function handleA(event) {
 	  $a = $a + 1
-  }
+}
   
-  function handleAPrime(event) {
+function handleAPrime(event) {
 	  $aPrime++
 	}
 
