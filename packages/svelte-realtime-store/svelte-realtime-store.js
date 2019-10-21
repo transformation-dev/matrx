@@ -27,7 +27,6 @@ class Client {
       window.localStorage.setItem('username', username)
     })
     this.socket.on('set', (storeID, value) => {
-      console.log('got set', value)
       client.stores[storeID].forEach((store) => {
         store._set(value)
       })
@@ -98,13 +97,15 @@ class Client {
   realtime(storeConfig, default_value, component = null, start = noop) {
     const storeID = storeConfig.storeID || storeConfig._entityID || JSON.stringify(storeConfig)
     const debounceWait = storeConfig.debounceWait || 0
+    const forceEmitBack = storeConfig.forceEmitBack || false
+    const ignoreLocalSet = storeConfig.ignoreLocalSet || false
     let value
     let stop
     const subscribers = []
     let lastNewValue
 
     function emitSet() {
-      client.socket.emit('set', storeID, lastNewValue)
+      client.socket.emit('set', storeID, lastNewValue, forceEmitBack)
     }
     const debouncedEmit = debounce(emitSet, debounceWait)
 
@@ -113,7 +114,11 @@ class Client {
       if (safe_not_equal(value, new_value)) {
         if (stop) { // store is ready
           debouncedEmit()
-          _set(new_value)
+          client.stores[storeID].forEach((store) => {
+            if (!store.ignoreLocalSet) {
+              store._set(new_value)
+            }
+          })
         }
       }
     }
@@ -183,7 +188,7 @@ class Client {
     if (!client.stores[storeID]) {
       client.stores[storeID] = []
     }
-    client.stores[storeID].push({get, set, _set, update, subscribe})
+    client.stores[storeID].push({get, set, _set, update, subscribe, forceEmitBack, ignoreLocalSet})
     return {get, set, update, subscribe}
   }
 

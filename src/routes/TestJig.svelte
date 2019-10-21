@@ -5,8 +5,8 @@
   const connected = realtimeClient.connected
   const storeID = new ShortUniqueId().randomUUID(13)  // Using a random number so parallelized test runs don't interfere with each other
 
-  const a = realtimeClient.realtime({storeID, _entityID: 'A', debounceWait: 1000}, 2000)
-  const aPrime = realtimeClient.realtime({storeID, _entityID: 'A'}, 2000)
+  const a = realtimeClient.realtime({storeID, debounceWait: 1000, forceEmitBack: true}, 2000)
+  const aPrime = realtimeClient.realtime({storeID, ignoreLocalSet: true}, 2000)
 
   function handleA(event) {
     $a = $a + 1
