@@ -61,9 +61,9 @@ realtime(storeConfig, default_value, component = null, start = noop)
 
 #### storeConfig options
 
-__storeConfig__ can be a string like in the simple example above or it can be an object. If, it's an object and it contains a __storeID__ field, that will be the name of the socket.io room used to identify other stores to synchronize to. If there is no __storeID__ field, the results of `JSON.stringify(storeConfig)` will be used as the storeID.
+`storeConfig` can be a string like in the simple example above or it can be an object. If, it's an object and it contains a `storeID` field, that will be the name of the socket.io room used to identify other stores to synchronize to. If there is no `storeID` field, it'll fall back to first the `_entityID` field, if present and failing all that, the results of `JSON.stringify(storeConfig)` will be used as the storeID.
 
-The __debounceWait__ field if present is the number of milliseconds to wait before sending the changed value to the server for synchronization. Use this for text input fields or any other incrementally altered field to prevent your application from being overly chatty.
+The `debounceWait` field if present is the number of milliseconds to wait before sending the changed value to the server for synchronization. Use this for text input fields or any other incrementally altered field to prevent your application from being overly chatty.
 
 ## Advanced usage
 

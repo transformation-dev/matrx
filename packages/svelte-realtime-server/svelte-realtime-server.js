@@ -51,7 +51,7 @@ function getServer(server, adapters, authenticate, namespace = DEFAULT_NAMESPACE
             socket.emit('set', storeID, cachedValue)  // This sends only the originator
           } else {
             room.cachedValue = value
-            // TODO: Make the below be used if there is client-side synchronization of multiple stores
+            // TODO: Think about switching below for efficiency. It's not done that way for now to be extra safe and because I wasn't sure when there are multiple stores on the same page that it would work
             // socket.to(storeID).emit('set', storeID, value)  // This sends to all clients except the originating client
             nsp.in(storeID).emit('set', storeID, value)  // This sends to all clients including the originator
           }
@@ -61,7 +61,7 @@ function getServer(server, adapters, authenticate, namespace = DEFAULT_NAMESPACE
       }
     })
 
-    socket.on('set', (storeID, value) => {
+    socket.on('set', (storeID, value, forceEmitBack) => {
       let room = nsp.adapter.rooms[storeID]
       if (!room) {
         socket.join(storeID)
@@ -72,9 +72,11 @@ function getServer(server, adapters, authenticate, namespace = DEFAULT_NAMESPACE
       } else {
         throw new Error('Unexpected condition. There should be one but there is no room for storeID: ' + storeID)
       }
-      // TODO: Make the below be used if there is client-side synchronization of multiple stores
-      // socket.to(storeID).emit('set', storeID, value)  // This sends to all clients except the originating client
-      nsp.in(storeID).emit('set', storeID, value)  // This sends to all clients including the originator
+      if (forceEmitBack) {
+        nsp.in(storeID).emit('set', storeID, value)  // This sends to all clients including the originator
+      } else {
+        socket.to(storeID).emit('set', storeID, value)  // This sends to all clients except the originating client
+      }
     })
 
     socket.on('initialize', (storeID, defaultValue, callback) => {
