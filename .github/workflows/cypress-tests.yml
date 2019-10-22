@@ -1,4 +1,4 @@
-name: Node CI
+name: Cypress tests
 
 on:
   pull_request:
@@ -8,11 +8,11 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
 
     strategy:
       matrix:
-        node-version: [12.x]
+        node-version: [12.x, 10.x, 8.x]
         os: [ubuntu-latest]
 
     steps:
