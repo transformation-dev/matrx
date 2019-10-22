@@ -48,11 +48,18 @@
 <h1>MatrX</h1>
 <!-- Navigation links, using the "link" action -->
 <!-- Also, use the "active" action to add the "active" CSS class when the URL matches -->
-<ul class="navigation-links">
-    <li><a href="/" use:link use:isActive>Home</a></li>
-    <li><a href="/brand" use:link use:isActive>Brand</a></li>
-    <li><a href="/hello/svelte" use:link use:isActive={'/hello/*', 'active'}>Say hi!</a></li>
-    <li><a href="/does/not/exist" use:link>Not found</a></li>
-</ul>
+
+<nav>
+	<ul>
+		<li><a class='{segment === undefined ? "selected" : ""}' href='/'>home</a></li>
+		<li><a class='{segment === "about" ? "selected" : ""}' href='about'>about</a></li>
+		<li><a class='{segment === "morgan" ? "selected" : ""}' href='morgan'>morgan</a></li>
+
+		<!-- for the blog link, we're using rel=prefetch so that Sapper prefetches
+		     the blog data when we hover over the link or tap it on a touchscreen -->
+		<li><a rel=prefetch class='{segment === "blog" ? "selected" : ""}' href='blog'>blog</a></li>
+		<li><a rel=prefetch class='{segment === "poc" ? "selected" : ""}' href='poc'>poc</a></li>
+	</ul>
+</nav>
 
 <Router {routes}/>
