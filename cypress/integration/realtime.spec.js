@@ -22,12 +22,12 @@ context('Realtime', () => {
 
     cy.get('#a-prime-button')
       .click()
-    
-    cy.get('#a-prime-value')
-      .contains("2002")
 
     cy.get('#a-value')
       .contains("2002")
+    
+    cy.get('#a-prime-value')
+      .contains("2001")  // Because we have ignoreLocalSet=true
   })
 
 })
