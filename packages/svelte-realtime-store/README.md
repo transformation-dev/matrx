@@ -44,12 +44,23 @@ Modify your .svelte files to look something like this
 <button on:click={handleA} class="button" disabled="{!$connected}">a++</button>
 ```
 
+One last step. You'll need to make the socket.io client available to the page. The easiest way to do that is to include this in your `index.html` file.
+
+```html
+<script src="/socket.io/socket.io.js"></script>
+```
+
+This works because the socket.io server serves up its own version-matched client on that endpoint when installed on your server either stand-alone or when included as part of the svelte-realtime-server.
+
+Alternatively, you can install the client as a seperate npm package and include it. See the socket.io documentation for details on how to do that.
+
 ### Notes
 
 * Notice how I've used the provided `realtimeClient.connected` store to disable the button when the window is disconnected. This is recommended unless you implement your own offline mode (including conflict resolution upon reconnection).
-* The first parameter of `realtimeClient.realtime()` is a unique identifier for the store which corresponds exactly to the name of the "room" in socket.io parlance.
-* If you are building a simple single user-base app, then you can do as I've done above  and make the store id match the variable name.
-* However, for multi-tenancy or other cases where you want the `a` variable for one page/user/tenant to be isolated from the `a` variable for another, you'll need to provide a different id for each seperate instance. I usually do this by prepending the variable identifier with the URL of the current page which specifies the uniqueness. If you pass in something other than a string, it'll run JSON.stringify() on it so something like this works using the Sapper-provided page store: `realtimeClient.realtime({page, variable: 'a'}, 1000)`. If you are not using Sapper and don't have to worry about server-side rendering (SSR), you can just do: `realtimeClient.realtime({page: window.location.href, variable: 'a'})`
+* The first parameter of `realtimeClient.realtime()` can be a simple string which will act as a unique identifier for the store which corresponds exactly to the name of the "room" in socket.io parlance.
+* If you are building a simple single user-base app, then you can do as I've done above and make the store id match the variable name.
+* However, for multi-tenancy or other cases where you want the `a` variable for one page/user/tenant to be isolated from the `a` variable for another, you'll need to provide a different id for each seperate instance. This can be done explicitly by proving an object with a `storeID` field (e.g. `realtimeClient.realtime({storeID: 'something'}, 1000)`). However, if your object lacks a `storeID` field it will run JSON.stringify() on it so something like this works using the Sapper-provided page store: `realtimeClient.realtime({page, variable: 'a'}, 1000)`. If you are not using Sapper and don't have to worry about server-side rendering (SSR), you can just do: `realtimeClient.realtime({page: window.location.href, variable: 'a'})`
+* I'm getting ready to add serialization to a database upon store updates so you may see examples of `_entityID` rather than `storeID`. I'll come back later, once I have that working and explain that option.
 * The second parameter of `realtimeClient.realtime()` is now the _default_ value rather than the _initial_ value. What this means is that if the server has cached a value for this store, it'll start with that value rather than the one you provide. 
 * Keep in mind that socket.io is very efficient at cleaning up "rooms" when there are no clients. So, the value will be flushed from the cache when all clients disconnect. The default or last browser update value will repopulate the cache upon reconnection.
 
@@ -61,9 +72,11 @@ realtime(storeConfig, default_value, component = null, start = noop)
 
 #### storeConfig options
 
-`storeConfig` can be a string like in the simple example above or it can be an object. If, it's an object and it contains a `storeID` field, that will be the name of the socket.io room used to identify other stores to synchronize to. If there is no `storeID` field, it'll fall back to first the `_entityID` field, if present and failing all that, the results of `JSON.stringify(storeConfig)` will be used as the storeID.
+`storeConfig` can be a string like in the simple example above or it can be an object. If, it's an object and it contains a `storeID` field, that will be the name of the socket.io room used to identify other stores to synchronize to. If there is no `storeID` field, it'll fall back first to the `_entityID` field, if present and failing all that, the results of `JSON.stringify(storeConfig)` will be used as the storeID.
 
 The `debounceWait` field if present is the number of milliseconds to wait before sending the changed value to the server for synchronization. Use this for text input fields or any other incrementally altered field to prevent your application from being overly chatty.
+
+svelte-realtime-store allows you to have multiple stores on the same page that connect to the same synchronized room. In these cases, the store will update local copies immdiately ignoring the `debounceWait`.
 
 ## Advanced usage
 

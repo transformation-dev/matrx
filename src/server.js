@@ -35,8 +35,8 @@ function authenticate(socket, data, callback) {
 
 const app = express()
 const server = http.createServer(app)
-// const nsp = getServer(server, adapters, authenticate)
-const nsp = getServer(server)  // TODO: Restore the above line with a real authenticate and adapters
+const nsp = getServer(server, adapters, authenticate)
+// const nsp = getServer(server)  // TODO: Restore the above line with a real authenticate and adapters
   
 app.use((req, res, next) => {
   res.locals.nonce = uuidv4()

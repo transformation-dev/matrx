@@ -25,7 +25,8 @@
     "test": "start-server-and-test start http://localhost:8080 cypress",
     "test:active": "start-server-and-test start http://localhost:8080 cypress:active",
     "css:build": "node-sass --omit-source-map-url src/matrx.scss dist/global.css",
-    "css:watch": "npm run css:build -- --watch"
+    "css:watch": "npm run css:build -- --watch",
+    "ports": "sudo netstat -ltnp"
   },
   "repository": {
     "type": "git",

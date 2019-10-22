@@ -97,8 +97,8 @@ class Client {
   realtime(storeConfig, default_value, component = null, start = noop) {
     const storeID = storeConfig.storeID || storeConfig._entityID || JSON.stringify(storeConfig)
     const debounceWait = storeConfig.debounceWait || 0
-    const forceEmitBack = storeConfig.forceEmitBack || false
-    const ignoreLocalSet = storeConfig.ignoreLocalSet || false
+    const forceEmitBack = storeConfig.forceEmitBack || false  // added to enable single-page testing
+    const ignoreLocalSet = storeConfig.ignoreLocalSet || false  // added to enable single-page testing
     let value
     let stop
     const subscribers = []
