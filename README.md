@@ -1,5 +1,6 @@
+![](https://github.com/matrx-transformation/matrx/workflows/Cypress%20tests/badge.svg)
 
-[![Build status](https://dev.azure.com/matrx-transformation/MatrX/_apis/build/status/matrx%20-%201%20-%20CI)](https://dev.azure.com/matrx-transformation/MatrX/_build/latest?definitionId=2)
+[![Deploy status](https://dev.azure.com/matrx-transformation/MatrX/_apis/build/status/matrx%20-%201%20-%20CI)](https://dev.azure.com/matrx-transformation/MatrX/_build/latest?definitionId=2)
 
 # `@matrx/matrx`
 

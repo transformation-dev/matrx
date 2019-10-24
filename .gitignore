@@ -2,6 +2,10 @@
 dist/bundle*
 dist/global.css
 
+# Coverage
+coverage/
+coverage-server/
+
 # Cypress
 cypress/videos
 cypress/screenshots

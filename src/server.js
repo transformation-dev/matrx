@@ -7,7 +7,7 @@ const helmet = require('helmet')
 
 const {getServer} = require('@matrx/svelte-realtime-server')
 const adapters = {
-  'cosmos-db-temporal': require('@matrx/svelte-realtime-adapter-cosmos-db-temporal')
+  // 'cosmos-db-temporal': require('@matrx/svelte-realtime-adapter-cosmos-db-temporal')
 }
 
 const PORT = process.env.PORT || 8080
