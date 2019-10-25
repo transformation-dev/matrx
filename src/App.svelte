@@ -22,7 +22,7 @@
     '/wild/something'
   ])
 
-  origin.subscribe((value) => {
+  function checkAuthentication(value) {
     if (!allowUnathenticated.has($location)) {
       realtimeClient.restoreSession((err) => {
         if (err) {
@@ -34,7 +34,34 @@
         }
       })
     }
+  }
+
+  origin.subscribe((value) => {
+    checkAuthentication(value)
   })
+
+  // realtimeClient.authenticated.subscribe((value) => {
+  //   checkAuthentication($origin)
+  // })
+
+  function handleLogout(event) {
+    realtimeClient.logout((err, logoutSuccessful) => {
+      if (err) {
+        throw err
+      } else {
+        if (logoutSuccessful) {
+          if (!allowUnathenticated.has($location)) {
+            push('/login?origin=' + $origin)
+          } else {
+            // Just stay on this page
+          }
+        } else {
+          throw new Error('logout failed')
+        }
+      }
+    })
+  }
+
 </script>
 
 <!-- TODO: Get rid of this style once we switch it to Bulma's is-active -->
@@ -54,5 +81,7 @@
     <li><a href="/hello/svelte" use:link use:isActive={'/hello/*', 'active'}>Say hi!</a></li>
     <li><a href="/does/not/exist" use:link>Not found</a></li>
 </ul>
+
+<button id="logout" on:click={handleLogout} class="button">Logout</button>
 
 <Router {routes}/>

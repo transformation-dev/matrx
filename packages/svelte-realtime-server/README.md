@@ -17,7 +17,6 @@ import http from 'http'
 import sirv from 'sirv'
 import express from 'express'
 import compression from 'compression'
-import uuidv4 from 'uuid/v4'
 
 // Look here
 import { getServer } from '@matrx/svelte-realtime-server'
@@ -44,4 +43,21 @@ server.listen(PORT, err => {
 
 ### Authentication
 
+To ensure that your connecting clients are who they say they are, you can provide an authentication callback when instantiating the svelte-realtime-server.
+
+```js
+function authenticate(socket, credentials, callback) {
+  db.findUser('User', {username: credentials.username}, function(err, user) {
+    if (err || !user) return callback(new Error("User not found"))
+    return callback(null, user.password == credentials.password)
+  })
+}
+
+const nsp = getServer(server, null, authenticate)
+```
+
+Note, the second parameter (that is `null` in the above exmple) is for the future when you can provide database adapters.
+
 ### Access control
+
+TBD

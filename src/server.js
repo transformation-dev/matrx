@@ -7,7 +7,7 @@ const helmet = require('helmet')
 
 const {getServer} = require('@matrx/svelte-realtime-server')
 const adapters = {
-  'cosmos-db-temporal': require('@matrx/svelte-realtime-adapter-cosmos-db-temporal')
+  // 'cosmos-db-temporal': require('@matrx/svelte-realtime-adapter-cosmos-db-temporal')
 }
 
 const PORT = process.env.PORT || 8080
@@ -35,8 +35,8 @@ function authenticate(socket, data, callback) {
 
 const app = express()
 const server = http.createServer(app)
-// const nsp = getServer(server, adapters, authenticate)
-const nsp = getServer(server)  // TODO: Restore the above line with a real authenticate and adapters
+const nsp = getServer(server, adapters, authenticate)
+// const nsp = getServer(server)  // TODO: Restore the above line with a real authenticate and adapters
   
 app.use((req, res, next) => {
   res.locals.nonce = uuidv4()

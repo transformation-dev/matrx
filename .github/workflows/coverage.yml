@@ -1,0 +1,32 @@
+name: Cypress tests
+
+on:
+  pull_request:
+    branches:
+    - master
+
+jobs:
+  build:
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        node-version: [12.x]
+        os: [macOS-latest]
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: npm ci, build, and coverage testing
+      run: |
+        npm ci
+        npm run css:build
+        npm run coverage:build
+        nyc npm test
+        npm run coverage:check
+      env:
+        CI: true
