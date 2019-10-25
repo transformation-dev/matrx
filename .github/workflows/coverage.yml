@@ -29,3 +29,8 @@ jobs:
         npm run coverage:check
       env:
         CI: true
+    - run: npm run coverage:generate-html-report
+    - uses: actions/upload-artifact@master
+      with:
+        name: coverage-report
+        path: docs/coverage
