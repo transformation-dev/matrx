@@ -15,10 +15,10 @@ class Client {
   constructor(namespace = Client.DEFAULT_NAMESPACE) {
     this._namespace = namespace
     this.connected = writable(false)
-    this.authenticated = false
+    this.authenticated = writable(false)
     this.socket = null
     this.stores = {}  // {storeID: [store]}
-    this.components = {}  // {storeID: component}
+    this.components = {}  // {storeID: component}  // TODO: Need to upgrade this to an array like stores
   }
 
   afterAuthenticated(callback) {
@@ -46,7 +46,7 @@ class Client {
     }
     this.socket.emit('join', storesReshaped)
     this.connected.set(true)
-    this.authenticated = true
+    this.authenticated.set(true)
     callback(null)
   }
 
@@ -60,17 +60,19 @@ class Client {
       })
       this.socket.on('disconnect', () => {
         this.connected.set(false)
-        this.authenticated = false  // When you are disconnected, you are automatically unauthenticated
+        this.authenticated.set(false)  // Commented out because it's possible to be disconnected and remain authenticated
         this.socket.removeAllListeners()  
         this.socket.on('reconnect', () => {
           this.login(credentials, callback)
         })
       })
-      // this.socket.on('unathenticated', () => {  // Pretty sure we don't need this. When someone is being kicked out from the server, we'll just disconnect which will unauthenticate them
-      //   this.authenticated = false
+      // this.socket.on('unauthenticated', () => {  // Pretty sure we don't need this. When someone is being kicked out from the server, we'll just disconnect which will unauthenticate them
+      //   console.log('got unauthenticated')
+      //   this.authenticated.set(false)
+      //   // this.socket.disconnect()
       // })
       this.socket.on('unauthorized', (err) => {  // This is for when there is an error
-        this.authenticated = false
+        this.authenticated.set(false)
         this.connected.set(false)
         callback(new Error('unauthorized'))
       })
@@ -90,8 +92,12 @@ class Client {
   logout(callback) {
     const sessionID = window.localStorage.getItem('sessionID')
     window.localStorage.removeItem('sessionID')
-    this.socket.emit('logout', sessionID)
-    this.socket.removeAllListeners()
+    client.socket.emit('logout', sessionID)
+    // client.socket.removeAllListeners()
+    // this.authenticated.set(false)
+    if (callback) {
+      return callback(null, true)
+    }
   }
 
   realtime(storeConfig, default_value, component = null, start = noop) {

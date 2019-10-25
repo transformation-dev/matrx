@@ -90,9 +90,13 @@ function getServer(server, adapters, authenticate, namespace = DEFAULT_NAMESPACE
 
     socket.on('logout', (sessionID) => {
       const session = sessions[sessionID]
-      session.sockets.forEach((socket) => {
-        socket.disconnect()
-      })
+      if (session) {
+        session.sockets.forEach((socket) => {
+          console.log(socket.conn.id)
+          // socket.emit('unauthenticated')
+          socket.disconnect()
+        })
+      }
     })
 
   }

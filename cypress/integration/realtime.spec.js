@@ -30,4 +30,9 @@ context('Realtime', () => {
       .contains("2001")  // Because we have ignoreLocalSet=true
   })
 
+  // afterEach(() => {
+  //   cy.get("#logout")
+  //     .click()
+  // })
+
 })
