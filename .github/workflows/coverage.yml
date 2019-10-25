@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         node-version: [12.x]
-        os: [linux-latest]
+        os: [ubuntu-latest]
 
     steps:
     - uses: actions/checkout@v1
