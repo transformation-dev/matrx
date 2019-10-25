@@ -86,6 +86,11 @@ function getServer(server, adapters, authenticate, namespace = DEFAULT_NAMESPACE
         }
         socket.disconnect()
       }
+      if (forceEmitBack) {
+        nsp.in(storeID).emit('set', storeID, value)  // This sends to all clients including the originator
+      } else {
+        socket.to(storeID).emit('set', storeID, value)  // This sends to all clients except the originating client
+      }
     })
 
     socket.on('initialize', (sessionID, storeID, defaultValue, callback) => {
