@@ -10,6 +10,9 @@ coverage-server/
 cypress/videos
 cypress/screenshots
 
+# Docs
+docs
+
 ### Linux ###
 *~
 
