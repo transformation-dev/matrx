@@ -20,7 +20,6 @@
     "start": "node src/server",
     "eslint": "npx eslint -c .eslintrc.js --ext .js,.svelte,.html .",
     "lint": "npm run eslint",
-    "nightwatch": "nightwatch",
     "cypress": "cypress run",
     "cypress:active": "cypress run --spec cypress/integration/realtime.spec.js",
     "test": "start-server-and-test start http://localhost:8080 cypress",
