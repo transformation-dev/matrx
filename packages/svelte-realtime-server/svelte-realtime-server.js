@@ -61,30 +61,45 @@ function getServer(server, adapters, authenticate, namespace = DEFAULT_NAMESPACE
       }
     })
 
-    socket.on('set', (storeID, value, forceEmitBack) => {
-      let room = nsp.adapter.rooms[storeID]
-      if (!room) {
-        socket.join(storeID)
-        room = nsp.adapter.rooms[storeID]
-      }
-      if (room) {  // There should always be a room now but better safe
-        room.cachedValue = value
+    socket.on('set', (sessionID, storeID, value, forceEmitBack) => {
+      const session = sessions[sessionID]
+      if (session) {
+        let room = nsp.adapter.rooms[storeID]
+        if (!room) {
+          socket.join(storeID)
+          room = nsp.adapter.rooms[storeID]
+        }
+        if (room) {  // There should always be a room now but better safe
+          room.cachedValue = value
+        } else {
+          throw new Error('Unexpected condition. There should be one but there is no room for storeID: ' + storeID)
+        }
+        if (forceEmitBack) {
+          nsp.in(storeID).emit('set', storeID, value)  // This sends to all clients including the originator
+        } else {
+          socket.to(storeID).emit('set', storeID, value)  // This sends to all clients except the originating client
+        }
       } else {
-        throw new Error('Unexpected condition. There should be one but there is no room for storeID: ' + storeID)
-      }
-      if (forceEmitBack) {
-        nsp.in(storeID).emit('set', storeID, value)  // This sends to all clients including the originator
-      } else {
-        socket.to(storeID).emit('set', storeID, value)  // This sends to all clients except the originating client
+        const room = nsp.adapter.rooms[storeID]
+        if (room && room.cachedValue) {
+          socket.emit('revert', storeID, room.cachedValue)
+        }
+        socket.disconnect()
       }
     })
 
-    socket.on('initialize', (storeID, defaultValue, callback) => {
-      const room = nsp.adapter.rooms[storeID]
-      if (room && room.cachedValue) {
-        callback(room.cachedValue)
+    socket.on('initialize', (sessionID, storeID, defaultValue, callback) => {
+      const session = sessions[sessionID]
+      if (session) {
+        const room = nsp.adapter.rooms[storeID]
+        if (room && room.cachedValue) {
+          callback(room.cachedValue)
+        } else {
+          callback(defaultValue)
+        }
       } else {
-        callback(defaultValue)
+        socket.disconnect()
+        // TODO: disconnect, unauthenticate, etc.
       }
     })
 
@@ -92,10 +107,9 @@ function getServer(server, adapters, authenticate, namespace = DEFAULT_NAMESPACE
       const session = sessions[sessionID]
       if (session) {
         session.sockets.forEach((socket) => {
-          console.log(socket.conn.id)
-          // socket.emit('unauthenticated')
           socket.disconnect()
         })
+        delete sessions[sessionID]
       }
     })
 

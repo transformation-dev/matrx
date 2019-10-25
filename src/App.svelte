@@ -40,10 +40,9 @@
     checkAuthentication(value)
   })
 
-  realtimeClient.authenticated.subscribe((value) => {
-    console.log('got change to authenticated', value)
-    checkAuthentication($origin)
-  })
+  // realtimeClient.authenticated.subscribe((value) => {
+  //   checkAuthentication($origin)
+  // })
 
   function handleLogout(event) {
     realtimeClient.logout((err, logoutSuccessful) => {

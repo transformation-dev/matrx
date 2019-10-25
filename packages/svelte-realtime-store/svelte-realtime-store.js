@@ -15,7 +15,7 @@ class Client {
   constructor(namespace = Client.DEFAULT_NAMESPACE) {
     this._namespace = namespace
     this.connected = writable(false)
-    this.authenticated = writable(false)
+    // this.authenticated = writable(false)
     this.socket = null
     this.stores = {}  // {storeID: [store]}
     this.components = {}  // {storeID: component}  // TODO: Need to upgrade this to an array like stores
@@ -46,7 +46,7 @@ class Client {
     }
     this.socket.emit('join', storesReshaped)
     this.connected.set(true)
-    this.authenticated.set(true)
+    // this.authenticated.set(true)
     callback(null)
   }
 
@@ -60,7 +60,7 @@ class Client {
       })
       this.socket.on('disconnect', () => {
         this.connected.set(false)
-        this.authenticated.set(false)  // Commented out because it's possible to be disconnected and remain authenticated
+        // this.authenticated.set(false)  // Commented out because it's possible to be disconnected and remain authenticated
         this.socket.removeAllListeners()  
         this.socket.on('reconnect', () => {
           this.login(credentials, callback)
@@ -72,7 +72,7 @@ class Client {
       //   // this.socket.disconnect()
       // })
       this.socket.on('unauthorized', (err) => {  // This is for when there is an error
-        this.authenticated.set(false)
+        // this.authenticated.set(false)
         this.connected.set(false)
         callback(new Error('unauthorized'))
       })
@@ -111,7 +111,8 @@ class Client {
     let lastNewValue
 
     function emitSet() {
-      client.socket.emit('set', storeID, lastNewValue, forceEmitBack)
+      const sessionID = window.localStorage.getItem('sessionID')
+      client.socket.emit('set', sessionID, storeID, lastNewValue, forceEmitBack)
     }
     const debouncedEmit = debounce(emitSet, debounceWait)
 
@@ -169,7 +170,8 @@ class Client {
       }
 
       if (client.socket) {
-        client.socket.emit('initialize', storeID, value, (value) => {
+        const sessionID = window.localStorage.getItem('sessionID')
+        client.socket.emit('initialize', sessionID, storeID, value, (value) => {
           run(value)
         })
       } else {
