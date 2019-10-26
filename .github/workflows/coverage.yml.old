@@ -32,10 +32,20 @@ jobs:
       env:
         CI: true
 
-    - uses: codecov/codecov-action@v1.0.3
+    - name: Coveralls
+      uses: coverallsapp/github-action@master
       with:
-        token: ${{secrets.CODECOV_TOKEN}}
-        # file: ./coverage.xml #optional
+        parallel: true
+        github-token: ${{ secrets.github_token }}
+
+    - name: Coveralls Finished
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.github_token }}
+        parallel-finished: true
+
+    - name: generate html report
+      run: npm run coverage:generate-html-report
 
     - name: upload html report as artifact
       uses: actions/upload-artifact@master

@@ -30,8 +30,7 @@
     "coverage:build": "rollup -c rollup.config.coverage-client.js",
     "coverage:report": "nyc report --reporter=text-summary",
     "coverage:check": "nyc check-coverage --statements 85 --branches 65 --functions 80 --lines 85",
-    "coverage:generate-html-report": "nyc report -r html --report-dir docs/coverage",
-    "coverage": "npm run coverage:build; nyc npm test"
+    "coverage": "npm run coverage:build; nyc --reporter=lcov npm test"
   },
   "repository": {
     "type": "git",
