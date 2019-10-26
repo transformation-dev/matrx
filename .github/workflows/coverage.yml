@@ -34,3 +34,7 @@ jobs:
       with:
         name: coverage-report
         path: docs/coverage
+    - name: Coveralls
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.github_token }}
