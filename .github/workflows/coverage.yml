@@ -39,3 +39,4 @@ jobs:
       uses: actions/upload-artifact@master
       with:
         name: coverage-report
+        path: docs/coverage
