@@ -17,10 +17,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
+
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
+
     - name: npm ci, build, and coverage testing
       run: |
         npm ci
@@ -29,12 +31,22 @@ jobs:
         npm run coverage:check
       env:
         CI: true
+
     - name: Coveralls
       uses: coverallsapp/github-action@master
       with:
+        parallel: true
         github-token: ${{ secrets.github_token }}
+
+    - name: Coveralls Finished
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.github_token }}
+          parallel-finished: true
+
     - name: generate html report
       run: npm run coverage:generate-html-report
+
     - name: upload html report as artifact
       uses: actions/upload-artifact@master
       with:
