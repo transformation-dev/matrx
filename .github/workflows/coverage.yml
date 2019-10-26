@@ -39,10 +39,10 @@ jobs:
         github-token: ${{ secrets.github_token }}
 
     - name: Coveralls Finished
-        uses: coverallsapp/github-action@master
-        with:
-          github-token: ${{ secrets.github_token }}
-          parallel-finished: true
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.github_token }}
+        parallel-finished: true
 
     - name: generate html report
       run: npm run coverage:generate-html-report
