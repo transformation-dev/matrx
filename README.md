@@ -2,7 +2,7 @@
 
 [![Deploy status](https://dev.azure.com/matrx-transformation/MatrX/_apis/build/status/matrx%20-%201%20-%20CI)](https://dev.azure.com/matrx-transformation/MatrX/_build/latest?definitionId=2)
 
-[![Build status](https://dev.azure.com/matrx-transformation/MatrX/_apis/build/status/matrx%20-%201%20-%20CI)](https://dev.azure.com/matrx-transformation/MatrX/_build/latest?definitionId=2)
+[![Coverage Status](https://coveralls.io/repos/github/matrx-transformation/matrx/badge.svg?branch=master)](https://coveralls.io/github/matrx-transformation/matrx?branch=master)
 
 # `@matrx/matrx`
 
