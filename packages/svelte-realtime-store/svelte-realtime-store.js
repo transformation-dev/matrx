@@ -2,6 +2,7 @@
 
 const {writable, readable} = require('svelte/store')
 const {debounce} = require('lodash')
+const debug = require('debug')('svelte-realtime:store')
 
 // From svelte
 const subscriber_queue = []

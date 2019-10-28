@@ -15,8 +15,10 @@
     ]
   },
   "scripts": {
-    "build": "rollup -c",
-    "dev": "nodemon & npm run css:watch & rollup -c -w",
+    "build": "webpack",
+    "build-rollup": "rollup -c",
+    "dev": "nodemon & npm run css:watch & webpack -w",
+    "dev-rollup": "nodemon & npm run css:watch & rollup -c -w",
     "start": "node src/server",
     "eslint": "npx eslint -c .eslintrc.js --ext .js,.svelte,.html .",
     "lint": "npm run eslint",
@@ -27,7 +29,8 @@
     "css:build": "node-sass --omit-source-map-url src/matrx.scss dist/global.css",
     "css:watch": "npm run css:build -- --watch",
     "ports": "sudo netstat -ltnp",
-    "coverage:build": "rollup -c rollup.config.coverage-client.js",
+    "coverage:build": "webpack --config webpack.config.coverage-client.js",
+    "coverage:build-rollup": "rollup -c rollup.config.coverage-client.js",
     "coverage:report": "nyc report --reporter=text-summary",
     "coverage:check": "nyc check-coverage --statements 85 --branches 65 --functions 80 --lines 85",
     "coverage": "npm run coverage:build; nyc --reporter=lcov npm test"
@@ -48,7 +51,7 @@
     "@matrx/svelte-realtime-adapter-cosmos-db-temporal": "file:packages/svelte-realtime-adapter-cosmos-db-temporal",
     "@matrx/svelte-realtime-server": "file:packages/svelte-realtime-server",
     "compression": "^1.7.1",
-    "cypress": "^3.4.1",
+    "debug": "^4.1.1",
     "express": "^4.17.1",
     "helmet": "^3.21.1",
     "lodash": "^4.17.15",
@@ -60,13 +63,19 @@
   "devDependencies": {
     "@cypress/code-coverage": "^1.10.1",
     "@matrx/svelte-realtime-store": "file:packages/svelte-realtime-store",
+    "browserify": "^16.5.0",
     "bulma": "^0.7.5",
     "bulmaswatch": "^0.7.5",
+    "coverage-istanbul-loader": "^2.0.1",
+    "css-loader": "^3.2.0",
+    "cypress": "^3.5.0",
     "eslint": "^6.1.0",
     "eslint-plugin-html": "^6.0.0",
     "eslint-plugin-svelte3": "^2.7.3",
+    "istanbul-instrumenter-loader": "^3.0.1",
     "istanbul-lib-coverage": "^2.0.5",
     "lerna": "^3.16.5",
+    "mini-css-extract-plugin": "^0.8.0",
     "node-sass": "^4.12.0",
     "nodemon": "^1.19.3",
     "nyc": "^14.1.1",
@@ -77,8 +86,12 @@
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-svelte": "^5.1.0",
     "start-server-and-test": "^1.10.6",
+    "style-loader": "^1.0.0",
     "svelte": "^3.6.10",
-    "svelte-spa-router": "^1.2.1"
+    "svelte-loader": "^2.13.6",
+    "svelte-spa-router": "^1.2.1",
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.9"
   },
   "peerDependencies": {
     "svelte": "^3.5.0"
