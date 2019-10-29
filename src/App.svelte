@@ -4,6 +4,7 @@
   import active from 'svelte-spa-router/active'
   import {derived} from 'svelte/store'
   import {getClient} from '@matrx/svelte-realtime-store'
+  const debug = require('debug')('App.svelte')
 
   import routes from './routes'
 
@@ -22,14 +23,15 @@
     '/wild/something'
   ])
 
-  function checkAuthentication(value) {
+  function checkAuthentication(destination) {
+    debug('checkAuthentication() called.  destination: %s', destination)
     if (!allowUnathenticated.has($location)) {
       realtimeClient.restoreSession((err) => {
         if (err) {
-          push('/login?origin=' + value)    
+          push('/login?origin=' + destination)    
         } else {
           if ($location == '/login') {
-            push(value)
+            push(destination)
           }
         }
       })
@@ -37,10 +39,12 @@
   }
 
   origin.subscribe((value) => {
+    debug('origin store changed value to: %s', value)
     checkAuthentication(value)
   })
 
-  // realtimeClient.authenticated.subscribe((value) => {
+  // realtimeClient.connected.subscribe((value) => {
+  //   debug('connected store changed value to: %O', value)
   //   checkAuthentication($origin)
   // })
 
