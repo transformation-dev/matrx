@@ -178,12 +178,23 @@ class Client {
     function update(fn) {
       set(fn(value))
     }
-
-    function unsubscribe() {
-      debug('unsubscribe() called')
-    }
   
     function subscribe(run, invalidate = noop) {
+      function emitInitialize(delay=2) {
+        const sessionID = window.localStorage.getItem('sessionID')
+        if (sessionID) {
+          client.socket.emit('initialize', sessionID, storeID, value, (value) => {
+            run(value)
+          })
+        } else if (delay < 10000) {
+          debug('DELAY NEEDED FOR INITIALIZE TO AVOID RACE CONDITION WITH NEW-SESSION %i', delay)
+          setTimeout(() => {
+            emitInitialize(delay*2)
+          }, delay)
+        } else {
+          throw new Error('sessionID missing event after delay of ' + delay + 'ms')
+        }
+      }
       const subscriber = [run, invalidate]
       subscribers.push(subscriber)
       if (subscribers.length === 1) {
@@ -195,10 +206,7 @@ class Client {
       }
 
       if (client.socket) {
-        const sessionID = window.localStorage.getItem('sessionID')
-        client.socket.emit('initialize', sessionID, storeID, value, (value) => {
-          run(value)
-        })
+        emitInitialize()
       } else {
         run(value)
       }
@@ -222,7 +230,7 @@ class Client {
       client.stores[storeID] = []
     }
     client.stores[storeID].push({get, set, _set, update, subscribe, forceEmitBack, ignoreLocalSet})
-    return {get, set, update, subscribe, unsubscribe}
+    return {get, set, update, subscribe}
   }
 
 }
