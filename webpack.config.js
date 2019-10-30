@@ -1,8 +1,8 @@
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const path = require('path');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const path = require('path')
 
-const mode = process.env.NODE_ENV || 'development';
-const prod = mode === 'production';
+const mode = process.env.NODE_ENV || 'development'
+const prod = mode === 'production'
 
 module.exports = {
 	entry: {
@@ -32,24 +32,32 @@ module.exports = {
 					}
 				}
 			},
-			{
-				test: /\.css$/,
-				use: [
-					/**
-					 * MiniCssExtractPlugin doesn't support HMR.
-					 * For developing, use 'style-loader' instead.
-					 * */
-					prod ? MiniCssExtractPlugin.loader : 'style-loader',
-					'css-loader'
-				]
-			}
+      {
+        test: /\.css$/,
+        use: [
+          {
+            loader: MiniCssExtractPlugin.loader,
+            options: {
+              // you can specify a publicPath here
+              // by default it uses publicPath in webpackOptions.output
+              publicPath: '../dist',
+              hmr: process.env.NODE_ENV === 'development',
+            },
+          },
+          'css-loader',
+        ],
+      },
 		]
 	},
 	mode,
 	plugins: [
-		new MiniCssExtractPlugin({
-			filename: '[name].css'
-		})
-	],
+    new MiniCssExtractPlugin({
+      // Options similar to the same options in webpackOptions.output
+      // all options are optional
+      filename: '[name].css',
+      chunkFilename: '[id].css',
+      ignoreOrder: false, // Enable to remove warnings about conflicting order
+    }),
+  ],
 	devtool: prod ? false: 'source-map'
 };

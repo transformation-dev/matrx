@@ -72,7 +72,7 @@
 <style>
   /* Style for "active" links; need to mark this :global because the router adds the class directly */
   :global(a.active) {
-      color: green;
+      color: red;
   }
 </style>
 
