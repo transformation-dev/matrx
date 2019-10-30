@@ -192,7 +192,7 @@ class Client {
             emitInitialize(delay*2)
           }, delay)
         } else {
-          throw new Error('sessionID missing event after delay of ' + delay + 'ms')
+          throw new Error('sessionID still missing after delay of ' + delay + 'ms')
         }
       }
       const subscriber = [run, invalidate]

@@ -32,7 +32,7 @@
     "coverage:build": "webpack --config webpack.config.coverage-client.js",
     "coverage:build-rollup": "rollup -c rollup.config.coverage-client.js",
     "coverage:report": "nyc report --reporter=text-summary",
-    "coverage:check": "nyc check-coverage --statements 85 --branches 65 --functions 80 --lines 85",
+    "coverage:check": "nyc check-coverage --statements 85 --branches 60 --functions 80 --lines 85",
     "coverage": "npm run coverage:build; nyc --reporter=lcov npm test"
   },
   "repository": {
