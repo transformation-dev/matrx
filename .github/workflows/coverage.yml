@@ -17,10 +17,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
+
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
+
     - name: npm ci, build, and coverage testing
       run: |
         npm ci
@@ -29,12 +31,14 @@ jobs:
         npm run coverage:check
       env:
         CI: true
-    - run: npm run coverage:generate-html-report
-    - uses: actions/upload-artifact@master
+
+    - uses: codecov/codecov-action@v1.0.3
+      with:
+        token: ${{secrets.CODECOV_TOKEN}}
+        # file: ./coverage.xml #optional
+
+    - name: upload html report as artifact
+      uses: actions/upload-artifact@master
       with:
         name: coverage-report
-        path: docs/coverage
-    - name: Coveralls
-      uses: coverallsapp/github-action@master
-      with:
-        github-token: ${{ secrets.github_token }}
+        path: coverage/lcov-report

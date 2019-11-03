@@ -2,6 +2,7 @@
 
 const {writable, readable} = require('svelte/store')
 const {debounce} = require('lodash')
+const debug = require('debug')('svelte-realtime:store')
 
 // From svelte
 const subscriber_queue = []
@@ -13,31 +14,36 @@ function safe_not_equal(a, b) {
 class Client { 
 
   constructor(namespace = Client.DEFAULT_NAMESPACE) {
+    debug('Client.constructor() called')
     this._namespace = namespace
     this.connected = writable(false)
-    // this.authenticated = writable(false)
     this.socket = null
     this.stores = {}  // {storeID: [store]}
     this.components = {}  // {storeID: component}  // TODO: Need to upgrade this to an array like stores
   }
 
   afterAuthenticated(callback) {
+    debug('afterAutenticated() called')
     this.socket.on('new-session', (sessionID, username) => {
+      debug('new-session msg received. sessionID: %s  username: %s', sessionID, username)
       window.localStorage.setItem('sessionID', sessionID)
       window.localStorage.setItem('username', username)
     })
     this.socket.on('set', (storeID, value) => {
+      debug('set msg received. storeID: %s  value: %O', storeID, value)
       client.stores[storeID].forEach((store) => {
         store._set(value)
       })
     })
     this.socket.on('revert', (storeID, value) => {
+      debug('revert msg received. storeID: %s  value: %O', storeID, value)
       client.stores[storeID].forEach((store) => {
         store._set(value)
         // TODO: Send "revert" event to each component
       })
     })
     this.socket.on('saved', (storeID) => {
+      debug('set msg received. storeID: %s', storeID)
       // TODO: Send "saved" event to each component
     })
     const storesReshaped = []
@@ -46,23 +52,26 @@ class Client {
     }
     this.socket.emit('join', storesReshaped)
     this.connected.set(true)
-    // this.authenticated.set(true)
     callback(null)
   }
 
   login(credentials, callback) { 
+    debug('login() called. credentials: %O', credentials)
     this.socket = io(this._namespace)  
     this.socket.removeAllListeners()
     this.socket.on('connect', () => {
+      debug('connect msg received')
       this.socket.emit('authentication', credentials)
       this.socket.on('authenticated', () => {
+        debug('authenticated msg received')
         this.afterAuthenticated(callback)
       })
       this.socket.on('disconnect', () => {
+        debug('disconnect msg received')
         this.connected.set(false)
-        // this.authenticated.set(false)  // Commented out because it's possible to be disconnected and remain authenticated
         this.socket.removeAllListeners()  
         this.socket.on('reconnect', () => {
+          debug('reconnect msg received')
           this.login(credentials, callback)
         })
       })
@@ -72,16 +81,25 @@ class Client {
       //   // this.socket.disconnect()
       // })
       this.socket.on('unauthorized', (err) => {  // This is for when there is an error
-        // this.authenticated.set(false)
+        debug('unauthorized msg received. error: %s', err)
         this.connected.set(false)
         callback(new Error('unauthorized'))
       })
     })
   }
 
-  restoreSession(callback) {
+  restoreSession(callback, delay = 2) {
     const sessionID = window.localStorage.getItem('sessionID')
     const username = window.localStorage.getItem('username')
+    debug('restoreSession() called. sessionID: %s  username: %s', sessionID, username)
+    if (!sessionID) {
+      debug('DELAY REQUIRED TO AVOID RACE CONDITION WITH SETTING THE NEW SESSION ID: %i', delay)
+      if (delay < 10000) {
+        return setTimeout(() => {
+          return this.restoreSession(callback, delay*2)
+        }, delay)
+      }
+    }
     if (sessionID) {
       this.login({sessionID, username}, callback)
     } else {
@@ -91,10 +109,9 @@ class Client {
 
   logout(callback) {
     const sessionID = window.localStorage.getItem('sessionID')
+    debug('logout() called. sessionID: %s', sessionID)
     window.localStorage.removeItem('sessionID')
     client.socket.emit('logout', sessionID)
-    // client.socket.removeAllListeners()
-    // this.authenticated.set(false)
     if (callback) {
       return callback(null, true)
     }
@@ -111,6 +128,7 @@ class Client {
     let lastNewValue
 
     function emitSet() {
+      debug('emitSet() called')
       const sessionID = window.localStorage.getItem('sessionID')
       client.socket.emit('set', sessionID, storeID, lastNewValue, forceEmitBack)
     }
@@ -135,6 +153,9 @@ class Client {
     }
 
     function _set(new_value) {
+      if (!new_value) {
+        debug('GOT NULL OR UNDEFINED new_value in _set() function')
+      }
       if (safe_not_equal(value, new_value)) {
         value = new_value
         if (stop) { // store is ready
@@ -159,6 +180,21 @@ class Client {
     }
   
     function subscribe(run, invalidate = noop) {
+      function emitInitialize(delay=2) {
+        const sessionID = window.localStorage.getItem('sessionID')
+        if (sessionID) {
+          client.socket.emit('initialize', sessionID, storeID, value, (value) => {
+            run(value)
+          })
+        } else if (delay < 10000) {
+          debug('DELAY NEEDED FOR INITIALIZE TO AVOID RACE CONDITION WITH NEW-SESSION %i', delay)
+          setTimeout(() => {
+            emitInitialize(delay*2)
+          }, delay)
+        } else {
+          throw new Error('sessionID still missing after delay of ' + delay + 'ms')
+        }
+      }
       const subscriber = [run, invalidate]
       subscribers.push(subscriber)
       if (subscribers.length === 1) {
@@ -170,10 +206,7 @@ class Client {
       }
 
       if (client.socket) {
-        const sessionID = window.localStorage.getItem('sessionID')
-        client.socket.emit('initialize', sessionID, storeID, value, (value) => {
-          run(value)
-        })
+        emitInitialize()
       } else {
         run(value)
       }

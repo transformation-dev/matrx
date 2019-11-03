@@ -1,8 +1,8 @@
-![](https://github.com/matrx-transformation/matrx/workflows/Cypress%20tests/badge.svg)
+![](https://github.com/matrx-transformation/matrx/workflows/Cypress%20tests/badge.svg?style=flat-square)
 
-[![Deploy status](https://dev.azure.com/matrx-transformation/MatrX/_apis/build/status/matrx%20-%201%20-%20CI)](https://dev.azure.com/matrx-transformation/MatrX/_build/latest?definitionId=2)
+![Codecov](https://img.shields.io/codecov/c/github/matrx-transformation/matrx?style=for-the-badge)
 
-[![Build status](https://dev.azure.com/matrx-transformation/MatrX/_apis/build/status/matrx%20-%201%20-%20CI)](https://dev.azure.com/matrx-transformation/MatrX/_build/latest?definitionId=2)
+![Azure DevOps releases](https://img.shields.io/azure-devops/release/matrx-transformation/eeebab5f-7e66-4a67-bd67-c98a299f2aae/1/1?style=for-the-badge)
 
 # `@matrx/matrx`
 

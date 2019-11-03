@@ -3,6 +3,7 @@
 const socketIO = require('socket.io')
 const socketIOAuth = require('socketio-auth')
 const uuidv4 = require('uuid/v4')
+const debug = require('debug')('svelte-realtime:server')
 
 const DEFAULT_NAMESPACE = '/svelte-realtime'
 
@@ -11,6 +12,11 @@ function getServer(server, adapters, authenticate, namespace = DEFAULT_NAMESPACE
   const nsp = io.of(namespace)
   const sessions = {}  // {sessionID: {sessionID, user, sockets: Set()}}
 
+  nsp.use((socket, next) => {
+    debug('SOCKET.IO MIDDLEWARE CALLED.  Cookies: %O', socket.request.headers.cookie)
+    return next()
+  })
+
   if (!authenticate) {
     authenticate = function(socket, data, callback) {
       return callback(null, true)
@@ -18,6 +24,7 @@ function getServer(server, adapters, authenticate, namespace = DEFAULT_NAMESPACE
   }
 
   function wrappedAuthenticate(socket, data, callback) {
+    debug('wrappedAuthenticate() called.  data: %O', data)
     if (data.sessionID) {
       const session = sessions[data.sessionID]
       if (session) {
@@ -32,6 +39,7 @@ function getServer(server, adapters, authenticate, namespace = DEFAULT_NAMESPACE
   }
   
   function postAuthenticate(socket, user) {  // TODO: How do we get the user into this function?
+    debug('postAuthenticate() called. ')
     // socket.on('disconnect', () => {})  // Since we're storing everything in the nsp's socket or room, we shouldn't need any additional cleanup
 
     if (!user.sessionID) {
@@ -42,6 +50,7 @@ function getServer(server, adapters, authenticate, namespace = DEFAULT_NAMESPACE
     }
 
     socket.on('join', (stores) => {  // TODO: Check access control before joining
+      debug('join msg received.  stores: %O', stores)
       for (const {storeID, value} of stores) {
         socket.join(storeID)
         const room = nsp.adapter.rooms[storeID]
@@ -62,6 +71,7 @@ function getServer(server, adapters, authenticate, namespace = DEFAULT_NAMESPACE
     })
 
     socket.on('set', (sessionID, storeID, value, forceEmitBack) => {
+      debug('set msg received. sessionID: %s  storeID: %s  value: %O', sessionID, storeID, value)
       const session = sessions[sessionID]
       if (session) {
         let room = nsp.adapter.rooms[storeID]
@@ -86,14 +96,10 @@ function getServer(server, adapters, authenticate, namespace = DEFAULT_NAMESPACE
         }
         socket.disconnect()
       }
-      if (forceEmitBack) {
-        nsp.in(storeID).emit('set', storeID, value)  // This sends to all clients including the originator
-      } else {
-        socket.to(storeID).emit('set', storeID, value)  // This sends to all clients except the originating client
-      }
     })
 
     socket.on('initialize', (sessionID, storeID, defaultValue, callback) => {
+      debug('initialize msg received.  sessionID: %s  storeID: %s  defaultValue: %O', sessionID, storeID, defaultValue)
       const session = sessions[sessionID]
       if (session) {
         const room = nsp.adapter.rooms[storeID]
@@ -103,12 +109,13 @@ function getServer(server, adapters, authenticate, namespace = DEFAULT_NAMESPACE
           callback(defaultValue)
         }
       } else {
+        callback(defaultValue)
         socket.disconnect()
-        // TODO: disconnect, unauthenticate, etc.
       }
     })
 
     socket.on('logout', (sessionID) => {
+      debug('logout msg received.  sessionID: %s', sessionID)
       const session = sessions[sessionID]
       if (session) {
         session.sockets.forEach((socket) => {
