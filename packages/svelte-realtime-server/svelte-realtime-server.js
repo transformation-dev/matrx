@@ -12,6 +12,11 @@ function getServer(server, adapters, authenticate, namespace = DEFAULT_NAMESPACE
   const nsp = io.of(namespace)
   const sessions = {}  // {sessionID: {sessionID, user, sockets: Set()}}
 
+  nsp.use((socket, next) => {
+    debug('SOCKET.IO MIDDLEWARE CALLED.  Cookies: %O', socket.request.headers.cookie)
+    return next()
+  })
+
   if (!authenticate) {
     authenticate = function(socket, data, callback) {
       return callback(null, true)

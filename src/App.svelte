@@ -66,6 +66,8 @@
     })
   }
 
+  // checkAuthentication($origin) 
+
 </script>
 
 <!-- TODO: Get rid of this style once we switch it to Bulma's is-active -->
