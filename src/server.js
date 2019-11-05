@@ -36,10 +36,9 @@ const adapters = {
 }
 
 const PORT = process.env.PORT || 8080
-const SESSION_SECRET = process.env.SESSION_SECRET
+const {NODE_ENV, SESSION_SECRET} = process.env
 if (!SESSION_SECRET) throw new Error('Must set SESSION_SECRET environment variable')
-const {NODE_ENV} = process.env
-// const dev = NODE_ENV === 'development'
+const dev = NODE_ENV === 'development'
 
 // function authenticate(socket, data, callback) {
 //   const username = data.username
@@ -69,6 +68,7 @@ app.use(require('express-session')({
   secret: SESSION_SECRET,
   resave: true,
   saveUninitialized: true,
+  name: 'sessionID',
   cookie: { maxAge: 1000 * 60 * 60 * 24 * 30 },  // 30 days
 }))
 app.use(passport.initialize())

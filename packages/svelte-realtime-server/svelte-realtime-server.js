@@ -4,24 +4,34 @@ const socketIO = require('socket.io')
 const socketIOAuth = require('socketio-auth')
 const uuidv4 = require('uuid/v4')
 const debug = require('debug')('svelte-realtime:server')
+const cookie = require('cookie')
+const cookieParser = require('cookie-parser')
 
 const DEFAULT_NAMESPACE = '/svelte-realtime'
+
+const {SESSION_SECRET} = process.env
+if (!SESSION_SECRET) throw new Error('Must set SESSION_SECRET environment variable')
 
 function getServer(server, adapters, authenticate, namespace = DEFAULT_NAMESPACE) {
   const io = socketIO(server)
   const nsp = io.of(namespace)
   const sessions = {}  // {sessionID: {sessionID, user, sockets: Set()}}
 
-  nsp.use((socket, next) => {
-    debug('SOCKET.IO MIDDLEWARE CALLED.  Cookies: %O', socket.request.headers.cookie)
-    return next()
-  })
-
   if (!authenticate) {
     authenticate = function(socket, data, callback) {
       return callback(null, true)
     }
   }
+
+  nsp.use((socket, next) => {
+    const rawCookies = socket.request.headers.cookie
+    const parsedCookies = cookie.parse(rawCookies)
+    const sessionID = cookieParser.signedCookie(parsedCookies.sessionID, SESSION_SECRET)
+    debug('SOCKET.IO MIDDLEWARE CALLED.  sessionID: %O', sessionID)
+    return next()
+  })
+
+
 
   function wrappedAuthenticate(socket, data, callback) {
     debug('wrappedAuthenticate() called.  data: %O', data)
