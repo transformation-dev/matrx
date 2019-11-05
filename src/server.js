@@ -1,4 +1,5 @@
 const http = require('http')
+const fs = require('fs')
 const serveStatic = require('serve-static')
 const express = require('express')
 const bodyParser = require('body-parser')
@@ -10,6 +11,8 @@ const debug = require('debug')('matrx-server')
 
 const passport = require('passport')
 const LocalStrategy = require('passport-local').Strategy
+const expressSession = require('express-session')
+const FileStore = require('session-file-store')(expressSession)
 
 passport.use(new LocalStrategy(
 	function(username, password, done) {
@@ -36,9 +39,12 @@ const adapters = {
 }
 
 const PORT = process.env.PORT || 8080
-const {NODE_ENV, SESSION_SECRET} = process.env
+const {NODE_ENV, SESSION_SECRET, HOME} = process.env
 if (!SESSION_SECRET) throw new Error('Must set SESSION_SECRET environment variable')
 const dev = NODE_ENV === 'development'
+const sessionPath = (HOME || '.') + '/sessions'
+if (!fs.existsSync(sessionPath)) fs.mkdirSync(sessionPath)
+fs.chmodSync(sessionPath, 0o755)
 
 // function authenticate(socket, data, callback) {
 //   const username = data.username
@@ -59,16 +65,18 @@ const dev = NODE_ENV === 'development'
 //   // })
 // }
 
+const sessionStore = new FileStore({path: sessionPath})
 const app = express()
 const server = http.createServer(app)
 const nsp = getServer(server, adapters)
 // const nsp = getServer(server)  // TODO: Restore the above line with a real authenticate and adapters
 
-app.use(require('express-session')({
+app.use(expressSession({
   secret: SESSION_SECRET,
   resave: true,
   saveUninitialized: true,
   name: 'sessionID',
+  store: sessionStore,
   cookie: { maxAge: 1000 * 60 * 60 * 24 * 30 },  // 30 days
 }))
 app.use(passport.initialize())

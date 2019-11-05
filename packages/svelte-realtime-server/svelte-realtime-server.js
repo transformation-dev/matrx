@@ -28,10 +28,12 @@ function getServer(server, adapters, authenticate, namespace = DEFAULT_NAMESPACE
     const parsedCookies = cookie.parse(rawCookies)
     const sessionID = cookieParser.signedCookie(parsedCookies.sessionID, SESSION_SECRET)
     debug('SOCKET.IO MIDDLEWARE CALLED.  sessionID: %O', sessionID)
-    return next()
+    if (sessionID) {
+      return next()
+    } else {
+      return next(new Error('not authorized'))
+    }
   })
-
-
 
   function wrappedAuthenticate(socket, data, callback) {
     debug('wrappedAuthenticate() called.  data: %O', data)
