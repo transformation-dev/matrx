@@ -42,7 +42,7 @@ const PORT = process.env.PORT || 8080
 const {NODE_ENV, SESSION_SECRET, HOME} = process.env
 if (!SESSION_SECRET) throw new Error('Must set SESSION_SECRET environment variable')
 const dev = NODE_ENV === 'development'
-const sessionPath = (HOME || '.') + '/sessions'
+const sessionPath = (HOME || '/home') + '/sessions'
 if (!fs.existsSync(sessionPath)) fs.mkdirSync(sessionPath)
 fs.chmodSync(sessionPath, 0o755)
 
@@ -68,7 +68,7 @@ fs.chmodSync(sessionPath, 0o755)
 const sessionStore = new FileStore({path: sessionPath})
 const app = express()
 const server = http.createServer(app)
-const nsp = getServer(server, adapters)
+const nsp = getServer(server, adapters, sessionStore)
 // const nsp = getServer(server)  // TODO: Restore the above line with a real authenticate and adapters
 
 app.use(expressSession({
@@ -108,9 +108,13 @@ app.use(
 )
 
 app.post('/login',
+  function(req, res, next) {
+    debug('Got POST to /login')
+    return next()
+  },
   jsonParser,
   function(req, res, next) {
-    debug('Got POST to login.  req.body: %O', req.body)
+    debug('Got POST to /login.  req.body: %O', req.body)
     return next()
   },
   passport.authenticate('local'),

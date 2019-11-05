@@ -12,7 +12,7 @@ const DEFAULT_NAMESPACE = '/svelte-realtime'
 const {SESSION_SECRET} = process.env
 if (!SESSION_SECRET) throw new Error('Must set SESSION_SECRET environment variable')
 
-function getServer(server, adapters, authenticate, namespace = DEFAULT_NAMESPACE) {
+function getServer(server, adapters, sessionStore, authenticate, namespace = DEFAULT_NAMESPACE) {
   const io = socketIO(server)
   const nsp = io.of(namespace)
   const sessions = {}  // {sessionID: {sessionID, user, sockets: Set()}}

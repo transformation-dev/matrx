@@ -55,7 +55,42 @@ class Client {
     callback(null)
   }
 
-  login(credentials, callback) { 
+  restoreSession(callback) { 
+    debug('connect() called')
+    this.socket = io(this._namespace)  
+    this.socket.removeAllListeners()
+    this.socket.on('connect', (result) => {
+      debug('connect msg received.  result: %O', result)
+      // this.socket.emit('authentication', credentials)
+      // this.socket.on('authenticated', () => {
+      //   debug('authenticated msg received')
+      //   this.afterAuthenticated(callback)
+      // })
+      this.socket.on('disconnect', () => {
+        debug('disconnect msg received')
+        this.connected.set(false)
+        this.socket.removeAllListeners()  
+        this.socket.on('reconnect', () => {
+          debug('reconnect msg received')
+          this.connect(() => {
+            debug('Got response to call to connect() from inside reconnect event. Ignoring.')
+          })
+        })
+      })
+      // this.socket.on('unauthenticated', () => {  // Pretty sure we don't need this. When someone is being kicked out from the server, we'll just disconnect which will unauthenticate them
+      //   console.log('got unauthenticated')
+      //   this.authenticated.set(false)
+      //   // this.socket.disconnect()
+      // })
+      // this.socket.on('unauthorized', (err) => {  // This is for when there is an error
+      //   debug('unauthorized msg received. error: %s', err)
+      //   this.connected.set(false)
+      //   callback(new Error('unauthorized'))
+      // })
+    })
+  }
+
+  loginOld(credentials, callback) { 
     debug('login() called. credentials: %O', credentials)
     this.socket = io(this._namespace)  
     this.socket.removeAllListeners()
@@ -88,7 +123,7 @@ class Client {
     })
   }
 
-  restoreSession(callback, delay = 2) {
+  restoreSessionOld(callback, delay = 2) {
     const sessionID = window.localStorage.getItem('sessionID')
     const username = window.localStorage.getItem('username')
     debug('restoreSession() called. sessionID: %s  username: %s', sessionID, username)

@@ -38,9 +38,9 @@
     }
   }
 
-  origin.subscribe((value) => {
-    debug('origin store changed value to: %s', value)
-    checkAuthentication(value)
+  origin.subscribe((originValue) => {
+    debug('origin store changed value to: %s', originValue)
+    checkAuthentication(originValue)
   })
 
   // realtimeClient.connected.subscribe((value) => {
