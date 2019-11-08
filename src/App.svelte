@@ -48,22 +48,24 @@
   //   checkAuthentication($origin)
   // })
 
-  function handleLogout(event) {
-    realtimeClient.logout((err, logoutSuccessful) => {
-      if (err) {
-        throw err
-      } else {
-        if (logoutSuccessful) {
-          if (!allowUnathenticated.has($location)) {
-            push('/login?origin=' + $origin)
-          } else {
-            // Just stay on this page
-          }
-        } else {
-          throw new Error('logout failed')
-        }
-      }
+  async function handleLogout(event) {
+    const response = await fetch('/logout', { 
+      headers: {
+        'Accept': 'application/json'
+      },
+      credentials: 'same-origin', 
     })
+    // const parsed = await response.body.json()
+    debug('Got response from logout: %O', response)
+    if (response.ok) {
+      if (!allowUnathenticated.has($location)) {
+        return push('/login?origin=' + $origin)
+      } else {
+        // Just stay on this page
+      }
+    } else {
+      throw new Error('logout failed')
+    }
   }
 
   // checkAuthentication($origin) 

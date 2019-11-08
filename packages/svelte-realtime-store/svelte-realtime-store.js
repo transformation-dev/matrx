@@ -24,11 +24,6 @@ class Client {
 
   afterAuthenticated(callback) {
     debug('afterAutenticated() called')
-    this.socket.on('new-session', (sessionID, username) => {
-      debug('new-session msg received. sessionID: %s  username: %s', sessionID, username)
-      window.localStorage.setItem('sessionID', sessionID)
-      window.localStorage.setItem('username', username)
-    })
     this.socket.on('set', (storeID, value) => {
       debug('set msg received. storeID: %s  value: %O', storeID, value)
       client.stores[storeID].forEach((store) => {
@@ -56,16 +51,11 @@ class Client {
   }
 
   restoreSession(callback) { 
-    debug('connect() called')
+    debug('restoreSession() called')
     this.socket = io(this._namespace)  
     this.socket.removeAllListeners()
     this.socket.on('connect', (result) => {
       debug('connect msg received.  result: %O', result)
-      // this.socket.emit('authentication', credentials)
-      // this.socket.on('authenticated', () => {
-      //   debug('authenticated msg received')
-      //   this.afterAuthenticated(callback)
-      // })
       this.socket.on('disconnect', () => {
         debug('disconnect msg received')
         this.connected.set(false)
@@ -77,79 +67,9 @@ class Client {
           })
         })
       })
-      // this.socket.on('unauthenticated', () => {  // Pretty sure we don't need this. When someone is being kicked out from the server, we'll just disconnect which will unauthenticate them
-      //   console.log('got unauthenticated')
-      //   this.authenticated.set(false)
-      //   // this.socket.disconnect()
-      // })
-      // this.socket.on('unauthorized', (err) => {  // This is for when there is an error
-      //   debug('unauthorized msg received. error: %s', err)
-      //   this.connected.set(false)
-      //   callback(new Error('unauthorized'))
-      // })
+      this.afterAuthenticated(callback)
+      // this.connected.set(true)
     })
-  }
-
-  loginOld(credentials, callback) { 
-    debug('login() called. credentials: %O', credentials)
-    this.socket = io(this._namespace)  
-    this.socket.removeAllListeners()
-    this.socket.on('connect', () => {
-      debug('connect msg received')
-      this.socket.emit('authentication', credentials)
-      this.socket.on('authenticated', () => {
-        debug('authenticated msg received')
-        this.afterAuthenticated(callback)
-      })
-      this.socket.on('disconnect', () => {
-        debug('disconnect msg received')
-        this.connected.set(false)
-        this.socket.removeAllListeners()  
-        this.socket.on('reconnect', () => {
-          debug('reconnect msg received')
-          this.login(credentials, callback)
-        })
-      })
-      // this.socket.on('unauthenticated', () => {  // Pretty sure we don't need this. When someone is being kicked out from the server, we'll just disconnect which will unauthenticate them
-      //   console.log('got unauthenticated')
-      //   this.authenticated.set(false)
-      //   // this.socket.disconnect()
-      // })
-      this.socket.on('unauthorized', (err) => {  // This is for when there is an error
-        debug('unauthorized msg received. error: %s', err)
-        this.connected.set(false)
-        callback(new Error('unauthorized'))
-      })
-    })
-  }
-
-  restoreSessionOld(callback, delay = 2) {
-    const sessionID = window.localStorage.getItem('sessionID')
-    const username = window.localStorage.getItem('username')
-    debug('restoreSession() called. sessionID: %s  username: %s', sessionID, username)
-    if (!sessionID) {
-      debug('DELAY REQUIRED TO AVOID RACE CONDITION WITH SETTING THE NEW SESSION ID: %i', delay)
-      if (delay < 10000) {
-        return setTimeout(() => {
-          return this.restoreSession(callback, delay*2)
-        }, delay)
-      }
-    }
-    if (sessionID) {
-      this.login({sessionID, username}, callback)
-    } else {
-      callback(new Error('failed to restore session'))
-    }
-  }
-
-  logout(callback) {
-    const sessionID = window.localStorage.getItem('sessionID')
-    debug('logout() called. sessionID: %s', sessionID)
-    window.localStorage.removeItem('sessionID')
-    client.socket.emit('logout', sessionID)
-    if (callback) {
-      return callback(null, true)
-    }
   }
 
   realtime(storeConfig, default_value, component = null, start = noop) {
@@ -164,8 +84,7 @@ class Client {
 
     function emitSet() {
       debug('emitSet() called')
-      const sessionID = window.localStorage.getItem('sessionID')
-      client.socket.emit('set', sessionID, storeID, lastNewValue, forceEmitBack)
+      client.socket.emit('set', storeID, lastNewValue, forceEmitBack)
     }
     const debouncedEmit = debounce(emitSet, debounceWait)
 
@@ -215,21 +134,6 @@ class Client {
     }
   
     function subscribe(run, invalidate = noop) {
-      function emitInitialize(delay=2) {
-        const sessionID = window.localStorage.getItem('sessionID')
-        if (sessionID) {
-          client.socket.emit('initialize', sessionID, storeID, value, (value) => {
-            run(value)
-          })
-        } else if (delay < 10000) {
-          debug('DELAY NEEDED FOR INITIALIZE TO AVOID RACE CONDITION WITH NEW-SESSION %i', delay)
-          setTimeout(() => {
-            emitInitialize(delay*2)
-          }, delay)
-        } else {
-          throw new Error('sessionID still missing after delay of ' + delay + 'ms')
-        }
-      }
       const subscriber = [run, invalidate]
       subscribers.push(subscriber)
       if (subscribers.length === 1) {
@@ -241,7 +145,10 @@ class Client {
       }
 
       if (client.socket) {
-        emitInitialize()
+        // emitInitialize()
+        client.socket.emit('initialize', storeID, value, (value) => {
+          run(value)
+        })
       } else {
         run(value)
       }

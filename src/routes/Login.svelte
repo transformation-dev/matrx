@@ -3,6 +3,7 @@
 
   import {getClient} from '@matrx/svelte-realtime-store'
   import {push, querystring} from 'svelte-spa-router'
+  const debug = require('debug')('Login.svelte')
 
   const origin = new URLSearchParams($querystring).get('origin')
   const realtimeClient = getClient()
@@ -18,22 +19,14 @@
       },
       credentials: 'same-origin', 
       body: JSON.stringify(credentials)
-      // body: credentials
     })
-    console.log('got response', response)
-    // const myJson = await response.json()
-    // console.log('myJson', myJson)
-    // realtimeClient.login({username: 'username', password: 'password'}, async (err) => {
-    //   if (err) {
-    //     console.log('login failed')  // TODO: Display an error and let them retry
-    //   } else {
-    //     if (origin) {
-    //       push(origin)
-    //     } else {
-    //       push('/')
-    //     }
-    //   }
-    // })
+    if (response.ok) {
+      if (origin) {
+        push(origin)
+      } else {
+        push('/')
+      }
+    }
   }
   
 </script>

@@ -46,35 +46,15 @@ const sessionPath = (HOME || '/home') + '/sessions'
 if (!fs.existsSync(sessionPath)) fs.mkdirSync(sessionPath)
 fs.chmodSync(sessionPath, 0o755)
 
-// function authenticate(socket, data, callback) {
-//   const username = data.username
-//   const password = data.password
-//   const user = {hashedPassword: 'abc', salt: '123'}
-//   function hash(password, salt) {
-//     return 'abc'
-//   }
-//   if (!user) {
-//     return callback(new Error('User not found'))
-//   }
-//   // if (err) return callback(err)
-//   return callback(null, user.hashedPassword === hash(password, user.salt))
-//   // return callback(null, false)
-//   // db.findUser('User', {username:username}, function(err, user) {
-//   //   if (err || !user) return callback(new Error("User not found"))
-//   //   return callback(null, user.password == password)
-//   // })
-// }
-
 const sessionStore = new FileStore({path: sessionPath})
 const app = express()
 const server = http.createServer(app)
 const nsp = getServer(server, adapters, sessionStore)
-// const nsp = getServer(server)  // TODO: Restore the above line with a real authenticate and adapters
 
 app.use(expressSession({
   secret: SESSION_SECRET,
-  resave: true,
-  saveUninitialized: true,
+  resave: false,
+  saveUninitialized: false,
   name: 'sessionID',
   store: sessionStore,
   cookie: { maxAge: 1000 * 60 * 60 * 24 * 30 },  // 30 days
@@ -119,8 +99,33 @@ app.post('/login',
   },
   passport.authenticate('local'),
   function(req, res, next) {
-    debug('login succeeded', req.user)
-    res.status(200).send('login successful')
+    debug('Login succeeded', req.user)
+    return res.status(200).json({status: 'Login successful'})
+  }
+)
+
+app.get('/checkauth',
+  function isAuthenticated(req,res,next) {
+    if(req.user) {
+      return next()
+    } else {
+      return res.status(401).json({error: 'User not authenticated'})
+    }
+  }, 
+  function(req, res){
+   return res.status(200).json({status: 'Login successful'})
+  }
+)
+
+app.get('/logout',
+  function(req, res, next) {
+    debug('Got GET to /logout %O', req.user)
+    req.session.destroy()
+    // req.logout()
+    return res
+      .status(200)
+      .clearCookie('sessionID', {httpOnly: true})
+      .json({status: 'Logout successful'})
   }
 )
 
