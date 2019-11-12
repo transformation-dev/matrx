@@ -2,6 +2,11 @@
 
 ![Codecov](https://img.shields.io/codecov/c/github/matrx-transformation/matrx?style=for-the-badge)
 
+[![Total alerts](https://img.shields.io/lgtm/alerts/g/matrx-transformation/matrx.svg?logo=lgtm&logoWidth=18&style=for-the-badge)](https://lgtm.com/projects/g/matrx-transformation/matrx/alerts/)
+
+[![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/matrx-transformation/matrx.svg?logo=lgtm&logoWidth=18&style=for-the-badge)](https://lgtm.com/projects/g/matrx-transformation/matrx/context:javascript)
+
+
 ![Azure DevOps releases](https://img.shields.io/azure-devops/release/matrx-transformation/eeebab5f-7e66-4a67-bd67-c98a299f2aae/1/1?style=for-the-badge)
 
 # `@matrx/matrx`

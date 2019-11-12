@@ -23,24 +23,35 @@
     '/wild/something'
   ])
 
-  function checkAuthentication(destination) {
-    debug('checkAuthentication() called.  destination: %s', destination)
+  function redirect(authenticated) {
+    if (! authenticated) {
+      if (!allowUnathenticated.has($location)) {
+        // realtimeClient.logout()
+        return push('/login?origin=' + $origin)
+      } else {
+        // Just stay on this page
+      }
+    } 
+  }
+
+  async function checkAuthentication(event) {
     if (!allowUnathenticated.has($location)) {
-      realtimeClient.restoreSession((err) => {
-        if (err) {
-          push('/login?origin=' + destination)    
-        } else {
-          if ($location == '/login') {
-            push(destination)
-          }
-        }
+      const response = await fetch('/checkauth', { 
+        headers: {
+          'Accept': 'application/json'
+        },
+        credentials: 'same-origin', 
       })
+      debug('Got response from /checkauth: %O', response)
+      if (response.ok) {
+        realtimeClient.restoreConnection(redirect)
+      }
     }
   }
 
-  origin.subscribe((value) => {
-    debug('origin store changed value to: %s', value)
-    checkAuthentication(value)
+  origin.subscribe((originValue) => {
+    debug('origin store changed value to: %s', originValue)
+    checkAuthentication(originValue)
   })
 
   // realtimeClient.connected.subscribe((value) => {
@@ -48,22 +59,16 @@
   //   checkAuthentication($origin)
   // })
 
-  function handleLogout(event) {
-    realtimeClient.logout((err, logoutSuccessful) => {
-      if (err) {
-        throw err
-      } else {
-        if (logoutSuccessful) {
-          if (!allowUnathenticated.has($location)) {
-            push('/login?origin=' + $origin)
-          } else {
-            // Just stay on this page
-          }
-        } else {
-          throw new Error('logout failed')
-        }
-      }
+  async function handleLogout(event) {
+    const response = await fetch('/logout', { 
+      headers: {
+        'Accept': 'application/json'
+      },
+      credentials: 'same-origin', 
     })
+    // const parsed = await response.body.json()
+    debug('Got response from /logout: %O', response)
+    redirect(response.ok)
   }
 
   // checkAuthentication($origin) 

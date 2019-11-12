@@ -108,9 +108,9 @@ class Adapter {
 
 function getAdapter() {  // TODO: Allow authentication to be passed in to overide the default of getting it from environment variables
   if (!adapter) {
-    adapater = new Adapter()
+    adapter = new Adapter()
   }
-  return adapater
+  return adapter
 }
 
 let adapter
