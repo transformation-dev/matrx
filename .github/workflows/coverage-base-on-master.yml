@@ -1,4 +1,4 @@
-name: Coverage
+name: Coverage base on master
 
 on:
   push:
