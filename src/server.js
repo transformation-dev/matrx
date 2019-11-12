@@ -7,6 +7,7 @@ const compression = require('compression')
 const uuidv4 = require('uuid/v4')
 const helmet = require('helmet')
 // const csrf = require('csurf')
+// const cookieParser = require('cookie-parser')
 const debug = require('debug')('matrx-server')
 
 const passport = require('passport')
@@ -54,6 +55,8 @@ const app = express()
 const server = http.createServer(app)
 const svelteRealtimeServer = getServer(server, adapters, sessionStore)
 
+
+
 app.use(expressSession({
   secret: SESSION_SECRET,
   resave: false,
@@ -65,7 +68,7 @@ app.use(expressSession({
 app.use(passport.initialize())
 app.use(passport.session())
 
-// app.use(csrf({cookie: false}))
+// app.use(cookieParser())
 
 app.use((req, res, next) => {
   res.locals.nonce = uuidv4()
@@ -91,6 +94,8 @@ app.use(
   compression({threshold: 0}),
   serveStatic('dist')
 )
+
+// app.use(csrf({cookie: true}))
 
 app.post('/login',
   function(req, res, next) {
