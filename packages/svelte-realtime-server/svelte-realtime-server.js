@@ -1,8 +1,4 @@
-// const crypto = require('crypto')
-
 const socketIO = require('socket.io')
-// const socketIOAuth = require('socketio-auth')
-const uuidv4 = require('uuid/v4')
 const debug = require('debug')('svelte-realtime:server')
 const cookie = require('cookie')
 const cookieParser = require('cookie-parser')
@@ -15,14 +11,27 @@ if (!SESSION_SECRET) throw new Error('Must set SESSION_SECRET environment variab
 function getServer(server, adapters, sessionStore, namespace = DEFAULT_NAMESPACE) {
   const io = socketIO(server)
   const nsp = io.of(namespace)
+  const lookupSocketsBySessionID = new Map()  // {sessionID: [socket]}
 
   nsp.use((socket, next) => {
     const rawCookies = socket.request.headers.cookie
     const parsedCookies = cookie.parse(rawCookies)
     const sessionID = cookieParser.signedCookie(parsedCookies.sessionID, SESSION_SECRET)
-    debug('SOCKET.IO MIDDLEWARE CALLED.  sessionID: %O', sessionID)
-    if (sessionID) {  // TODO: Look up in sessionStore if this is valid
-      return next()
+    debug('socket.io middleware called.  sessionID: %O', sessionID)
+    if (sessionID) {
+      sessionStore.get(sessionID, (err, session) => {
+        debug('sessionStore.get callback called. session: %O', session)
+        if (err) {
+          return next(new Error('not authorized'))
+        } else {
+          socket.sessionID = sessionID  // TODO: Maybe switch this to key off of username
+          if (!lookupSocketsBySessionID.get(sessionID)) {
+            lookupSocketsBySessionID.set(sessionID, new Set())
+          }
+          lookupSocketsBySessionID.get(sessionID).add(socket)
+          return next()
+        }
+      })
     } else {
       return next(new Error('not authorized'))
     }
@@ -100,7 +109,16 @@ function getServer(server, adapters, sessionStore, namespace = DEFAULT_NAMESPACE
 
   })
 
-  return nsp
+  function logout(sessionID) {
+    debug('svelte-realtime-server.logout() called.  sessionID: %O', sessionID)
+    if (lookupSocketsBySessionID.get(sessionID)) {
+      lookupSocketsBySessionID.get(sessionID).forEach((tempSocket) => {
+        tempSocket.disconnect()
+      })
+    }
+  }
+
+  return {nsp, logout}
 }
 
 module.exports = {getServer}  // TODO: Eventually change this to export once supported

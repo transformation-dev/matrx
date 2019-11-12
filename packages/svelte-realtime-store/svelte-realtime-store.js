@@ -47,28 +47,30 @@ class Client {
     }
     this.socket.emit('join', storesReshaped)
     this.connected.set(true)
-    callback(null)
+    callback(true)
   }
 
-  restoreSession(callback) { 
-    debug('restoreSession() called')
+  restoreConnection(callback) { 
+    debug('restoreConnection() called')
+    if (this.socket) {
+      this.socket.removeAllListeners()
+      this.socket = null
+    }
     this.socket = io(this._namespace)  
-    this.socket.removeAllListeners()
-    this.socket.on('connect', (result) => {
-      debug('connect msg received.  result: %O', result)
+    this.socket.on('connect', () => {
+      debug('connect msg received')
       this.socket.on('disconnect', () => {
         debug('disconnect msg received')
         this.connected.set(false)
         this.socket.removeAllListeners()  
         this.socket.on('reconnect', () => {
           debug('reconnect msg received')
-          this.connect(() => {
-            debug('Got response to call to connect() from inside reconnect event. Ignoring.')
+          this.restoreConnection(() => {
+            debug('Got response to call to restoreConnection() from inside reconnect event. Ignoring.')
           })
         })
       })
       this.afterAuthenticated(callback)
-      // this.connected.set(true)
     })
   }
 
@@ -145,7 +147,6 @@ class Client {
       }
 
       if (client.socket) {
-        // emitInitialize()
         client.socket.emit('initialize', storeID, value, (value) => {
           run(value)
         })

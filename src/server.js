@@ -2,8 +2,7 @@ const http = require('http')
 const fs = require('fs')
 const serveStatic = require('serve-static')
 const express = require('express')
-const bodyParser = require('body-parser')
-const jsonParser = bodyParser.json()
+const jsonParser = express.json()
 const compression = require('compression')
 const uuidv4 = require('uuid/v4')
 const helmet = require('helmet')
@@ -18,7 +17,7 @@ passport.use(new LocalStrategy(
 	function(username, password, done) {
     debug('LocalStrategy callback called.  username: %s', username)
 		if (password === 'admin') {
-			return done(null, {id: 1, name: username})
+			return done(null, {id: 1, name: username})  // TODO: Upgrade this with the real information
 		} else {
 			return done(null, false)
 		}
@@ -26,11 +25,14 @@ passport.use(new LocalStrategy(
 ))
 
 passport.serializeUser(function(user, cb) {
-	cb(null, JSON.stringify(user))
+  cb(null, user)  // TODO: Should probably just stick the userID into the session store
+	// cb(null, JSON.stringify(user))
 })
 
 passport.deserializeUser(function(packet, cb) {
-	cb(null,JSON.parse(packet))
+  // TODO: Lookup in database the user and return it instead of packet
+  cb(null, packet)
+	// cb(null, JSON.parse(packet))
 })
 
 const {getServer} = require('@matrx/svelte-realtime-server')
@@ -49,7 +51,7 @@ fs.chmodSync(sessionPath, 0o755)
 const sessionStore = new FileStore({path: sessionPath})
 const app = express()
 const server = http.createServer(app)
-const nsp = getServer(server, adapters, sessionStore)
+const svelteRealtimeServer = getServer(server, adapters, sessionStore)
 
 app.use(expressSession({
   secret: SESSION_SECRET,
@@ -106,7 +108,7 @@ app.post('/login',
 
 app.get('/checkauth',
   function isAuthenticated(req,res,next) {
-    if(req.user) {
+    if (req.user) {
       return next()
     } else {
       return res.status(401).json({error: 'User not authenticated'})
@@ -119,11 +121,11 @@ app.get('/checkauth',
 
 app.get('/logout',
   function(req, res, next) {
-    debug('Got GET to /logout %O', req.user)
+    debug('Got GET to /logout.\nreq.user: %O\nreq.sessionID: %O', req.user, req.sessionID)
     req.session.destroy()
-    // req.logout()
+    svelteRealtimeServer.logout(req.sessionID)
     return res
-      .status(200)
+      .status(401)
       .clearCookie('sessionID', {httpOnly: true})
       .json({status: 'Logout successful'})
   }

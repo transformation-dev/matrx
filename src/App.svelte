@@ -23,18 +23,29 @@
     '/wild/something'
   ])
 
-  function checkAuthentication(destination) {
-    debug('checkAuthentication() called.  destination: %s', destination)
+  function redirect(authenticated) {
+    if (! authenticated) {
+      if (!allowUnathenticated.has($location)) {
+        // realtimeClient.logout()
+        return push('/login?origin=' + $origin)
+      } else {
+        // Just stay on this page
+      }
+    } 
+  }
+
+  async function checkAuthentication(event) {
     if (!allowUnathenticated.has($location)) {
-      realtimeClient.restoreSession((err) => {
-        if (err) {
-          push('/login?origin=' + destination)    
-        } else {
-          if ($location == '/login') {
-            push(destination)
-          }
-        }
+      const response = await fetch('/checkauth', { 
+        headers: {
+          'Accept': 'application/json'
+        },
+        credentials: 'same-origin', 
       })
+      debug('Got response from /checkauth: %O', response)
+      if (response.ok) {
+        realtimeClient.restoreConnection(redirect)
+      }
     }
   }
 
@@ -56,16 +67,8 @@
       credentials: 'same-origin', 
     })
     // const parsed = await response.body.json()
-    debug('Got response from logout: %O', response)
-    if (response.ok) {
-      if (!allowUnathenticated.has($location)) {
-        return push('/login?origin=' + $origin)
-      } else {
-        // Just stay on this page
-      }
-    } else {
-      throw new Error('logout failed')
-    }
+    debug('Got response from /logout: %O', response)
+    redirect(response.ok)
   }
 
   // checkAuthentication($origin) 
