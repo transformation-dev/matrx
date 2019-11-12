@@ -28,7 +28,7 @@ jobs:
         npm ci
         npm run css:build
         npm run coverage
-        npm run coverage:check
+        # npm run coverage:check
       env:
         CI: true
         SESSION_SECRET: ${{secrets.SESSION_SECRET}}
@@ -43,3 +43,9 @@ jobs:
       with:
         name: coverage-report
         path: coverage/lcov-report
+
+    - name: check coverage levels
+      run: |
+        npm run coverage:check
+      env:
+        CI: true

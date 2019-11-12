@@ -6,6 +6,7 @@ const jsonParser = express.json()
 const compression = require('compression')
 const uuidv4 = require('uuid/v4')
 const helmet = require('helmet')
+// const csrf = require('csurf')
 const debug = require('debug')('matrx-server')
 
 const passport = require('passport')
@@ -63,6 +64,8 @@ app.use(expressSession({
 }))
 app.use(passport.initialize())
 app.use(passport.session())
+
+// app.use(csrf({cookie: false}))
 
 app.use((req, res, next) => {
   res.locals.nonce = uuidv4()
