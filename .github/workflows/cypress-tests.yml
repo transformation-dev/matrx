@@ -29,3 +29,4 @@ jobs:
         npm test
       env:
         CI: true
+        SESSION_SECRET: ${{secrets.SESSION_SECRET}}
