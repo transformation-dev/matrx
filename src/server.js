@@ -55,8 +55,6 @@ const app = express()
 const server = http.createServer(app)
 const svelteRealtimeServer = getServer(server, adapters, sessionStore)
 
-
-
 app.use(expressSession({
   secret: SESSION_SECRET,
   resave: false,

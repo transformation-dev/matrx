@@ -24,7 +24,7 @@ function getServer(server, adapters, sessionStore, namespace = DEFAULT_NAMESPACE
         if (err) {
           return next(new Error('not authorized'))
         } else {
-          socket.sessionID = sessionID  // TODO: Maybe switch this to key off of username
+          socket.sessionID = sessionID
           if (!lookupSocketsBySessionID.get(sessionID)) {
             lookupSocketsBySessionID.set(sessionID, new Set())
           }
@@ -38,9 +38,20 @@ function getServer(server, adapters, sessionStore, namespace = DEFAULT_NAMESPACE
   })
   
   nsp.on('connect', (socket) => {
-  // function postAuthenticate(socket, user) {  // TODO: How do we get the user into this function?
-    debug('postAuthenticate() called. ')
-    // socket.on('disconnect', () => {})  // Since we're storing everything in the nsp's socket or room, we shouldn't need any additional cleanup
+    debug('connect msg received')
+
+    socket.on('disconnect', () => {
+      debug('disconnect msg received')
+      if (socket.sessionID) {
+        const socketSet = lookupSocketsBySessionID.get(socket.sessionID)
+        if (socketSet) {
+          socketSet.delete(socket)
+          if (socketSet.size == 0) {
+            lookupSocketsBySessionID.delete(socket.sessionID)
+          }
+        }
+      }
+    })
 
     socket.on('join', (stores) => {  // TODO: Check access control before joining
       debug('join msg received.  stores: %O', stores)
@@ -115,6 +126,7 @@ function getServer(server, adapters, sessionStore, namespace = DEFAULT_NAMESPACE
       lookupSocketsBySessionID.get(sessionID).forEach((tempSocket) => {
         tempSocket.disconnect()
       })
+      lookupSocketsBySessionID.delete(sessionID)
     }
   }
 
