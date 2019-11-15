@@ -7,6 +7,7 @@
   const debug = require('debug')('matrx:App.svelte')
 
   import routes from './routes'
+  import {CSRFToken} from './stores'
 
   function isActive(node, path) {
     return active(node, path, 'is-active')  // TODO: Change to 'is-active' when for Bulma
@@ -23,6 +24,8 @@
     '/wild/something'
   ])
 
+  const loginRoute = '/login'
+
   function redirect(authenticated) {
     if (! authenticated) {
       if (!allowUnathenticated.has($location)) {
@@ -38,16 +41,17 @@
 
   async function checkAuthentication() {
     debug('checkAuthentication() called')
-    if (!allowUnathenticated.has($location)) {
+    if ($location === loginRoute || !allowUnathenticated.has($location)) {
       const response = await fetch('/checkauth', { 
         headers: {
           'Accept': 'application/json'
         },
         credentials: 'same-origin', 
       })
-      // const parsed = await response.body.json()
-      debug('Got response from /checkauth: %O', response)
-      if (response.ok) {
+      const parsed = await response.json()
+      debug('Got response from /checkauth: %O', parsed)
+      CSRFToken.set(parsed.CSRFToken)
+      if (parsed.status === 'Authenticated') {
         realtimeClient.restoreConnection(redirect)
       }
     }
@@ -70,8 +74,8 @@
       },
       credentials: 'same-origin', 
     })
-    // const parsed = await response.body.json()
-    debug('Got response from /logout: %O', response)
+    const parsed = await response.json()
+    debug('Got response from /logout: %O', parsed)
     redirect(response.ok)
   }
 

@@ -3,6 +3,7 @@
 
   import {getClient} from '@matrx/svelte-realtime-store'
   import {push, querystring} from 'svelte-spa-router'
+  import {CSRFToken} from '../stores'
   const debug = require('debug')('matrx:Login.svelte')
 
   const origin = new URLSearchParams($querystring).get('origin')
@@ -15,7 +16,8 @@
       method: 'POST', 
       headers: {
         'Accept': 'application/json',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'CSRF-Token': $CSRFToken
       },
       credentials: 'same-origin', 
       body: JSON.stringify(credentials)

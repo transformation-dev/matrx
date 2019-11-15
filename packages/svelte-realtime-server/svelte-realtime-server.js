@@ -76,29 +76,33 @@ function getServer(server, adapters, sessionStore, namespace = DEFAULT_NAMESPACE
 
     socket.on('set', (storeID, value, forceEmitBack) => {
       debug('set msg received. storeID: %s  value: %O', storeID, value)
-      const session = true  // TODO: Make this be a function of the middleware
-      if (session) {
-        let room = nsp.adapter.rooms[storeID]
-        if (!room) {
-          socket.join(storeID)
-          room = nsp.adapter.rooms[storeID]
-        }
-        if (room) {  // There should always be a room now but better safe
-          room.cachedValue = value
-        } else {
-          throw new Error('Unexpected condition. There should be one but there is no room for storeID: ' + storeID)
-        }
-        if (forceEmitBack) {
-          nsp.in(storeID).emit('set', storeID, value)  // This sends to all clients including the originator
-        } else {
-          socket.to(storeID).emit('set', storeID, value)  // This sends to all clients except the originating client
-        }
+
+      // Latency compensation by optimistically sending update to room
+      let room = nsp.adapter.rooms[storeID]
+      if (!room) {
+        socket.join(storeID)
+        room = nsp.adapter.rooms[storeID]
+      }
+      if (room) {  // There should always be a room now but better safe
+        room.cachedValue = value
       } else {
+        throw new Error('Unexpected condition. There should be one but there is no room for storeID: ' + storeID)
+      }
+      if (forceEmitBack) {
+        nsp.in(storeID).emit('set', storeID, value)  // This sends to all clients including the originator
+      } else {
+        socket.to(storeID).emit('set', storeID, value)  // This sends to all clients except the originating client
+      }
+
+      // TODO: Save to database via adapter
+
+      // If database save fails, then revert
+      const databaseSaveFailed = false  // TODO: Drive this off of above
+      if (databaseSaveFailed) {
         const room = nsp.adapter.rooms[storeID]
         if (room && room.cachedValue) {
-          socket.emit('revert', storeID, room.cachedValue)
+          nsp.in(storeID).emit('revert', storeID, room.cachedValue)  // This sends to all clients including the originator
         }
-        socket.disconnect()
       }
     })
   })

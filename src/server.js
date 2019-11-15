@@ -6,8 +6,7 @@ const jsonParser = express.json()
 const compression = require('compression')
 const uuidv4 = require('uuid/v4')
 const helmet = require('helmet')
-// const csrf = require('csurf')
-// const cookieParser = require('cookie-parser')
+const csrf = require('csurf')
 const debug = require('debug')('matrx:server.js')
 
 const passport = require('passport')
@@ -66,8 +65,6 @@ app.use(expressSession({
 app.use(passport.initialize())
 app.use(passport.session())
 
-// app.use(cookieParser())
-
 app.use((req, res, next) => {
   res.locals.nonce = uuidv4()
   next()
@@ -93,7 +90,7 @@ app.use(
   serveStatic('dist')
 )
 
-// app.use(csrf({cookie: true}))
+app.use(csrf({cookie: false}))
 
 app.post('/login',
   function(req, res, next) {
@@ -113,15 +110,15 @@ app.post('/login',
 )
 
 app.get('/checkauth',
-  function isAuthenticated(req,res,next) {
+  function isAuthenticated(req, res, next) {
     if (req.user) {
       return next()
     } else {
-      return res.status(401).json({error: 'User not authenticated'})
+      return res.status(200).json({"CSRFToken": req.csrfToken(), status: 'Not authenticated'})
     }
   }, 
   function(req, res){
-   return res.status(200).json({status: 'Login successful'})
+   return res.status(200).json({"CSRFToken": req.csrfToken(), status: 'Authenticated'})
   }
 )
 
