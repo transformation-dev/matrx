@@ -37,4 +37,5 @@
   
 </script>
 
-<button id="login" on:click={handleLogin} disabled="{!localStorage.getItem('CSRFToken')}">Login</button>
+<!-- <button id="login" on:click={handleLogin} disabled="{!localStorage.getItem('CSRFToken')}">Login</button> -->
+<button id="login" on:click={handleLogin}>Login</button>
