@@ -4,7 +4,7 @@
   import active from 'svelte-spa-router/active'
   import {derived} from 'svelte/store'
   import {getClient} from '@matrx/svelte-realtime-store'
-  const debug = require('debug')('App.svelte')
+  const debug = require('debug')('matrx:App.svelte')
 
   import routes from './routes'
 
@@ -31,10 +31,13 @@
       } else {
         // Just stay on this page
       }
-    } 
+    } else {
+      return push($origin)
+    }
   }
 
-  async function checkAuthentication(event) {
+  async function checkAuthentication() {
+    debug('checkAuthentication() called')
     if (!allowUnathenticated.has($location)) {
       const response = await fetch('/checkauth', { 
         headers: {
@@ -42,6 +45,7 @@
         },
         credentials: 'same-origin', 
       })
+      // const parsed = await response.body.json()
       debug('Got response from /checkauth: %O', response)
       if (response.ok) {
         realtimeClient.restoreConnection(redirect)
@@ -51,12 +55,12 @@
 
   origin.subscribe((originValue) => {
     debug('origin store changed value to: %s', originValue)
-    checkAuthentication(originValue)
+    checkAuthentication()
   })
 
   // realtimeClient.connected.subscribe((value) => {
   //   debug('connected store changed value to: %O', value)
-  //   checkAuthentication($origin)
+  //   checkAuthentication()
   // })
 
   async function handleLogout(event) {
@@ -71,7 +75,7 @@
     redirect(response.ok)
   }
 
-  // checkAuthentication($origin) 
+  // checkAuthentication() 
 
 </script>
 

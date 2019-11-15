@@ -2,7 +2,7 @@
 
 const {writable, readable} = require('svelte/store')
 const {debounce} = require('lodash')
-const debug = require('debug')('svelte-realtime:store')
+const debug = require('debug')('matrx:svelte-realtime-store')
 
 // From svelte
 const subscriber_queue = []
@@ -146,13 +146,7 @@ class Client {
         value = default_value
       }
 
-      if (client.socket) {
-        client.socket.emit('initialize', storeID, value, (value) => {
-          run(value)
-        })
-      } else {
-        run(value)
-      }
+      run(value)
       
       return () => {
         const index = subscribers.indexOf(subscriber)

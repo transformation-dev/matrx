@@ -1,5 +1,5 @@
 const socketIO = require('socket.io')
-const debug = require('debug')('svelte-realtime:server')
+const debug = require('debug')('matrx:svelte-realtime-server')
 const cookie = require('cookie')
 const cookieParser = require('cookie-parser')
 
@@ -101,23 +101,6 @@ function getServer(server, adapters, sessionStore, namespace = DEFAULT_NAMESPACE
         socket.disconnect()
       }
     })
-
-    socket.on('initialize', (storeID, defaultValue, callback) => {
-      debug('initialize msg received.  storeID: %s  defaultValue: %O', storeID, defaultValue)
-      const session = true  // TODO: Make this a function of the middleware
-      if (session) {
-        const room = nsp.adapter.rooms[storeID]
-        if (room && room.cachedValue) {
-          callback(room.cachedValue)
-        } else {
-          callback(defaultValue)
-        }
-      } else {
-        callback(defaultValue)
-        socket.disconnect()
-      }
-    })
-
   })
 
   function logout(sessionID) {

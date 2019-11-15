@@ -8,7 +8,7 @@ const uuidv4 = require('uuid/v4')
 const helmet = require('helmet')
 // const csrf = require('csurf')
 // const cookieParser = require('cookie-parser')
-const debug = require('debug')('matrx-server')
+const debug = require('debug')('matrx:server.js')
 
 const passport = require('passport')
 const LocalStrategy = require('passport-local').Strategy

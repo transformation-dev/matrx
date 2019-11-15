@@ -3,7 +3,7 @@
 
   import {getClient} from '@matrx/svelte-realtime-store'
   import {push, querystring} from 'svelte-spa-router'
-  const debug = require('debug')('Login.svelte')
+  const debug = require('debug')('matrx:Login.svelte')
 
   const origin = new URLSearchParams($querystring).get('origin')
   const realtimeClient = getClient()
@@ -20,7 +20,11 @@
       credentials: 'same-origin', 
       body: JSON.stringify(credentials)
     })
-    if (response.ok) {
+    pushOrigin(response.ok)
+  }
+
+  function pushOrigin(ok) {
+    if (ok) {
       if (origin) {
         push(origin)
       } else {
