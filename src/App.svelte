@@ -7,7 +7,7 @@
   const debug = require('debug')('matrx:App.svelte')
 
   import routes from './routes'
-  import {CSRFToken} from './stores'
+  // import {CSRFToken} from './stores'
 
   function isActive(node, path) {
     return active(node, path, 'is-active')  // TODO: Change to 'is-active' when for Bulma
@@ -50,7 +50,7 @@
       })
       const parsed = await response.json()
       debug('Got response from /checkauth: %O', parsed)
-      CSRFToken.set(parsed.CSRFToken)
+      localStorage.setItem('CSRFToken', parsed.CSRFToken)
       if (parsed.status === 'Authenticated') {
         realtimeClient.restoreConnection(redirect)
       }

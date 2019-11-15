@@ -3,7 +3,7 @@
 
   import {getClient} from '@matrx/svelte-realtime-store'
   import {push, querystring} from 'svelte-spa-router'
-  import {CSRFToken} from '../stores'
+  // import {CSRFToken} from '../stores'
   const debug = require('debug')('matrx:Login.svelte')
 
   const origin = new URLSearchParams($querystring).get('origin')
@@ -17,7 +17,7 @@
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'CSRF-Token': $CSRFToken
+        'CSRF-Token': localStorage.getItem('CSRFToken')
       },
       credentials: 'same-origin', 
       body: JSON.stringify(credentials)
@@ -37,4 +37,4 @@
   
 </script>
 
-<button id="login" on:click={handleLogin} disabled="{!$CSRFToken}">Login</button>
+<button id="login" on:click={handleLogin} disabled="{!localStorage.getItem('CSRFToken')}">Login</button>
