@@ -37,4 +37,4 @@
   
 </script>
 
-<button id="login" on:click={handleLogin}>Login</button>
+<button id="login" on:click={handleLogin} disabled="{!$CSRFToken}">Login</button>
