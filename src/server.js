@@ -63,7 +63,7 @@ app.use(expressSession({
   name: 'sessionID',
   store: sessionStore,
   cookie: { maxAge: 1000 * 60 * 60 * 24 * 30 },  // 30 days
-}))  // lgtm [js/missing-token-validation]
+}))
 app.use(passport.initialize())
 app.use(passport.session())
 
@@ -92,7 +92,7 @@ app.use(
   serveStatic('dist')
 )
 
-app.use(cookieParser())
+app.use(cookieParser())  // lgtm [js/missing-token-validation]
 
 app.post('/login',
   function(req, res, next) {
