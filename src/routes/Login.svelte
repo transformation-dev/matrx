@@ -3,7 +3,7 @@
 
   import {getClient} from '@matrx/svelte-realtime-store'
   import {push, querystring} from 'svelte-spa-router'
-  // import {CSRFToken} from '../stores'
+  import {CSRFTokenAvailable} from '../stores'
   const debug = require('debug')('matrx:Login.svelte')
 
   const origin = new URLSearchParams($querystring).get('origin')
@@ -37,5 +37,4 @@
   
 </script>
 
-<!-- <button id="login" on:click={handleLogin} disabled="{!localStorage.getItem('CSRFToken')}">Login</button> -->
-<button id="login" on:click={handleLogin}>Login</button>
+<button id="login" on:click={handleLogin} disabled="{!$CSRFTokenAvailable}">Login</button>

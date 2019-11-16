@@ -1,3 +1,3 @@
 import {writable} from 'svelte/store'
 
-export const CSRFToken = writable('')
+export const CSRFTokenAvailable = writable(false)

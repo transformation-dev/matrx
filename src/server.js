@@ -6,7 +6,9 @@ const jsonParser = express.json()
 const compression = require('compression')
 const uuidv4 = require('uuid/v4')
 const helmet = require('helmet')
+const cookieParser = require('cookie-parser')
 const csrf = require('csurf')
+const csrfProtection = csrf({ cookie: true })
 const debug = require('debug')('matrx:server.js')
 
 const passport = require('passport')
@@ -44,7 +46,7 @@ const adapters = {
 const PORT = process.env.PORT || 8080
 const {NODE_ENV, SESSION_SECRET, HOME} = process.env
 if (!SESSION_SECRET) throw new Error('Must set SESSION_SECRET environment variable')
-const dev = NODE_ENV === 'development'
+const dev = !(NODE_ENV === 'production')
 const sessionPath = (HOME || '/home') + '/sessions'
 if (!fs.existsSync(sessionPath)) fs.mkdirSync(sessionPath)
 fs.chmodSync(sessionPath, 0o755)
@@ -90,7 +92,9 @@ app.use(
   serveStatic('dist')
 )
 
-app.use(csrf({cookie: false}))
+app.use(cookieParser())
+
+// app.use(csrf({cookie: false}))
 
 app.post('/login',
   function(req, res, next) {
@@ -98,6 +102,7 @@ app.post('/login',
     return next()
   },
   jsonParser,
+  // csrfProtection,
   function(req, res, next) {
     debug('Got POST to /login.  req.body: %O', req.body)
     return next()
@@ -105,32 +110,37 @@ app.post('/login',
   passport.authenticate('local'),
   function(req, res, next) {
     debug('Login succeeded', req.user)
-    return res.status(200).json({status: 'Login successful'})
+    return res.status(200).json({authenticated: true})
   }
 )
 
 app.get('/checkauth',
+  csrfProtection,
   function isAuthenticated(req, res, next) {
     if (req.user) {
       return next()
     } else {
-      return res.status(200).json({"CSRFToken": req.csrfToken(), status: 'Not authenticated'})
+      return res.status(200).json({"CSRFToken": req.csrfToken(), authenticated: false})
+      // return res.status(200).json({authenticated: false})
     }
   }, 
   function(req, res){
-   return res.status(200).json({"CSRFToken": req.csrfToken(), status: 'Authenticated'})
+   return res.status(200).json({"CSRFToken": req.csrfToken(), authenticated: true})
+  //  return res.status(200).json({authenticated: true})
   }
 )
 
 app.get('/logout',
+  csrfProtection,
   function(req, res, next) {
     debug('Got GET to /logout.\nreq.user: %O\nreq.sessionID: %O', req.user, req.sessionID)
     req.session.destroy()
     svelteRealtimeServer.logout(req.sessionID)
     return res
-      .status(401)
+      .status(200)
       .clearCookie('sessionID', {httpOnly: true})
-      .json({status: 'Logout successful'})
+      .json({"CSRFToken": req.csrfToken(), authenticated: false})
+      // .json({authenticated: false})
   }
 )
 
