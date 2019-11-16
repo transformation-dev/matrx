@@ -17,7 +17,6 @@
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'CSRF-Token': localStorage.getItem('CSRFToken')
       },
       credentials: 'same-origin', 
       body: JSON.stringify(credentials)

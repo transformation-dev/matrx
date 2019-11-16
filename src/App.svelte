@@ -55,7 +55,6 @@
       })
       const parsed = await response.json()
       debug('Got response from /checkauth: %O', parsed)
-      localStorage.setItem('CSRFToken', parsed.CSRFToken)
       $CSRFTokenAvailable = true
       if (parsed.authenticated) {
         realtimeClient.restoreConnection(redirect)
@@ -78,13 +77,13 @@
     const response = await fetch('/logout', { 
       headers: {
         'Accept': 'application/json',
-        'CSRF-Token': localStorage.getItem('CSRFToken')
+        // 'CSRF-Token': localStorage.getItem('CSRFToken')
       },
       credentials: 'same-origin', 
     })
     const parsed = await response.json()
     debug('Got response from /logout: %O', parsed)
-    localStorage.setItem('CSRFToken', parsed.CSRFToken)
+    // localStorage.setItem('CSRFToken', parsed.CSRFToken)
     $CSRFTokenAvailable = true
     redirect(parsed.authenticated)
   }

@@ -94,15 +94,12 @@ app.use(
 
 app.use(cookieParser())
 
-// app.use(csrf({cookie: false}))
-
 app.post('/login',
   function(req, res, next) {
     debug('Got POST to /login')
     return next()
   },
   jsonParser,
-  // csrfProtection,
   function(req, res, next) {
     debug('Got POST to /login.  req.body: %O', req.body)
     return next()
@@ -120,13 +117,11 @@ app.get('/checkauth',
     if (req.user) {
       return next()
     } else {
-      return res.status(200).json({"CSRFToken": req.csrfToken(), authenticated: false})
-      // return res.status(200).json({authenticated: false})
+      return res.status(200).json({authenticated: false})
     }
   }, 
   function(req, res){
-   return res.status(200).json({"CSRFToken": req.csrfToken(), authenticated: true})
-  //  return res.status(200).json({authenticated: true})
+   return res.status(200).json({authenticated: true})
   }
 )
 
@@ -139,8 +134,7 @@ app.get('/logout',
     return res
       .status(200)
       .clearCookie('sessionID', {httpOnly: true})
-      .json({"CSRFToken": req.csrfToken(), authenticated: false})
-      // .json({authenticated: false})
+      .json({authenticated: false})
   }
 )
 
