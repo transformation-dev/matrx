@@ -6,8 +6,11 @@
 // import bulmaswatch (must happen before importing bulma)
 @import "node_modules/bulmaswatch/lux/_variables.scss";
 
+
 // adjusts height of nav-bar (must happen before importing bulma)
 $navbar-height: 3rem;
+$box-padding: 5rem; 
+$box-radius: 10px;
 
 // Import only what you need from Bulma
 // @import "../node_modules/bulma/sass/utilities/_all.sass";

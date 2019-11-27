@@ -203,26 +203,15 @@
         </div>
       </div>
       <div class="navbar-end">
-        <a class="navbar-item" href="https://github.com/jgthms/bulma" target="_blank">
-          Github
-        </a>
-        <a class="navbar-item" href="https://twitter.com/jgthms" target="_blank">
-          Twitter
-        </a>
         <div class="navbar-item">
           <div class="field is-grouped">
             <p class="control">
-              <a id="twitter" class="button">
-                <span>Tweet</span>
-              </a>
-            </p>
-            <p class="control">
-              <a class="button is-primary" href="https://github.com/jgthms/bulma/archive/0.4.3.zip">
-                <span class="icon">
-                  <i class="fa fa-download"></i>
+              <button id="logout" on:click={handleLogout} class="button is-rounded">
+                <span class="icon is-small is-left">
+                <i class="fas fa-sign-out-alt"></i>
                 </span>
-                <span>Download</span>
-              </a>
+                <span>Logout</span>
+              </button>
             </p>
           </div>
         </div>
@@ -230,6 +219,5 @@
     </div>
   </nav>
 
-<button id="logout" on:click={handleLogout} class="button">Logout</button>
 
 <Router {routes}/>

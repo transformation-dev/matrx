@@ -1149,11 +1149,11 @@ a.has-text-danger:hover, a.has-text-danger:focus {
 
 .box {
   background-color: white;
-  border-radius: 6px;
+  border-radius: 10px;
   box-shadow: 0 0 0 1px #b5bbbf;
   color: #4a4a4a;
   display: block;
-  padding: 1.25rem; }
+  padding: 5rem; }
 
 a.box:hover, a.box:focus {
   box-shadow: 0 2px 3px rgba(10, 10, 10, 0.1), 0 0 0 1px #7f888f; }

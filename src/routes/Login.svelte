@@ -31,5 +31,35 @@
   
 </script>
 
+<div class="tile is-ancestor">
+  <div class="tile is-parent">
+    <div class="tile is-child is-12"></div>
+  </div>
+</div>
+<div class="tile is-ancestor">
+  <div class="tile is-parent">
+    <div class="tile is-child"></div>
+    <div class="tile is-5 is-child has-text-centered box">
+      <p class="title has-text-centered">Hello!</p>
+        <div class="field">
+            <p class="control has-icons-left">
+              <input class="input" type="email" placeholder="Email">
+              <span class="icon is-small is-left">
+                <i class="fas fa-envelope"></i>
+              </span>
+            </p>
+          </div>
+          <div class="field">
+            <p class="control has-icons-left">
+              <input class="input" type="password" placeholder="Password">
+              <span class="icon is-small is-left">
+                <i class="fas fa-lock"></i>
+              </span>
+            </p>
+          </div>
+      <button class="button is-success is-centered" id="login" on:click={handleLogin}>login</button>
+    </div>
+    <div class="tile is-child"></div>
+  </div>
+</div>
 
-<button id="login" on:click={handleLogin}>Login</button>
