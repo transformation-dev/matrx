@@ -34,7 +34,8 @@
   "scripts": {
     "start": "cosmosdb-server -p 8081",
     "ports": "sudo netstat -ltnp",
-    "test": "tape test/*.js | tap-spec"
+    "tape": "tape test/*.js | tap-dot",
+    "test": "START_SERVER_AND_TEST_INSECURE=1 start-server-and-test start https-get://localhost:8081 tape"
   },
   "bugs": {
     "url": "https://github.com/matrx-transformation/matrx/issues"
@@ -45,6 +46,8 @@
   },
   "devDependencies": {
     "@zeit/cosmosdb-server": "^0.3.1",
+    "start-server-and-test": "^1.10.6",
+    "tap-dot": "^2.0.0",
     "tap-spec": "^5.0.0"
   }
 }
