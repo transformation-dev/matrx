@@ -22,7 +22,7 @@
   "main": "svelte-realtime-adapter-cosmos-db-temporal.js",
   "type": "module",
   "directories": {
-    "test": "__tests__"
+    "test": "test"
   },
   "publishConfig": {
     "access": "public"
@@ -32,12 +32,19 @@
     "url": "https://github.com/matrx-transformation/matrx/tree/master/packages/svelte-realtime-adapter-cosmos-db-temporal"
   },
   "scripts": {
-    "test": "echo \"Error: run tests from root\" && exit 1"
+    "start": "cosmosdb-server -p 8081",
+    "ports": "sudo netstat -ltnp",
+    "test": "tape test/*.js | tap-spec"
   },
   "bugs": {
     "url": "https://github.com/matrx-transformation/matrx/issues"
   },
   "dependencies": {
-    "@azure/cosmos": "^3.2.0"
+    "@azure/cosmos": "^3.4.2",
+    "tape": "^4.11.0"
+  },
+  "devDependencies": {
+    "@zeit/cosmosdb-server": "^0.3.1",
+    "tap-spec": "^5.0.0"
   }
 }
