@@ -37,29 +37,160 @@
   })
 </script>
 
-<!-- TODO: Get rid of this style once we switch it to Bulma's is-active -->
-<style>
-  /* Style for "active" links; need to mark this :global because the router adds the class directly */
-  :global(a.active) {
-      color: green;
-  }
-</style>
 
-<h1>MatrX</h1>
-<!-- Navigation links, using the "link" action -->
-<!-- Also, use the "active" action to add the "active" CSS class when the URL matches -->
-
-<nav>
-	<ul>
-		<li><a class='{segment === undefined ? "selected" : ""}' href='/'>home</a></li>
-		<li><a class='{segment === "about" ? "selected" : ""}' href='about'>about</a></li>
-		<li><a class='{segment === "morgan" ? "selected" : ""}' href='morgan'>morgan</a></li>
-
-		<!-- for the blog link, we're using rel=prefetch so that Sapper prefetches
-		     the blog data when we hover over the link or tap it on a touchscreen -->
-		<li><a rel=prefetch class='{segment === "blog" ? "selected" : ""}' href='blog'>blog</a></li>
-		<li><a rel=prefetch class='{segment === "poc" ? "selected" : ""}' href='poc'>poc</a></li>
-	</ul>
-</nav>
+<nav class="navbar ">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="#">
+        <img src="MatrXCloseWhite.png" alt="MatrX Logo">
+      </a>
+      <div class="navbar-burger burger" data-target="navMenuExample1">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+    <div id="navMenuExample1" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="#">
+          Home
+        </a>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="/#/morgan">
+            Morgan
+          </a>
+          <div class="navbar-dropdown ">
+            <a class="navbar-item " href="#">
+              Overview
+            </a>
+            <a class="navbar-item " href="#">
+              Modifiers
+            </a>
+            <a class="navbar-item " href="#">
+              Grid
+            </a>
+            <a class="navbar-item " href="#">
+              Form
+            </a>
+            <a class="navbar-item " href="#">
+              Elements
+            </a>
+            <a class="navbar-item is-active" href="#">
+              Components
+            </a>
+            <a class="navbar-item " href="#">
+              Layout
+            </a>
+            <hr class="navbar-divider">
+            <div class="navbar-item">
+              <div>version
+                <p class="has-text-info is-size-6-desktop">0.4.3</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link " href="#blog/">
+            Blog
+          </a>
+          <div id="blogDropdown" class="navbar-dropdown " data-style="width: 18rem;">
+            <a class="navbar-item" href="/2017/03/10/new-field-element/">
+              <div class="navbar-content">
+                <p>
+                  <small class="has-text-info">10 Mar 2017</small>
+                </p>
+                <p>New field element (for better controls)</p>
+              </div>
+            </a>
+            <a class="navbar-item" href="/2016/04/11/metro-ui-css-grid-with-bulma-tiles/">
+              <div class="navbar-content">
+                <p>
+                  <small class="has-text-info">11 Apr 2016</small>
+                </p>
+                <p>Metro UI CSS grid with Bulma tiles</p>
+              </div>
+            </a>
+            <a class="navbar-item" href="/2016/02/09/blog-launched-new-responsive-columns-new-helpers/">
+              <div class="navbar-content">
+                <p>
+                  <small class="has-text-info">09 Feb 2016</small>
+                </p>
+                <p>Blog launched, new responsive columns, new helpers</p>
+              </div>
+            </a>
+            <a class="navbar-item" href="#blog/">
+              More posts
+            </a>
+            <hr class="navbar-divider">
+            <div class="navbar-item">
+              <div class="navbar-content">
+                <div class="level is-mobile">
+                  <div class="level-left">
+                    <div class="level-item">
+                      <strong>Stay up to date!</strong>
+                    </div>
+                  </div>
+                  <div class="level-right">
+                    <div class="level-item">
+                      <a class="button is-rss is-small" href="#atom.xml">
+                        <span class="icon is-small">
+                          <i class="fa fa-rss"></i>
+                        </span>
+                        <span>Subscribe</span>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <div class="navbar-link">
+            More
+          </div>
+          <div id="moreDropdown" class="navbar-dropdown ">
+            <a class="navbar-item " href="#extensions/">
+              <div class="level is-mobile">
+                <div class="level-left">
+                  <div class="level-item">
+                    <p>
+                      <strong>Extensions</strong>
+                      <br>
+                      <small>Side projects to enhance Bulma</small>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/jgthms/bulma" target="_blank">
+          Github
+        </a>
+        <a class="navbar-item" href="https://twitter.com/jgthms" target="_blank">
+          Twitter
+        </a>
+        <div class="navbar-item">
+          <div class="field is-grouped">
+            <p class="control">
+              <a id="twitter" class="button">
+                <span>Tweet</span>
+              </a>
+            </p>
+            <p class="control">
+              <a class="button is-primary" href="https://github.com/jgthms/bulma/archive/0.4.3.zip">
+                <span class="icon">
+                  <i class="fa fa-download"></i>
+                </span>
+                <span>Download</span>
+              </a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
 
 <Router {routes}/>

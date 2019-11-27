@@ -1,4 +1,4 @@
 <h2 class="routetitle">Home!</h2>
 
-<p>MatrX!</p>
+<p>This is Home</p>
 
