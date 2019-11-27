@@ -19,6 +19,7 @@ All of the components found in the packages folder are open sourced under the MI
 
 ## Notes for development
 
+
 ### Using external components
 
 When using Svelte components installed from npm, such as [@sveltejs/svelte-virtual-list](https://github.com/sveltejs/svelte-virtual-list), Svelte needs the original component source (rather than any precompiled JavaScript that ships with the component). This allows the component to be rendered server-side, and also keeps your client-side app smaller.

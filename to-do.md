@@ -8,6 +8,7 @@
 * [X] Will notion work in off-line mode? Yes, as an android app
 * [X] Add our custom theme Lux and test the build functionality
 
+* [ ] Move @zeit/cosmosdb-server down into svelte-realtime-adapter...
 * [ ] Azure pipeline and/or GitHub actions
 * [ ] Create a test comparing routes.js results with contents of src/routes
 * [ ] Write one test for MatrX using cypress (or nightwatch?)
