@@ -1,0 +1,45 @@
+name: Coverage
+
+on:
+  push:
+    branches:
+    - master
+
+jobs:
+  coverage-base-on-master:
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        node-version: [12.x]
+        os: [ubuntu-latest]
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: npm ci, build, and coverage testing
+      run: |
+        npm ci
+        npm run css:build
+        npm run coverage
+      env:
+        CI: true
+        SESSION_SECRET: ${{secrets.SESSION_SECRET}}
+
+    - uses: codecov/codecov-action@v1.0.3
+      with:
+        token: ${{secrets.CODECOV_TOKEN}}
+        # file: ./coverage.xml #optional
+
+    - name: upload html report as artifact
+      uses: actions/upload-artifact@master
+      with:
+        name: coverage-report
+        path: coverage/lcov-report
+

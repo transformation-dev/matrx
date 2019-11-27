@@ -4,6 +4,7 @@
   import active from 'svelte-spa-router/active'
   import {derived} from 'svelte/store'
   import {getClient} from '@matrx/svelte-realtime-store'
+  const debug = require('debug')('App.svelte')
 
   import routes from './routes'
 
@@ -22,21 +23,57 @@
     '/wild/something'
   ])
 
-  origin.subscribe((value) => {
-    if (!allowUnathenticated.has($location)) {
-      realtimeClient.restoreSession((err) => {
-        if (err) {
-          push('/login?origin=' + value)    
-        } else {
-          if ($location == '/login') {
-            push(value)
-          }
-        }
-      })
-    }
-  })
-</script>
+  function redirect(authenticated) {
+    if (! authenticated) {
+      if (!allowUnathenticated.has($location)) {
+        // realtimeClient.logout()
+        return push('/login?origin=' + $origin)
+      } else {
+        // Just stay on this page
+      }
+    } 
+  }
 
+  async function checkAuthentication(event) {
+    if (!allowUnathenticated.has($location)) {
+      const response = await fetch('/checkauth', { 
+        headers: {
+          'Accept': 'application/json'
+        },
+        credentials: 'same-origin', 
+      })
+      debug('Got response from /checkauth: %O', response)
+      if (response.ok) {
+        realtimeClient.restoreConnection(redirect)
+      }
+    }
+  }
+
+  origin.subscribe((originValue) => {
+    debug('origin store changed value to: %s', originValue)
+    checkAuthentication(originValue)
+  })
+
+  // realtimeClient.connected.subscribe((value) => {
+  //   debug('connected store changed value to: %O', value)
+  //   checkAuthentication($origin)
+  // })
+
+  async function handleLogout(event) {
+    const response = await fetch('/logout', { 
+      headers: {
+        'Accept': 'application/json'
+      },
+      credentials: 'same-origin', 
+    })
+    // const parsed = await response.body.json()
+    debug('Got response from /logout: %O', response)
+    redirect(response.ok)
+  }
+
+  // checkAuthentication($origin) 
+
+</script>
 
 <nav class="navbar ">
     <div class="navbar-brand">
@@ -192,5 +229,7 @@
       </div>
     </div>
   </nav>
+
+<button id="logout" on:click={handleLogout} class="button">Logout</button>
 
 <Router {routes}/>

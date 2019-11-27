@@ -30,7 +30,11 @@ module.exports = {
         }
     },
     "globals": {
-      "io": "readonly"
+      "io": "readonly",
+      "cy": "readonly",
+      "context": "readonly",
+      "beforeEach": "readonly",
+      "it": "readonly"
     },
     rules: {
         'indent': [

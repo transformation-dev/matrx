@@ -1,6 +1,6 @@
 {
   "name": "@matrx/svelte-realtime-store",
-  "version": "0.4.1",
+  "version": "0.4.5",
   "description": "Browser-side stores and server-side middleware for building realtime Svelte apps",
   "keywords": [
     "realtime",

@@ -1,47 +1,49 @@
-// const crypto = require('crypto')
-
 const socketIO = require('socket.io')
-const socketIOAuth = require('socketio-auth')
-const uuidv4 = require('uuid/v4')
+const debug = require('debug')('svelte-realtime:server')
+const cookie = require('cookie')
+const cookieParser = require('cookie-parser')
 
 const DEFAULT_NAMESPACE = '/svelte-realtime'
 
-function getServer(server, adapters, authenticate, namespace = DEFAULT_NAMESPACE) {
+const {SESSION_SECRET} = process.env
+if (!SESSION_SECRET) throw new Error('Must set SESSION_SECRET environment variable')
+
+function getServer(server, adapters, sessionStore, namespace = DEFAULT_NAMESPACE) {
   const io = socketIO(server)
   const nsp = io.of(namespace)
-  const sessions = {}  // {sessionID: {sessionID, user, sockets: Set()}}
+  const lookupSocketsBySessionID = new Map()  // {sessionID: [socket]}
 
-  if (!authenticate) {
-    authenticate = function(socket, data, callback) {
-      return callback(null, true)
-    }
-  }
-
-  function wrappedAuthenticate(socket, data, callback) {
-    if (data.sessionID) {
-      const session = sessions[data.sessionID]
-      if (session) {
-        session.sockets.add(socket)
-        return callback(null, true)
-      } else {
-        authenticate(socket, data, callback)
-      }
+  nsp.use((socket, next) => {
+    const rawCookies = socket.request.headers.cookie
+    const parsedCookies = cookie.parse(rawCookies)
+    const sessionID = cookieParser.signedCookie(parsedCookies.sessionID, SESSION_SECRET)
+    debug('socket.io middleware called.  sessionID: %O', sessionID)
+    if (sessionID) {
+      sessionStore.get(sessionID, (err, session) => {
+        debug('sessionStore.get callback called. session: %O', session)
+        if (err) {
+          return next(new Error('not authorized'))
+        } else {
+          socket.sessionID = sessionID  // TODO: Maybe switch this to key off of username
+          if (!lookupSocketsBySessionID.get(sessionID)) {
+            lookupSocketsBySessionID.set(sessionID, new Set())
+          }
+          lookupSocketsBySessionID.get(sessionID).add(socket)
+          return next()
+        }
+      })
     } else {
-      authenticate(socket, data, callback)
+      return next(new Error('not authorized'))
     }
-  }
+  })
   
-  function postAuthenticate(socket, user) {  // TODO: How do we get the user into this function?
+  nsp.on('connect', (socket) => {
+  // function postAuthenticate(socket, user) {  // TODO: How do we get the user into this function?
+    debug('postAuthenticate() called. ')
     // socket.on('disconnect', () => {})  // Since we're storing everything in the nsp's socket or room, we shouldn't need any additional cleanup
 
-    if (!user.sessionID) {
-      const sessionID = uuidv4()
-      const session = {sessionID, user, sockets: new Set([socket])}
-      sessions[sessionID] = session
-      socket.emit('new-session', sessionID, user.username)
-    }
-
     socket.on('join', (stores) => {  // TODO: Check access control before joining
+      debug('join msg received.  stores: %O', stores)
       for (const {storeID, value} of stores) {
         socket.join(storeID)
         const room = nsp.adapter.rooms[storeID]
@@ -51,7 +53,7 @@ function getServer(server, adapters, authenticate, namespace = DEFAULT_NAMESPACE
             socket.emit('set', storeID, cachedValue)  // This sends only the originator
           } else {
             room.cachedValue = value
-            // TODO: Make the below be used if there is client-side synchronization of multiple stores
+            // TODO: Think about switching below for efficiency. It's not done that way for now to be extra safe and because I wasn't sure when there are multiple stores on the same page that it would work
             // socket.to(storeID).emit('set', storeID, value)  // This sends to all clients except the originating client
             nsp.in(storeID).emit('set', storeID, value)  // This sends to all clients including the originator
           }
@@ -61,43 +63,62 @@ function getServer(server, adapters, authenticate, namespace = DEFAULT_NAMESPACE
       }
     })
 
-    socket.on('set', (storeID, value) => {
-      let room = nsp.adapter.rooms[storeID]
-      if (!room) {
-        socket.join(storeID)
-        room = nsp.adapter.rooms[storeID]
-      }
-      if (room) {  // There should always be a room now but better safe
-        room.cachedValue = value
+    socket.on('set', (storeID, value, forceEmitBack) => {
+      debug('set msg received. storeID: %s  value: %O', storeID, value)
+      const session = true  // TODO: Make this be a function of the middleware
+      if (session) {
+        let room = nsp.adapter.rooms[storeID]
+        if (!room) {
+          socket.join(storeID)
+          room = nsp.adapter.rooms[storeID]
+        }
+        if (room) {  // There should always be a room now but better safe
+          room.cachedValue = value
+        } else {
+          throw new Error('Unexpected condition. There should be one but there is no room for storeID: ' + storeID)
+        }
+        if (forceEmitBack) {
+          nsp.in(storeID).emit('set', storeID, value)  // This sends to all clients including the originator
+        } else {
+          socket.to(storeID).emit('set', storeID, value)  // This sends to all clients except the originating client
+        }
       } else {
-        throw new Error('Unexpected condition. There should be one but there is no room for storeID: ' + storeID)
+        const room = nsp.adapter.rooms[storeID]
+        if (room && room.cachedValue) {
+          socket.emit('revert', storeID, room.cachedValue)
+        }
+        socket.disconnect()
       }
-      // TODO: Make the below be used if there is client-side synchronization of multiple stores
-      // socket.to(storeID).emit('set', storeID, value)  // This sends to all clients except the originating client
-      nsp.in(storeID).emit('set', storeID, value)  // This sends to all clients including the originator
     })
 
     socket.on('initialize', (storeID, defaultValue, callback) => {
-      const room = nsp.adapter.rooms[storeID]
-      if (room && room.cachedValue) {
-        callback(room.cachedValue)
+      debug('initialize msg received.  storeID: %s  defaultValue: %O', storeID, defaultValue)
+      const session = true  // TODO: Make this a function of the middleware
+      if (session) {
+        const room = nsp.adapter.rooms[storeID]
+        if (room && room.cachedValue) {
+          callback(room.cachedValue)
+        } else {
+          callback(defaultValue)
+        }
       } else {
         callback(defaultValue)
+        socket.disconnect()
       }
     })
 
-    socket.on('logout', (sessionID) => {
-      const session = sessions[sessionID]
-      session.sockets.forEach((socket) => {
-        socket.disconnect()
-      })
-    })
+  })
 
+  function logout(sessionID) {
+    debug('svelte-realtime-server.logout() called.  sessionID: %O', sessionID)
+    if (lookupSocketsBySessionID.get(sessionID)) {
+      lookupSocketsBySessionID.get(sessionID).forEach((tempSocket) => {
+        tempSocket.disconnect()
+      })
+    }
   }
 
-  socketIOAuth(nsp, {authenticate: wrappedAuthenticate, postAuthenticate})
-
-  return nsp
+  return {nsp, logout}
 }
 
 module.exports = {getServer}  // TODO: Eventually change this to export once supported
