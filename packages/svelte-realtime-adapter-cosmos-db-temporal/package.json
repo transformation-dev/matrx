@@ -34,7 +34,7 @@
   "scripts": {
     "start": "cosmosdb-server -p 8081",
     "ports": "sudo netstat -ltnp",
-    "tape": "tape test/*.js | tap-dot",
+    "tape": "tape test/*.js | tap-diff",
     "test": "START_SERVER_AND_TEST_INSECURE=1 start-server-and-test start https-get://localhost:8081 tape"
   },
   "bugs": {
@@ -42,12 +42,12 @@
   },
   "dependencies": {
     "@azure/cosmos": "^3.4.2",
+    "lodash": "^4.17.15",
     "tape": "^4.11.0"
   },
   "devDependencies": {
     "@zeit/cosmosdb-server": "^0.3.1",
     "start-server-and-test": "^1.10.6",
-    "tap-dot": "^2.0.0",
-    "tap-spec": "^5.0.0"
+    "tap-diff": "^0.1.1"
   }
 }

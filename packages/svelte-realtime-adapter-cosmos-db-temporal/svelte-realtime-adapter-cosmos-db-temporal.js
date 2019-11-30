@@ -14,7 +14,7 @@ the _entityID will be set to the same value as the id field. When _isTemporal:tr
 _entityID will be a new GUID.
 */
 
-const cosmos = require('@azure/cosmos')
+const { CosmosClient } = require("@azure/cosmos")
 const fs = require('fs')
 const path = require('path')
 
@@ -44,6 +44,12 @@ class Adapter {
 
   // Fetch the most current version of an entity
   async read(entityID) {
+
+  }
+
+  // Upsert a single entity
+  // The only required field in the oldValue is the _etag field
+  async upsert(entityID, oldValue, newValue) {
 
   }
 
