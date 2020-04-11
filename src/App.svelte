@@ -5,8 +5,9 @@
   import {derived} from 'svelte/store'
   import {getClient} from '@matrx/svelte-realtime-store'
   const debug = require('debug')('App.svelte')
-
   import routes from './routes'
+  import Icon from 'svelte-awesome'
+  import { beer, refresh, comment, codeFork, camera, ban, signOut } from 'svelte-awesome/icons'
 
   function isActive(node, path) {
     return active(node, path, 'is-active')  // TODO: Change to 'is-active' when for Bulma
@@ -206,11 +207,9 @@
         <div class="navbar-item">
           <div class="field is-grouped">
             <p class="control">
-              <button id="logout" on:click={handleLogout} class="button is-rounded">
-                <span class="icon is-small is-left">
-                <i class="fas fa-sign-out-alt"></i>
-                </span>
-                <span>Logout</span>
+              <button id="logout" on:click={handleLogout} class="button is-rounded"> 
+                <Icon data={signOut}/>
+               Logout
               </button>
             </p>
           </div>
