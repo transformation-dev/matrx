@@ -67,9 +67,6 @@
   },
   "devDependencies": {
     "@cypress/code-coverage": "^1.10.1",
-    "@fortawesome/fontawesome-free": "^5.13.0",
-    "@fortawesome/fontawesome-svg-core": "^1.2.28",
-    "@fortawesome/free-solid-svg-icons": "^5.13.0",
     "@matrx/svelte-realtime-store": "file:packages/svelte-realtime-store",
     "browserify": "^16.5.0",
     "bulma": "^0.7.5",

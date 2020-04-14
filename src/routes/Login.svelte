@@ -1,6 +1,9 @@
 <script>
   export let params = {}
-
+  
+  import Icon from 'svelte-awesome'
+  import { envelope, key } from 'svelte-awesome/icons'
+  
   import {getClient} from '@matrx/svelte-realtime-store'
   import {push, querystring} from 'svelte-spa-router'
   const debug = require('debug')('Login.svelte')
@@ -44,16 +47,16 @@
         <div class="field">
             <p class="control has-icons-left">
               <input class="input" type="email" placeholder="Email">
-              <span class="icon is-small is-left">
-                <i class="fas fa-envelope"></i>
-              </span>
+                <span class="icon is-small is-left">
+                  <Icon data={envelope}/>
+                </span> 
             </p>
           </div>
           <div class="field">
             <p class="control has-icons-left">
               <input class="input" type="password" placeholder="Password">
               <span class="icon is-small is-left">
-                <i class="fas fa-lock"></i>
+                <Icon data={key}/>
               </span>
             </p>
           </div>
