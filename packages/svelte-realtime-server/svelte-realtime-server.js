@@ -1,5 +1,5 @@
 const socketIO = require('socket.io')
-const debug = require('debug')('svelte-realtime:server')
+const debug = require('debug')('matrx:svelte-realtime-server')
 const cookie = require('cookie')
 const cookieParser = require('cookie-parser')
 
@@ -24,7 +24,7 @@ function getServer(server, adapters, sessionStore, namespace = DEFAULT_NAMESPACE
         if (err) {
           return next(new Error('not authorized'))
         } else {
-          socket.sessionID = sessionID  // TODO: Maybe switch this to key off of username
+          socket.sessionID = sessionID
           if (!lookupSocketsBySessionID.get(sessionID)) {
             lookupSocketsBySessionID.set(sessionID, new Set())
           }
@@ -38,9 +38,20 @@ function getServer(server, adapters, sessionStore, namespace = DEFAULT_NAMESPACE
   })
   
   nsp.on('connect', (socket) => {
-  // function postAuthenticate(socket, user) {  // TODO: How do we get the user into this function?
-    debug('postAuthenticate() called. ')
-    // socket.on('disconnect', () => {})  // Since we're storing everything in the nsp's socket or room, we shouldn't need any additional cleanup
+    debug('connect msg received')
+
+    socket.on('disconnect', () => {
+      debug('disconnect msg received')
+      if (socket.sessionID) {
+        const socketSet = lookupSocketsBySessionID.get(socket.sessionID)
+        if (socketSet) {
+          socketSet.delete(socket)
+          if (socketSet.size == 0) {
+            lookupSocketsBySessionID.delete(socket.sessionID)
+          }
+        }
+      }
+    })
 
     socket.on('join', (stores) => {  // TODO: Check access control before joining
       debug('join msg received.  stores: %O', stores)
@@ -65,48 +76,35 @@ function getServer(server, adapters, sessionStore, namespace = DEFAULT_NAMESPACE
 
     socket.on('set', (storeID, value, forceEmitBack) => {
       debug('set msg received. storeID: %s  value: %O', storeID, value)
-      const session = true  // TODO: Make this be a function of the middleware
-      if (session) {
-        let room = nsp.adapter.rooms[storeID]
-        if (!room) {
-          socket.join(storeID)
-          room = nsp.adapter.rooms[storeID]
-        }
-        if (room) {  // There should always be a room now but better safe
-          room.cachedValue = value
-        } else {
-          throw new Error('Unexpected condition. There should be one but there is no room for storeID: ' + storeID)
-        }
-        if (forceEmitBack) {
-          nsp.in(storeID).emit('set', storeID, value)  // This sends to all clients including the originator
-        } else {
-          socket.to(storeID).emit('set', storeID, value)  // This sends to all clients except the originating client
-        }
+
+      // Latency compensation by optimistically sending update to room
+      let room = nsp.adapter.rooms[storeID]
+      if (!room) {
+        socket.join(storeID)
+        room = nsp.adapter.rooms[storeID]
+      }
+      if (room) {  // There should always be a room now but better safe
+        room.cachedValue = value
       } else {
+        throw new Error('Unexpected condition. There should be one but there is no room for storeID: ' + storeID)
+      }
+      if (forceEmitBack) {
+        nsp.in(storeID).emit('set', storeID, value)  // This sends to all clients including the originator
+      } else {
+        socket.to(storeID).emit('set', storeID, value)  // This sends to all clients except the originating client
+      }
+
+      // TODO: Save to database via adapter
+
+      // If database save fails, then revert
+      const databaseSaveFailed = false  // TODO: Drive this off of above
+      if (databaseSaveFailed) {
         const room = nsp.adapter.rooms[storeID]
         if (room && room.cachedValue) {
-          socket.emit('revert', storeID, room.cachedValue)
+          nsp.in(storeID).emit('revert', storeID, room.cachedValue)  // This sends to all clients including the originator
         }
-        socket.disconnect()
       }
     })
-
-    socket.on('initialize', (storeID, defaultValue, callback) => {
-      debug('initialize msg received.  storeID: %s  defaultValue: %O', storeID, defaultValue)
-      const session = true  // TODO: Make this a function of the middleware
-      if (session) {
-        const room = nsp.adapter.rooms[storeID]
-        if (room && room.cachedValue) {
-          callback(room.cachedValue)
-        } else {
-          callback(defaultValue)
-        }
-      } else {
-        callback(defaultValue)
-        socket.disconnect()
-      }
-    })
-
   })
 
   function logout(sessionID) {
@@ -115,6 +113,7 @@ function getServer(server, adapters, sessionStore, namespace = DEFAULT_NAMESPACE
       lookupSocketsBySessionID.get(sessionID).forEach((tempSocket) => {
         tempSocket.disconnect()
       })
+      lookupSocketsBySessionID.delete(sessionID)
     }
   }
 

@@ -28,7 +28,7 @@ const app = express()
 const server = http.createServer(app)
 
 // And here
-const nsp = getServer(server)
+const svelteRealtimeServer = getServer(server, adapters, sessionStore)
   
 app.use(
 	compression({ threshold: 0 }),
@@ -43,20 +43,7 @@ server.listen(PORT, err => {
 
 ### Authentication
 
-To ensure that your connecting clients are who they say they are, you can provide an authentication callback when instantiating the svelte-realtime-server.
-
-```js
-function authenticate(socket, credentials, callback) {
-  db.findUser('User', {username: credentials.username}, function(err, user) {
-    if (err || !user) return callback(new Error("User not found"))
-    return callback(null, user.password == credentials.password)
-  })
-}
-
-const nsp = getServer(server, null, authenticate)
-```
-
-Note, the second parameter (that is `null` in the above exmple) is for the future when you can provide database adapters.
+svelte-realtime-server now requiers a sessionID cookie to be present when the browser first connects. The `server.js` file in the parent folder is a fully working example of how you can do this complete with example /login, /logout, and /checkauth endpoints. At this time, we require you to pass in the sessionStore as the third parameter but this will later be upgraded to permit you to pass in your own callback functions. The second parameter, `adapters` is for the as-yet incomplete database serialization functionality and you can safely pass in `null` at this time.
 
 ### Access control
 
