@@ -6,6 +6,7 @@ import Login from './routes/Login.svelte'
 import Poc from './routes/Poc.svelte'
 import TestJig from './routes/TestJig.svelte'
 import Morgan from './routes/Morgan.svelte'
+import Plan from './routes/Plan.svelte'
 
 const routes = {
   '/': Home,
@@ -17,6 +18,7 @@ const routes = {
   '/wild/*': Wild,  // Wildcard parameter
   '/test-jig': TestJig,
   '/morgan': Morgan,
+  '/plan': Plan,
   '*': NotFound,  // Catch-all, must be last
 }
 
