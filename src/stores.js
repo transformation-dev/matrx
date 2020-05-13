@@ -139,16 +139,11 @@ export const plan = writable({
   }
 })
 
-export let practiceBeingDragged = writable(null)
+let practiceBeingDragged = null
 
 export function dragStart(event) {
-  practiceBeingDragged.set(event.target.id)
+  practiceBeingDragged = event.target.id
   event.target.style.opacity = .5
-  // console.log(event.target.id)
-  // plan.update((value) => {
-  //   console.log(value)
-  //   return value
-  // })
 }
 
 export function dragEnd(event) {
@@ -156,21 +151,17 @@ export function dragEnd(event) {
   event.target.style.opacity = ""
 }
 
-// function findParentColumn(node) {
-//   if (node.classList.contains('column')) {
-//     return node
-//   } else {
-//     return findParentColumn(node.parentNode)
-//   }
-// }
-
 export function dragEnter(event) {
+  event.preventDefault()
   const queueSwimlaneID = event.target.getAttribute('queueSwimlaneID')
   const assessedLevel = event.target.getAttribute('assessedLevel')
-  // console.log(event)
   if (queueSwimlaneID && assessedLevel) {
     event.target.style.background = 'purple'
   }
+}
+
+export function dragOver(event) {
+  event.preventDefault()
 }
 
 export function dragLeave(event) {
@@ -182,11 +173,90 @@ export function dragLeave(event) {
 }
 
 export function drop(event) {
-  queueSwimlaneID = event.target.getAttribute('queueSwimlaneID')
-  assessedLevel = event.target.getAttribute('assessedLevel')
+  const queueSwimlaneID = event.target.getAttribute('queueSwimlaneID')
+  const assessedLevel = event.target.getAttribute('assessedLevel')
+  console.log(practiceBeingDragged)
+  console.log(queueSwimlaneID, assessedLevel)
   if (queueSwimlaneID && assessedLevel) {
-    event.target.style.background=''
-    event.target.setAttribute(queueSwimlaneID)
-    event.target.setAttribute(assessedLevel)
+    plan.update((value) => {
+      console.log(value)
+      return value
+    })
   }
 }
+
+export class Dragster {
+  /*
+  Copyright 2019 Ben Smithett
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy of
+  this software and associated documentation files (the "Software"), to deal in
+  the Software without restriction, including without limitation the rights to
+  use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+  the Software, and to permit persons to whom the Software is furnished to do so,
+  subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+  FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+  COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+  IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  */
+
+  constructor(el) {
+    this.dragenter = this.dragenter.bind(this);
+    this.dragleave = this.dragleave.bind(this);
+    this.el = el;
+    this.first = false;
+    this.second = false;
+    this.el.addEventListener("dragenter", this.dragenter, false);
+    this.el.addEventListener("dragleave", this.dragleave, false);
+  }
+
+  dragenter(event) {
+    event.preventDefault()
+    if (this.first) {
+      return this.second = true;
+    } else {
+      this.first = true;
+      this.customEvent = document.createEvent("CustomEvent");
+      this.customEvent.initCustomEvent("dragster-enter", true, true, {
+        dataTransfer: event.dataTransfer,
+        sourceEvent: event
+      });
+      return this.el.dispatchEvent(this.customEvent);
+    }
+  }
+
+  dragleave(event) {
+    if (this.second) {
+      this.second = false;
+    } else if (this.first) {
+      this.first = false;
+    }
+    if (!this.first && !this.second) {
+      this.customEvent = document.createEvent("CustomEvent");
+      this.customEvent.initCustomEvent("dragster-leave", true, true, {
+        dataTransfer: event.dataTransfer,
+        sourceEvent: event
+      });
+      return this.el.dispatchEvent(this.customEvent);
+    }
+  }
+
+  removeListeners() {
+    this.el.removeEventListener("dragenter", this.dragenter, false);
+    return this.el.removeEventListener("dragleave", this.dragleave, false);
+  }
+
+  // Call after drop
+  reset() {
+    this.first = false;
+    return this.second = false;
+  }
+
+};

@@ -2,13 +2,16 @@
   export let kanbanCellContents = []
   export let assessedLevel = ''
   export let queueSwimlaneID = ''
-  import {dragStart, dragEnd, dragEnter, dragLeave, drop} from '../stores.js'
+
+  import {dragStart, dragEnd, dragEnter, dragOver, dragLeave, drop, Dragster} from '../stores.js'
+
+
 </script>
 
-<div class="column" is-cell={true} {assessedLevel} {queueSwimlaneID} on:dragenter={dragEnter} on:dragleave={dragLeave}>
+<div class="column drop-zone" {assessedLevel} {queueSwimlaneID} on:dragster-enter={dragEnter} on:dragster-leave={dragLeave} on:drop={drop} on:dragover={dragOver}>
   {#each kanbanCellContents as practice}
-    <div id={practice.practice.id} class="card" draggable='true'>
-      <div class="card-content" is-cell={false} {assessedLevel} {queueSwimlaneID} on:dragenter={dragEnter} on:dragstart={dragStart} on:dragend={dragEnd} on:drop={drop} >
+    <div id={practice.practice.id} class="card" draggable='true' on:dragstart={dragStart} on:dragend={dragEnd}>
+      <div class="card-content">
         <div class="content">
           {practice.practice.label}
         </div>

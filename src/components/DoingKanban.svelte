@@ -1,7 +1,7 @@
 <script>
 
-  import {formulation, plan, queueSwimlanes} from '../stores'
-
+  import {formulation, plan, queueSwimlanes, Dragster, drop} from '../stores'
+  import { onMount } from 'svelte'
   import KanbanCell from './KanbanCell'
 
   const practicesIndex = {}
@@ -30,6 +30,12 @@
     }
   }
 
+  onMount(() => {
+    const dropZones = document.getElementsByClassName('drop-zone')
+    for (const element of dropZones) {
+      new Dragster(element)
+    }
+  })
 
 </script>
 
