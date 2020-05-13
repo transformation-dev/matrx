@@ -1,8 +1,14 @@
 <script>
   import {arrowCircleLeft, arrowCircleRight} from 'svelte-awesome/icons'
-  import Icon from 'svelte-awesome'
+  // import Icon from 'svelte-awesome'
+  import FormulationGrid from '../components/FormulationGrid.svelte'
 
-  const NUMBER_OF_SLIDES = 3
+  const slides = [
+    {label: 'Todo'},
+    {label: 'Doing'},
+    {label: 'Done'},
+  ]
+  const NUMBER_OF_SLIDES = slides.length
   let startOn = 1
   let slidesToDisplay = 1
   $: endOn = startOn + slidesToDisplay - 1
@@ -42,30 +48,38 @@
 
 <h1>Plan</h1>
 
-<div class="container">
-    <div class="columns">
-      {#if startOn > 0}
-        <div id="pan-left" on:click={panLeft} on:dragenter={startPanTimer} on:dragleave={clearPanTimer} class="column is-narrow has-background-grey">
-          <Icon data={arrowCircleLeft} />
-          Left
-        </div>
-      {/if}
-
-      <div class="column has-text-centered has-background-info">
-
-        <div class="card" draggable="true" on:dragstart={dragStart}>
-          <div class="card-content">
-            <div class="content">{startOn}-{endOn}</div>
-          </div>
-        </div>
-
+<div class="section">
+  <div class="columns is-vcentered has-background-primary">
+    {#if startOn > 0}
+      <div id="pan-left" on:click={panLeft} on:dragenter={startPanTimer} on:dragleave={clearPanTimer} class="column is-narrow has-background-primary">
+        <!-- <Icon data={arrowCircleLeft} /> -->
+        <div class="rotate-left has-text-centered">{slides[startOn - 1].label}</div>
       </div>
-      
-      {#if endOn < NUMBER_OF_SLIDES - 1}
-        <div id="pan-right" on:click={panRight} on:dragenter={startPanTimer} on:dragleave={clearPanTimer} class="column is-narrow has-background-grey">
-          <Icon data={arrowCircleRight} />
-          Right
+    {/if}
+
+    <div class="column has-text-centered has-background-info">
+      <div class="columns">
+        <div class="column is-gapless has-background-primary">
+          {slides[startOn].label}
         </div>
-      {/if}
+      </div>
+      <FormulationGrid />
     </div>
+    
+    {#if endOn < NUMBER_OF_SLIDES - 1}
+      <div id="pan-right" on:click={panRight} on:dragenter={startPanTimer} on:dragleave={clearPanTimer} class="column is-narrow has-background-primary">
+        <!-- <Icon data={arrowCircleRight} /> -->
+        <div class="rotate-right">{slides[startOn + 1].label}</div>
+      </div>
+    {/if}
+  </div>
 </div>
+
+<style>
+  .rotate-left {
+    transform: rotate(-90deg);
+  }
+  .rotate-right {
+    transform: rotate(90deg);
+  }
+</style>
