@@ -2,6 +2,7 @@
   import {arrowCircleLeft, arrowCircleRight} from 'svelte-awesome/icons'
   // import Icon from 'svelte-awesome'
   import FormulationGrid from '../components/FormulationGrid.svelte'
+  import DoingKanban from '../components/DoingKanban.svelte'
 
   const slides = [
     {label: 'Todo'},
@@ -58,13 +59,18 @@
     {/if}
 
     <div class="column has-text-centered has-background-info">
+      <DoingKanban />
+    </div>
+
+    <!-- {#if startOn >= 0 && } -->
+    <!-- <div class="column has-text-centered has-background-info">
       <div class="columns">
-        <div class="column is-gapless has-background-primary">
+        <div class="column has-background-primary">
           {slides[startOn].label}
         </div>
       </div>
       <FormulationGrid />
-    </div>
+    </div> -->
     
     {#if endOn < NUMBER_OF_SLIDES - 1}
       <div id="pan-right" on:click={panRight} on:dragenter={startPanTimer} on:dragleave={clearPanTimer} class="column is-narrow has-background-primary">
