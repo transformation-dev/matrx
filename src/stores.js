@@ -60,11 +60,6 @@ export const formulation = writable({
   ]
 })
 
-// export let assessmentLevels = {
-//   level1: 'Thoughts',
-//   level2: 'Words'
-// }
-
 export const queueSwimlanes = writable({
   queue1: {
     id: 'queue1',
@@ -139,6 +134,10 @@ export const plan = writable({
   }
 })
 
+function findDropZoneParent(target) {
+  return target.classList.contains('drop-zone') ? target : findDropZoneParent(target.parentNode)
+}
+
 let practiceBeingDragged = null
 
 export function dragStart(event) {
@@ -147,17 +146,12 @@ export function dragStart(event) {
 }
 
 export function dragEnd(event) {
-  // practiceBeingDragged.set(null)
   event.target.style.opacity = ""
 }
 
 export function dragEnter(event) {
-  event.preventDefault()
-  const queueSwimlaneID = event.target.getAttribute('queueSwimlaneID')
-  const assessedLevel = event.target.getAttribute('assessedLevel')
-  if (queueSwimlaneID && assessedLevel) {
-    event.target.style.background = 'purple'
-  }
+  // event.preventDefault()
+  event.target.style.background = 'purple'
 }
 
 export function dragOver(event) {
@@ -165,21 +159,18 @@ export function dragOver(event) {
 }
 
 export function dragLeave(event) {
-  const queueSwimlaneID = event.target.getAttribute('queueSwimlaneID')
-  const assessedLevel = event.target.getAttribute('assessedLevel')
-  if (queueSwimlaneID && assessedLevel) {
-    event.target.style.background = ''
-  }  
+  event.target.style.background = '' 
 }
 
 export function drop(event) {
-  const queueSwimlaneID = event.target.getAttribute('queueSwimlaneID')
-  const assessedLevel = event.target.getAttribute('assessedLevel')
-  console.log(practiceBeingDragged)
-  console.log(queueSwimlaneID, assessedLevel)
+  const dropZoneParent = findDropZoneParent(event.target)
+  dropZoneParent.style.background = ''
+  const queueSwimlaneID = dropZoneParent.getAttribute('queueSwimlaneID')
+  const assessedLevel = dropZoneParent.getAttribute('assessedLevel')
   if (queueSwimlaneID && assessedLevel) {
     plan.update((value) => {
-      console.log(value)
+      value[practiceBeingDragged].queueSwimlaneID = queueSwimlaneID
+      value[practiceBeingDragged].assessedLevel = assessedLevel
       return value
     })
   }
