@@ -33,36 +33,36 @@
 </div>
 
 <div class="columns">
-<div id={slideLabel} class="column drop-zone" use:addDragster on:dragster-enter={dragEnter} on:dragster-leave={dragLeave} on:drop={localDrop} on:dragover={dragOver}>
-  {#each $formulation.disciplines as discipline}
-    <div class="columns">
-      {#if slideLabel == 'Todo'}
-        <div class="column is-2 has-background-grey-lighter">
-          {discipline.label}
-        </div>
-      {/if}
-      {#each discipline.practices as practice}
-        {#if $plan[practice.id].status == slideLabel}
-          <div id={practice.id} class="column" draggable="true" on:dragstart={dragStart}>
-            {practice.label}
+  <div id={slideLabel} class="column drop-zone" use:addDragster on:dragster-enter={dragEnter} on:dragster-leave={dragLeave} on:drop={localDrop} on:dragover={dragOver}>
+    {#each $formulation.disciplines as discipline}
+      <div class="columns">
+        {#if slideLabel == 'Todo'}
+          <div class="column with-border is-2 has-background-grey-lighter">
+            {discipline.label}
           </div>
         {/if}
-      {/each}
-      {#if blankDisciplineIDs[discipline.id]}
-        <div class="column" />
-      {/if}
-      {#if slideLabel == 'Done'}
-        <div class="column is-2 has-background-grey-lighter">
-          {discipline.label}
-        </div>
-      {/if}
-    </div>
-  {/each}
-</div>
+        {#each discipline.practices as practice}
+          {#if $plan[practice.id].status == slideLabel}
+            <div id={practice.id} class="column with-border" draggable="true" on:dragstart={dragStart}>
+              {practice.label}
+            </div>
+          {/if}
+        {/each}
+        {#if blankDisciplineIDs[discipline.id]}
+          <div class="column with-border" />
+        {/if}
+        {#if slideLabel == 'Done'}
+          <div class="column with-border is-2 has-background-grey-lighter">
+            {discipline.label}
+          </div>
+        {/if}
+      </div>
+    {/each}
+  </div>
 </div>
 
 <style>
-  .column {
+  .with-border {
     border-top: 1px solid;
     border-right: 1px solid;
     border-color: gray;
