@@ -1,6 +1,6 @@
 <script>
   import {arrowCircleLeft, arrowCircleRight} from 'svelte-awesome/icons'
-  // import Icon from 'svelte-awesome'
+  import Icon from 'svelte-awesome'
   import FormulationGrid from '../components/FormulationGrid.svelte'
   import DoingKanban from '../components/DoingKanban.svelte'
 
@@ -10,9 +10,10 @@
     {label: 'Done'},
   ]
   const NUMBER_OF_SLIDES = slides.length
-  let startOn = 1
-  let slidesToDisplay = 1
+  let startOn = 0
+  let slidesToDisplay = 2
   $: endOn = startOn + slidesToDisplay - 1
+
 
   let panTimer = null
 
@@ -24,12 +25,7 @@
     startOn = Math.min(NUMBER_OF_SLIDES - 1, startOn + 1)
   }
 
-  function dragStart(event) {
-    console.log(event.target)
-  }
-
   function startPanTimer(event) {
-    console.log(event)
     if (event.target.id === "pan-right") {
       panTimer = setTimeout(panRight, 1000)
     } else if (event.target.id === "pan-left") {
@@ -50,32 +46,37 @@
 <h1>Plan</h1>
 
 <div class="section">
-  <div class="columns is-vcentered has-background-primary">
+  <div class="columns has-background-primary">
     {#if startOn > 0}
-      <div id="pan-left" on:click={panLeft} on:dragenter={startPanTimer} on:dragleave={clearPanTimer} class="column is-narrow has-background-primary">
-        <!-- <Icon data={arrowCircleLeft} /> -->
-        <div class="rotate-left has-text-centered">{slides[startOn - 1].label}</div>
+      <div id="pan-left" on:click={panLeft} on:dragenter={startPanTimer} on:dragleave={clearPanTimer} class="column is-narrow has-background-primary has-text-centered">
+        <Icon data={arrowCircleLeft} scale="1.75" style="fill: white; padding: 5px"/>
+        <div class="rotate-left has-text-centered has-text-white">{slides[startOn - 1].label}</div>
       </div>
     {/if}
 
-    <div class="column has-text-centered has-background-info">
-      <DoingKanban />
-    </div>
-
-    <!-- {#if startOn >= 0 && } -->
-    <!-- <div class="column has-text-centered has-background-info">
-      <div class="columns">
-        <div class="column has-background-primary">
-          {slides[startOn].label}
-        </div>
+    {#if startOn <= 0 &&  endOn >= 0}
+      <div class="column has-text-centered has-background-info">
+        <FormulationGrid label={slides[0].label} />
       </div>
-      <FormulationGrid />
-    </div> -->
+    {/if}
+
+    {#if startOn <= 1 && endOn >= 1}
+      <div class="column has-text-centered has-background-primary">
+        <DoingKanban />
+      </div>
+    {/if}
+
+    {#if startOn <= 2 &&  endOn >= 2}
+      <div class="column has-text-centered has-background-info">
+        <FormulationGrid label={slides[2].label} />
+      </div>
+    {/if}
+
     
     {#if endOn < NUMBER_OF_SLIDES - 1}
-      <div id="pan-right" on:click={panRight} on:dragenter={startPanTimer} on:dragleave={clearPanTimer} class="column is-narrow has-background-primary">
-        <!-- <Icon data={arrowCircleRight} /> -->
-        <div class="rotate-right">{slides[startOn + 1].label}</div>
+      <div id="pan-right" on:click={panRight} on:dragenter={startPanTimer} on:dragleave={clearPanTimer} class="column is-narrow has-background-primary has-text-centered">
+        <Icon data={arrowCircleRight} scale="1.75" style="fill: white; padding: 5px"/>
+        <div class="rotate-right has-text-centered has-text-white">{slides[startOn + 1].label}</div>
       </div>
     {/if}
   </div>

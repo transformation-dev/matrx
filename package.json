@@ -47,6 +47,7 @@
   "dependencies": {
     "@matrx/svelte-realtime-adapter-cosmos-db-temporal": "file:packages/svelte-realtime-adapter-cosmos-db-temporal",
     "@matrx/svelte-realtime-server": "file:packages/svelte-realtime-server",
+    "bulma-badge": "^3.0.1",
     "compression": "^1.7.1",
     "cookie": "^0.4.1",
     "cookie-parser": "^1.4.5",

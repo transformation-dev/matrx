@@ -33,23 +33,23 @@
 </script>
 
 <div class="columns">
-  <div class="column has-background-primary">
+  <div class="column has-background-primary has-text-white">
     Doing
   </div>
 </div>
 
 <!-- Fixed columns/column set for top row labels -->
 <div class="columns">
-  <div class="column is-2 has-background-grey" />
-  <div class="column has-background-grey">Words</div>
-  <div class="column has-background-grey">Actions</div>
-  <div class="column has-background-grey">Culture</div>
+  <div class="column is-2 has-background-grey-lighter" />
+  <div class="column has-background-grey-lighter has-text-black">Words</div>
+  <div class="column has-background-grey-lighter has-text-black">Actions</div>
+  <div class="column has-background-grey-lighter has-text-black">Culture</div>
 </div>
 
 <!-- each loop over queueSwimlanes -->
 {#each Object.entries(kanbanRestructured) as [queueSwimlaneID, queueSwimlaneContents]}
   <div class="columns">
-    <div class="column is-in-center is-2 has-background-grey">
+    <div class="column is-in-center is-2 has-background-grey-lighter has-text-black">
       {$queueSwimlanes[queueSwimlaneID].label}
     </div>
     <KanbanCell assessedLevel='Words' {queueSwimlaneID} kanbanCellContents={queueSwimlaneContents.Words} />

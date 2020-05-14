@@ -6,6 +6,8 @@
 // import bulmaswatch (must happen before importing bulma)
 @import "node_modules/bulmaswatch/lux/_variables.scss";
 
+//adds color grey-lightest
+$grey-lighter: lighten($grey, 30%);
 
 // adjusts height of nav-bar (must happen before importing bulma)
 $navbar-height: 3rem;
@@ -26,7 +28,9 @@ $box-radius: 10px;
 // Imports all of Bulma // TODO: Optimize to only the parts I later need
 @import "../node_modules/bulma/bulma.sass";
 
-@import "node_modules/bulmaswatch/lux/_overrides.scss";
+@import "../node_modules/bulma-badge/src/sass/index.sass";
+
+@import "../node_modules/bulmaswatch/lux/_overrides.scss";
 
 
 

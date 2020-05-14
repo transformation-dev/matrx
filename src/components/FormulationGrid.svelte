@@ -1,8 +1,15 @@
 <script>
+  export let label = ''
 
   import {formulation, plan, dragStart} from '../stores'
 
 </script>
+
+<div class="columns">
+  <div class="column has-background-primary has-text-white">
+    {label}
+  </div>
+</div>
 
 {#each $formulation.disciplines as discipline}
   <div class="columns">

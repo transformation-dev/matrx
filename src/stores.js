@@ -154,7 +154,7 @@ export function dragEnd(event) {
 
 export function dragEnter(event) {
   // event.preventDefault()
-  event.target.style.background = 'purple'
+  event.target.style.background = 'grey'
 }
 
 export function dragOver(event) {
