@@ -13,8 +13,9 @@
     }
   }
 
-  const kanbanRestructured = {}  // {queueSwimlaneID: {assessedLevel: [<div class="card">]}}
+  let kanbanRestructured = {}  // {queueSwimlaneID: {assessedLevel: [<div class="card">]}}
   $: {
+    kanbanRestructured = {}
     for (const [queueSwimlaneID, queueSwimlane] of Object.entries($queueSwimlanes)) {
       kanbanRestructured[queueSwimlane.id] = {
         Words: [],
@@ -25,7 +26,9 @@
     for (const [practiceID, practice] of Object.entries($plan)){
       if (practice.status === 'Doing') {
         practice.practice = practicesIndex[practiceID]
-        kanbanRestructured[practice.queueSwimlaneID][practice.assessedLevel].push(practice)
+        if (practice.queueSwimlaneID && practice.assessedLevel) {
+          kanbanRestructured[practice.queueSwimlaneID][practice.assessedLevel].push(practice)
+        } 
       }
     }
   }

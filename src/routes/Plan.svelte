@@ -3,7 +3,7 @@
   import Icon from 'svelte-awesome'
   import FormulationGrid from '../components/FormulationGrid.svelte'
   import DoingKanban from '../components/DoingKanban.svelte'
-  import {addDragster} from '../stores.js'
+  import {addDragster, dropDone, dropTodo, dragOver} from '../stores.js'
 
   const slides = [
     {label: 'Todo'},
@@ -11,7 +11,7 @@
     {label: 'Done'},
   ]
   const NUMBER_OF_SLIDES = slides.length
-  let startOn = 0
+  let startOn = 1
   let slidesToDisplay = 1
   $: endOn = startOn + slidesToDisplay - 1
 
@@ -38,8 +38,14 @@
     clearTimeout(panTimer)
   }
 
-  function drop(event) {
-    
+  function localDropDone(event) {
+    clearPanTimer()
+    dropDone(event)
+  }
+
+  function localDropTodo(event) {
+    clearPanTimer()
+    dropTodo(event)
   }
 
 </script>
@@ -49,7 +55,7 @@
 <div class="section">
   <div class="columns has-background-primary">
     {#if startOn > 0}
-      <div use:addDragster id="pan-left" on:click={panLeft} on:dragster-enter={startPanTimer} on:dragster-leave={clearPanTimer} class="column drop-zone is-narrow has-background-primary has-text-centered">
+      <div use:addDragster id="pan-left" on:click={panLeft} on:drop={localDropTodo} on:dragster-enter={startPanTimer} on:dragster-leave={clearPanTimer} on:dragover={dragOver} class="column drop-zone is-narrow has-background-primary has-text-centered">
         <Icon data={arrowCircleLeft} scale="1.75" style="fill: white; padding: 5px"/>
         <div class="rotate-left has-text-centered has-text-white">{slides[startOn - 1].label}</div>
       </div>
@@ -74,7 +80,7 @@
     {/if}
 
     {#if endOn < NUMBER_OF_SLIDES - 1}
-      <div id="pan-right" on:click={panRight} on:dragenter={startPanTimer} on:dragleave={clearPanTimer} class="column is-narrow has-background-primary has-text-centered">
+      <div use:addDragster id="pan-right" on:click={panRight} on:drop={localDropDone} on:dragster-enter={startPanTimer} on:dragster-leave={clearPanTimer} on:dragover={dragOver} class="column drop-zone is-narrow has-background-primary has-text-centered">
         <Icon data={arrowCircleRight} scale="1.75" style="fill: white; padding: 5px"/>
         <div class="rotate-right has-text-centered has-text-white">{slides[startOn + 1].label}</div>
       </div>

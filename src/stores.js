@@ -180,6 +180,26 @@ export function drop(event) {
   }
 }
 
+function dropPan(event, newStatus) {
+  const dropZoneParent = findDropZoneParent(event.target)
+  // dropZoneParent.style.background = ''
+  plan.update((value) => {
+    value[practiceBeingDragged].queueSwimlaneID = null
+    value[practiceBeingDragged].assessedLevel = null
+    value[status] = newStatus
+    return value
+  })
+  dragsters[dropZoneParent.id].reset()
+}
+
+export function dropDone(event) {
+  dropPan(event, "Done")
+}
+
+export function dropTodo(event) {
+  dropPan(event, "Todo")
+}
+
 export class Dragster {
   /*
   Copyright 2019 Ben Smithett
@@ -259,7 +279,6 @@ export class Dragster {
 const dragsters = {}  // {id: <Dragster>}
 
 export function addDragster(node) {
-  console.log(node.id)
   const id = node.id
   dragsters[id] = new Dragster(node)
   return {
