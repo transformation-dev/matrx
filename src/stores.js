@@ -74,7 +74,7 @@ export const queueSwimlanes = writable({
   }
 })
 
-export const plan = realtimeClient.realtime({_entityID: 'A'}, {
+export const plan = realtimeClient.realtime({_entityID: 'plan'}, {
   practice1: {
     practiceID: 'practice1',
     formulationID: 'formulation1',
@@ -145,6 +145,7 @@ let practiceBeingDragged = null
 
 export function dragStart(event) {
   practiceBeingDragged = event.target.id
+  console.log(practiceBeingDragged)
   event.target.style.opacity = .5
 }
 
@@ -170,34 +171,38 @@ export function drop(event) {
   dropZoneParent.style.background = ''
   const queueSwimlaneID = dropZoneParent.getAttribute('queueSwimlaneID')
   const assessedLevel = dropZoneParent.getAttribute('assessedLevel')
+  console.log(queueSwimlaneID, assessedLevel)
   if (queueSwimlaneID && assessedLevel) {
     plan.update((value) => {
       value[practiceBeingDragged].queueSwimlaneID = queueSwimlaneID
       value[practiceBeingDragged].assessedLevel = assessedLevel
+      value[practiceBeingDragged].status = 'Doing'
       return value
     })
     dragsters[dropZoneParent.id].reset()
   }
 }
 
-function dropPan(event, newStatus) {
+export function dropPan(event, newStatus) {
   const dropZoneParent = findDropZoneParent(event.target)
-  // dropZoneParent.style.background = ''
+  let queueSwimlanesCached
+  queueSwimlanes.update((value) => {
+    queueSwimlanesCached = value
+    return value
+  })
+  dropZoneParent.style.background = ''
   plan.update((value) => {
-    value[practiceBeingDragged].queueSwimlaneID = null
-    value[practiceBeingDragged].assessedLevel = null
-    value[status] = newStatus
+    if (newStatus === "Doing") {
+      value[practiceBeingDragged].queueSwimlaneID = Object.keys(queueSwimlanesCached)[0]
+      value[practiceBeingDragged].assessedLevel = "Words"
+    } else {
+      value[practiceBeingDragged].queueSwimlaneID = null
+      value[practiceBeingDragged].assessedLevel = null
+    }
+    value[practiceBeingDragged].status = newStatus
     return value
   })
   dragsters[dropZoneParent.id].reset()
-}
-
-export function dropDone(event) {
-  dropPan(event, "Done")
-}
-
-export function dropTodo(event) {
-  dropPan(event, "Todo")
 }
 
 export class Dragster {
@@ -283,8 +288,10 @@ export function addDragster(node) {
   dragsters[id] = new Dragster(node)
   return {
     destroy() {
-      dragsters[id].removeListeners()
-      delete dragsters[id]
+      if (dragsters[id]) {
+        dragsters[id].removeListeners()
+        delete dragsters[id]
+      }
     }
   }
 }

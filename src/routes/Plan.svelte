@@ -1,9 +1,9 @@
 <script>
-  import {arrowCircleLeft, arrowCircleRight} from 'svelte-awesome/icons'
+  import {arrowCircleLeft, arrowCircleRight, spinner} from 'svelte-awesome/icons'
   import Icon from 'svelte-awesome'
   import FormulationGrid from '../components/FormulationGrid.svelte'
   import DoingKanban from '../components/DoingKanban.svelte'
-  import {addDragster, dropDone, dropTodo, dragOver} from '../stores.js'
+  import {addDragster, dropPan, dragOver, dragEnter} from '../stores.js'
 
   const slides = [
     {label: 'Todo'},
@@ -11,22 +11,24 @@
     {label: 'Done'},
   ]
   const NUMBER_OF_SLIDES = slides.length
-  let startOn = 1
+  let startOn = 0
   let slidesToDisplay = 1
   $: endOn = startOn + slidesToDisplay - 1
-
 
   let panTimer = null
 
   function panLeft() {
     startOn = Math.max(0, startOn - 1)
+    panTimer = null
   }
 
   function panRight() {
     startOn = Math.min(NUMBER_OF_SLIDES - 1, startOn + 1)
+    panTimer = null
   }
 
   function startPanTimer(event) {
+    event.target.style.background = 'grey'
     if (event.target.id === "pan-right") {
       panTimer = setTimeout(panRight, 1000)
     } else if (event.target.id === "pan-left") {
@@ -34,18 +36,20 @@
     }
   }
 
-  function clearPanTimer() {
+  function clearPanTimer(event) {
+    event.target.style.background = ''
     clearTimeout(panTimer)
+    panTimer = null
   }
 
-  function localDropDone(event) {
-    clearPanTimer()
-    dropDone(event)
+  function dropLeft(event) {
+    clearPanTimer(event)
+    dropPan(event, slides[startOn - 1].label)
   }
 
-  function localDropTodo(event) {
-    clearPanTimer()
-    dropTodo(event)
+  function dropRight(event) {
+    clearPanTimer(event)
+    dropPan(event, slides[startOn + 1].label)
   }
 
 </script>
@@ -55,15 +59,18 @@
 <div class="section">
   <div class="columns has-background-primary">
     {#if startOn > 0}
-      <div use:addDragster id="pan-left" on:click={panLeft} on:drop={localDropTodo} on:dragster-enter={startPanTimer} on:dragster-leave={clearPanTimer} on:dragover={dragOver} class="column drop-zone is-narrow has-background-primary has-text-centered">
+      <div use:addDragster id="pan-left" on:click={panLeft} on:drop={dropLeft} on:dragster-enter={startPanTimer} on:dragster-leave={clearPanTimer} on:dragover={dragOver} class="column drop-zone is-narrow has-text-centered">
         <Icon data={arrowCircleLeft} scale="1.75" style="fill: white; padding: 5px"/>
         <div class="rotate-left has-text-centered has-text-white">{slides[startOn - 1].label}</div>
+        {#if panTimer}
+          <Icon data={spinner} pulse/>
+        {/if}
       </div>
     {/if}
 
     {#if startOn <= 0 &&  endOn >= 0}
       <div class="column has-text-centered has-background-info">
-        <FormulationGrid label={slides[0].label} />
+        <FormulationGrid slideLabel={slides[0].label} />
       </div>
     {/if}
 
@@ -75,14 +82,17 @@
 
     {#if startOn <= 2 &&  endOn >= 2}
       <div class="column has-text-centered has-background-info">
-        <FormulationGrid label={slides[2].label} />
+        <FormulationGrid slideLabel={slides[2].label} />
       </div>
     {/if}
 
     {#if endOn < NUMBER_OF_SLIDES - 1}
-      <div use:addDragster id="pan-right" on:click={panRight} on:drop={localDropDone} on:dragster-enter={startPanTimer} on:dragster-leave={clearPanTimer} on:dragover={dragOver} class="column drop-zone is-narrow has-background-primary has-text-centered">
+      <div use:addDragster id="pan-right" on:click={panRight} on:drop={dropRight} on:dragster-enter={startPanTimer} on:dragster-leave={clearPanTimer} on:dragover={dragOver} class="column drop-zone is-narrow has-text-centered">
         <Icon data={arrowCircleRight} scale="1.75" style="fill: white; padding: 5px"/>
         <div class="rotate-right has-text-centered has-text-white">{slides[startOn + 1].label}</div>
+        {#if panTimer}
+          <Icon data={spinner} pulse/>
+        {/if}
       </div>
     {/if}
   </div>
