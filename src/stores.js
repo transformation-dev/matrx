@@ -1,4 +1,7 @@
 import {writable} from 'svelte/store'
+import {getClient} from '@matrx/svelte-realtime-store'
+const realtimeClient = getClient()
+const connected = realtimeClient.connected
 
 export const CSRFTokenAvailable = writable(false)
 
@@ -71,7 +74,7 @@ export const queueSwimlanes = writable({
   }
 })
 
-export const plan = writable({
+export const plan = realtimeClient.realtime({_entityID: 'A'}, {
   practice1: {
     practiceID: 'practice1',
     formulationID: 'formulation1',
