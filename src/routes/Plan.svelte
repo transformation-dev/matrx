@@ -59,12 +59,13 @@
 <div class="section">
   <div class="columns has-background-primary">
     {#if startOn > 0}
-      <div use:addDragster id="pan-left" on:click={panLeft} on:drop={dropLeft} on:dragster-enter={startPanTimer} on:dragster-leave={clearPanTimer} on:dragover={dragOver} class="column drop-zone is-narrow has-text-centered">
-        <Icon data={arrowCircleLeft} scale="1.75" style="fill: white; padding: 5px"/>
-        <div class="rotate-left has-text-centered has-text-white">{slides[startOn - 1].label}</div>
+      <div use:addDragster id="pan-left" class="column drop-zone is-narrow has-text-centered" on:click={panLeft} on:drop={dropLeft} on:dragster-enter={startPanTimer} on:dragster-leave={clearPanTimer} on:dragover={dragOver}>
         {#if panTimer}
-          <Icon data={spinner} pulse/>
+          <Icon data={spinner} pulse scale="1.75" style="fill: white; padding: 5px"/>
+        {:else}
+          <Icon data={arrowCircleLeft} scale="1.75" style="fill: white; padding: 5px"/>
         {/if}
+        <div class="rotate-left has-text-centered has-text-white">{slides[startOn - 1].label}&nbsp;&nbsp;&nbsp;</div>
       </div>
     {/if}
 
@@ -88,11 +89,12 @@
 
     {#if endOn < NUMBER_OF_SLIDES - 1}
       <div use:addDragster id="pan-right" on:click={panRight} on:drop={dropRight} on:dragster-enter={startPanTimer} on:dragster-leave={clearPanTimer} on:dragover={dragOver} class="column drop-zone is-narrow has-text-centered">
-        <Icon data={arrowCircleRight} scale="1.75" style="fill: white; padding: 5px"/>
-        <div class="rotate-right has-text-centered has-text-white">{slides[startOn + 1].label}</div>
         {#if panTimer}
-          <Icon data={spinner} pulse/>
+          <Icon data={spinner} pulse scale="1.75" style="fill: white; padding: 5px"/>
+        {:else}
+          <Icon data={arrowCircleRight} scale="1.75" style="fill: white; padding: 5px"/>
         {/if}
+        <div class="rotate-right has-text-centered has-text-white">&nbsp;&nbsp;&nbsp;{slides[startOn + 1].label}</div>
       </div>
     {/if}
   </div>
