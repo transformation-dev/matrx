@@ -3,6 +3,7 @@
   import Icon from 'svelte-awesome'
   import FormulationGrid from '../components/FormulationGrid.svelte'
   import DoingKanban from '../components/DoingKanban.svelte'
+  import {addDragster} from '../stores.js'
 
   const slides = [
     {label: 'Todo'},
@@ -11,7 +12,7 @@
   ]
   const NUMBER_OF_SLIDES = slides.length
   let startOn = 0
-  let slidesToDisplay = 2
+  let slidesToDisplay = 1
   $: endOn = startOn + slidesToDisplay - 1
 
 
@@ -37,8 +38,8 @@
     clearTimeout(panTimer)
   }
 
-  function drop() {
-    dragActive = false
+  function drop(event) {
+    
   }
 
 </script>
@@ -48,7 +49,7 @@
 <div class="section">
   <div class="columns has-background-primary">
     {#if startOn > 0}
-      <div id="pan-left" on:click={panLeft} on:dragenter={startPanTimer} on:dragleave={clearPanTimer} class="column is-narrow has-background-primary has-text-centered">
+      <div use:addDragster id="pan-left" on:click={panLeft} on:dragster-enter={startPanTimer} on:dragster-leave={clearPanTimer} class="column drop-zone is-narrow has-background-primary has-text-centered">
         <Icon data={arrowCircleLeft} scale="1.75" style="fill: white; padding: 5px"/>
         <div class="rotate-left has-text-centered has-text-white">{slides[startOn - 1].label}</div>
       </div>
@@ -72,7 +73,6 @@
       </div>
     {/if}
 
-    
     {#if endOn < NUMBER_OF_SLIDES - 1}
       <div id="pan-right" on:click={panRight} on:dragenter={startPanTimer} on:dragleave={clearPanTimer} class="column is-narrow has-background-primary has-text-centered">
         <Icon data={arrowCircleRight} scale="1.75" style="fill: white; padding: 5px"/>

@@ -176,7 +176,7 @@ export function drop(event) {
       value[practiceBeingDragged].assessedLevel = assessedLevel
       return value
     })
-    dragsters[queueSwimlaneID][assessedLevel].reset()
+    dragsters[dropZoneParent.id].reset()
   }
 }
 
@@ -256,11 +256,16 @@ export class Dragster {
 
 };
 
-const dragsters = {}  // {queueSwimlaneID: {assessedLevel: <Dragster>}}
+const dragsters = {}  // {id: <Dragster>}
 
 export function addDragster(node) {
-  const queueSwimlaneID = node.getAttribute('queueSwimlaneID')
-  const assessedLevel = node.getAttribute('assessedLevel')
-  dragsters[queueSwimlaneID] = dragsters[queueSwimlaneID] || {}
-  dragsters[queueSwimlaneID][assessedLevel] = new Dragster(node)
+  console.log(node.id)
+  const id = node.id
+  dragsters[id] = new Dragster(node)
+  return {
+    destroy() {
+      dragsters[id].removeListeners()
+      delete dragsters[id]
+    }
+  }
 }
