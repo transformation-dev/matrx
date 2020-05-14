@@ -1,6 +1,6 @@
 <script>
 
-  import {formulation, plan, queueSwimlanes, Dragster, drop} from '../stores'
+  import {formulation, plan, queueSwimlanes, drop} from '../stores'
   import { onMount } from 'svelte'
   import KanbanCell from './KanbanCell'
 
@@ -13,7 +13,7 @@
     }
   }
 
-  const kanbanRestructured = {}
+  const kanbanRestructured = {}  // {queueSwimlaneID: {assessedLevel: [<div class="card">]}}
   $: {
     for (const [queueSwimlaneID, queueSwimlane] of Object.entries($queueSwimlanes)) {
       kanbanRestructured[queueSwimlane.id] = {
@@ -29,13 +29,6 @@
       }
     }
   }
-
-  onMount(() => {
-    const dropZones = document.getElementsByClassName('drop-zone')
-    for (const element of dropZones) {
-      new Dragster(element)
-    }
-  })
 
 </script>
 

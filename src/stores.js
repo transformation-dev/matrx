@@ -176,6 +176,7 @@ export function drop(event) {
       value[practiceBeingDragged].assessedLevel = assessedLevel
       return value
     })
+    dragsters[queueSwimlaneID][assessedLevel].reset()
   }
 }
 
@@ -254,3 +255,12 @@ export class Dragster {
   }
 
 };
+
+const dragsters = {}  // {queueSwimlaneID: {assessedLevel: <Dragster>}}
+
+export function addDragster(node) {
+  const queueSwimlaneID = node.getAttribute('queueSwimlaneID')
+  const assessedLevel = node.getAttribute('assessedLevel')
+  dragsters[queueSwimlaneID] = dragsters[queueSwimlaneID] || {}
+  dragsters[queueSwimlaneID][assessedLevel] = new Dragster(node)
+}
