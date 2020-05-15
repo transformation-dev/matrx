@@ -1,4 +1,5 @@
 <script>
+  import {slide, fade, fly} from 'svelte/transition'
   import {arrowCircleLeft, arrowCircleRight, spinner} from 'svelte-awesome/icons'
   import Icon from 'svelte-awesome'
   import FormulationGrid from '../components/FormulationGrid.svelte'
@@ -16,15 +17,22 @@
   $: endOn = startOn + slidesToDisplay - 1
 
   let panTimer = null
+	let inX = 1000
+  let outX = -1000
+  const duration = 100
 
   function panLeft() {
     startOn = Math.max(0, startOn - 1)
     panTimer = null
+    inX = -1000
+		outX = 1000
   }
 
   function panRight() {
     startOn = Math.min(NUMBER_OF_SLIDES - 1, startOn + 1)
     panTimer = null
+    inX = 1000
+		outX = -1000
   }
 
   function startPanTimer(event) {
@@ -59,7 +67,7 @@
 <div class="section">
   <div class="columns has-background-primary">
     {#if startOn > 0}
-      <div use:addDragster id="pan-left" class="column drop-zone is-narrow has-text-centered" on:click={panLeft} on:drop={dropLeft} on:dragster-enter={startPanTimer} on:dragster-leave={clearPanTimer} on:dragover={dragOver}>
+      <div in:fly={{x: inX, duration}} out:fly={{x: outX, duration}} use:addDragster id="pan-left" class="column drop-zone is-narrow has-text-centered" on:click={panLeft} on:drop={dropLeft} on:dragster-enter={startPanTimer} on:dragster-leave={clearPanTimer} on:dragover={dragOver}>
         {#if panTimer}
           <Icon data={spinner} pulse scale="1.75" style="fill: white; padding: 5px"/>
         {:else}
@@ -70,25 +78,25 @@
     {/if}
 
     {#if startOn <= 0 &&  endOn >= 0}
-      <div class="column has-text-centered has-background-info">
+      <div in:fly={{x: inX, duration}} out:fly={{x: outX, duration}} class="column has-text-centered has-background-info">
         <FormulationGrid slideLabel={slides[0].label} />
       </div>
     {/if}
 
     {#if startOn <= 1 && endOn >= 1}
-      <div class="column has-text-centered has-background-primary">
+      <div in:fly={{x: inX, duration}} out:fly={{x: outX, duration}} class="column has-text-centered has-background-primary">
         <DoingKanban />
       </div>
     {/if}
 
     {#if startOn <= 2 &&  endOn >= 2}
-      <div class="column has-text-centered has-background-info">
+      <div in:fly={{x: inX, duration}} out:fly={{x: outX, duration}} class="column has-text-centered has-background-info">
         <FormulationGrid slideLabel={slides[2].label} />
       </div>
     {/if}
 
     {#if endOn < NUMBER_OF_SLIDES - 1}
-      <div use:addDragster id="pan-right" on:click={panRight} on:drop={dropRight} on:dragster-enter={startPanTimer} on:dragster-leave={clearPanTimer} on:dragover={dragOver} class="column drop-zone is-narrow has-text-centered">
+      <div in:fly={{x: inX, duration}} out:fly={{x: outX, duration}} use:addDragster id="pan-right" on:click={panRight} on:drop={dropRight} on:dragster-enter={startPanTimer} on:dragster-leave={clearPanTimer} on:dragover={dragOver} class="column drop-zone is-narrow has-text-centered">
         {#if panTimer}
           <Icon data={spinner} pulse scale="1.75" style="fill: white; padding: 5px"/>
         {:else}

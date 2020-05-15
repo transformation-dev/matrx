@@ -145,7 +145,6 @@ let practiceBeingDragged = null
 
 export function dragStart(event) {
   practiceBeingDragged = event.target.id
-  console.log(practiceBeingDragged)
   event.target.style.opacity = .5
 }
 
@@ -171,7 +170,6 @@ export function drop(event) {
   dropZoneParent.style.background = ''
   const queueSwimlaneID = dropZoneParent.getAttribute('queueSwimlaneID')
   const assessedLevel = dropZoneParent.getAttribute('assessedLevel')
-  console.log(queueSwimlaneID, assessedLevel)
   if (queueSwimlaneID && assessedLevel) {
     plan.update((value) => {
       value[practiceBeingDragged].queueSwimlaneID = queueSwimlaneID
