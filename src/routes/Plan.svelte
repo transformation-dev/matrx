@@ -19,7 +19,7 @@
   let panTimer = null
 	let inX = 1000
   let outX = -1000
-  const duration = 100
+  const duration = 125
 
   function panLeft() {
     startOn = Math.max(0, startOn - 1)

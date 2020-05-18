@@ -1,7 +1,7 @@
 <script>
   export let slideLabel = ''
 
-  import {formulation, plan, dragStart, dropPan, dragOver, dragLeave, dragEnter, addDragster} from '../stores'
+  import {formulation, plan, dragStart, dragEnd, dropPan, dragOver, dragLeave, dragEnter, addDragster} from '../stores'
 
   let blankDisciplineIDs = {}
   $: {
@@ -43,7 +43,7 @@
         {/if}
         {#each discipline.practices as practice}
           {#if $plan[practice.id].status == slideLabel}
-            <div id={practice.id} class="column with-border" draggable="true" on:dragstart={dragStart}>
+            <div id={practice.id} class="column with-border" draggable="true" on:dragstart={dragStart} on:dragend={dragEnd}>
               {practice.label}
             </div>
           {/if}
