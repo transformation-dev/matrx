@@ -20,7 +20,7 @@
 
   const NUMBER_OF_SLIDES = slides.length
   let startOn = 0
-  let slidesToDisplay = 1
+  let slidesToDisplay = 3
   $: endOn = startOn + slidesToDisplay - 1
 
   let panTimer = null

@@ -43,7 +43,7 @@ In a .svelte file
 
   function drop(event) {
     const id = event.target.id
-    Dragster.getDragster(id).reset()  // Very important!
+    Dragster.reset(event.target)  // Very important!
     console.log('id of drop zone', id)
     console.log('id of thing being dragged', thingBeingDragged)
   }

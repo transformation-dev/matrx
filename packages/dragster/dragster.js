@@ -11,11 +11,16 @@ export class Dragster {
     if (!Dragster.dragsters) {
       Dragster.dragsters = {}
     }
+    if (Dragster.dragsters[this.el.id]) throw new Error('A Dragster for element with id "' + this.el.id + '" has already been instantiated')
     Dragster.dragsters[this.el.id] = this
   }
 
   static getDragster(id) {
     return Dragster.dragsters[id]
+  }
+
+  static reset(el) {
+    Dragster.dragsters[el.id].reset()
   }
 
   dragenter(event) {

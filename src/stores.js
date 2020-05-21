@@ -180,7 +180,7 @@ export function drop(event) {
       value[practiceBeingDragged].status = 'Doing'
       return value
     })
-    Dragster.getDragster(dropZoneParent.id).reset()
+    Dragster.reset(dropZoneParent)
   }
 }
 
@@ -203,7 +203,7 @@ export function dropPan(event, newStatus) {
     value[practiceBeingDragged].status = newStatus
     return value
   })
-  Dragster.getDragster(dropZoneParent.id).reset()
+  Dragster.reset(dropZoneParent)
 }
 
 export function addDragster(node) {
