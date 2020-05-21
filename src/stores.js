@@ -177,7 +177,7 @@ export function drop(event) {
       value[practiceBeingDragged].status = 'Doing'
       return value
     })
-    dragsters[dropZoneParent.id].reset()
+    Dragster.dragsters[dropZoneParent.id].reset()
   }
 }
 
@@ -200,7 +200,7 @@ export function dropPan(event, newStatus) {
     value[practiceBeingDragged].status = newStatus
     return value
   })
-  dragsters[dropZoneParent.id].reset()
+  Dragster.dragsters[dropZoneParent.id].reset()
 }
 
 export class Dragster {
@@ -223,73 +223,84 @@ export class Dragster {
   COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
   IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
   CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+  The above notice applies to the original code written by Ben Smithett but note that
+  the code below has been modified from Ben's code as follows:
+  
+  * Has been converted from CoffeeScript to JavaScript
+  * Uses ES6 Class
+  * Keeps track of its instances for later reference
+  * Provides a `destroy()` method that can be used as a callback to remove said
+    instances. If you use this with Svelte 3's `use:` directive, then Svelte will
+    automatically call destroy as something is removed from the DOM.
   */
 
   constructor(el) {
-    this.dragenter = this.dragenter.bind(this);
-    this.dragleave = this.dragleave.bind(this);
-    this.el = el;
-    this.first = false;
-    this.second = false;
-    this.el.addEventListener("dragenter", this.dragenter, false);
-    this.el.addEventListener("dragleave", this.dragleave, false);
+    this.dragenter = this.dragenter.bind(this)
+    this.dragleave = this.dragleave.bind(this)
+    this.el = el
+    this.first = false
+    this.second = false
+    this.el.addEventListener("dragenter", this.dragenter, false)
+    this.el.addEventListener("dragleave", this.dragleave, false)
+    this.destroy = this._destroy.bind(this)
+    if (!Dragster.dragsters) {
+      Dragster.dragsters = {}
+    }
+    Dragster.dragsters[this.el.id] = this
   }
 
   dragenter(event) {
     event.preventDefault()
     if (this.first) {
-      return this.second = true;
+      this.second = true
     } else {
-      this.first = true;
-      this.customEvent = document.createEvent("CustomEvent");
+      this.first = true
+      this.customEvent = document.createEvent("CustomEvent")
       this.customEvent.initCustomEvent("dragster-enter", true, true, {
         dataTransfer: event.dataTransfer,
         sourceEvent: event
-      });
-      return this.el.dispatchEvent(this.customEvent);
+      })
+      this.el.dispatchEvent(this.customEvent)
     }
   }
 
   dragleave(event) {
     if (this.second) {
-      this.second = false;
+      this.second = false
     } else if (this.first) {
-      this.first = false;
+      this.first = false
     }
     if (!this.first && !this.second) {
-      this.customEvent = document.createEvent("CustomEvent");
+      this.customEvent = document.createEvent("CustomEvent")
       this.customEvent.initCustomEvent("dragster-leave", true, true, {
         dataTransfer: event.dataTransfer,
         sourceEvent: event
-      });
-      return this.el.dispatchEvent(this.customEvent);
+      })
+      this.el.dispatchEvent(this.customEvent)
     }
   }
 
   removeListeners() {
-    this.el.removeEventListener("dragenter", this.dragenter, false);
-    return this.el.removeEventListener("dragleave", this.dragleave, false);
+    this.el.removeEventListener("dragenter", this.dragenter, false)
+    return this.el.removeEventListener("dragleave", this.dragleave, false)
   }
 
-  // Call after drop
+  // Must call after drop or a second drop to the same target sometimes gets missed
   reset() {
-    this.first = false;
-    return this.second = false;
+    this.first = false
+    return this.second = false
   }
 
-};
-
-const dragsters = {}  // {id: <Dragster>}
-
-export function addDragster(node) {
-  const id = node.id
-  dragsters[id] = new Dragster(node)
-  return {
-    destroy() {
-      if (dragsters[id]) {
-        dragsters[id].removeListeners()
-        delete dragsters[id]
-      }
+  _destroy() {
+    if (Dragster.dragsters[this.el.id]) {
+      Dragster.dragsters[this.el.id].removeListeners()
+      delete Dragster.dragsters[this.el.id]
     }
   }
+
+}
+
+export function addDragster(node) {
+  return new Dragster(node)
 }
