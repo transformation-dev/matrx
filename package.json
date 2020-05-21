@@ -69,6 +69,7 @@
   "devDependencies": {
     "@cypress/code-coverage": "^1.14.0",
     "@matrx/svelte-realtime-store": "file:packages/svelte-realtime-store",
+    "@matrx/dragster": "file:packages/dragster",
     "browserify": "^16.5.1",
     "bulma": "^0.7.5",
     "bulmaswatch": "^0.7.5",

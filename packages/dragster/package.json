@@ -1,0 +1,35 @@
+{
+  "name": "@matrx/dragster",
+  "version": "0.5.0",
+  "description": "Port of Ben Smithett's dragster to ES6. Wraps native dragenter/dragleave to behave like mouse event when hovering over child DOM elements.",
+  "keywords": [
+    "drag-and-drop",
+    "drag",
+    "drop",
+    "dragenter",
+    "dragleave",
+    "svelte",
+    "svelte3"
+  ],
+  "author": "Larry Maccherone <Larry@Maccherone.com>",
+  "homepage": "https://github.com/matrx-transformation/matrx/tree/master/packages/dragster#readme",
+  "license": "MIT",
+  "main": "dragster.js",
+  "type": "module",
+  "directories": {
+    "test": "__tests__"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/matrx-transformation/matrx/tree/master/packages/dragster"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "bugs": {
+    "url": "https://github.com/matrx-transformation/matrx/issues"
+  }
+}

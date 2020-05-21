@@ -17,6 +17,7 @@
   ]
 
   console.log(querystring)
+
   const NUMBER_OF_SLIDES = slides.length
   let startOn = 0
   let slidesToDisplay = 1

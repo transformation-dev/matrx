@@ -16,7 +16,6 @@
   "homepage": "https://github.com/matrx-transformation/matrx/tree/master/packages/svelte-realtime-server#readme",
   "license": "MIT",
   "main": "svelte-realtime-server.js",
-  "type": "module",
   "directories": {
     "test": "__tests__"
   },
