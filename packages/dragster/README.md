@@ -36,6 +36,11 @@ In a .svelte file
 
   let thingBeingDragged
 
+  function dragStart(event) {
+    thingBeingDragged = event.target.id
+    event.target.style.opacity = .5
+  }
+
   function drop(event) {
     const id = event.target.id
     Dragster.getDragster(id).reset()  // Very important!
@@ -51,13 +56,8 @@ In a .svelte file
     event.target.style.background = '' 
   }
 
-  function over(event) {  // Very important!
-    event.preventDefault()
-  }
-  
-  function dragStart(event) {
-    thingBeingDragged = event.target.id
-    event.target.style.opacity = .5
+  function over(event) {  
+    event.preventDefault()  // Very important!
   }
 
   function dragEnd(event) {
