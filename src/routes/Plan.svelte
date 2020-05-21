@@ -1,9 +1,13 @@
 <script>
+  // Import packages
   import {slide, fade, fly} from 'svelte/transition'
   import {arrowCircleLeft, arrowCircleRight, spinner} from 'svelte-awesome/icons'
   import Icon from 'svelte-awesome'
   import FormulationGrid from '../components/FormulationGrid.svelte'
   import DoingKanban from '../components/DoingKanban.svelte'
+  import {push, querystring} from 'svelte-spa-router'
+
+  // Import local code
   import {addDragster, dropPan, dragOver, dragEnter} from '../stores.js'
 
   const slides = [
@@ -11,6 +15,8 @@
     {label: 'Doing'},
     {label: 'Done'},
   ]
+
+  console.log(querystring)
   const NUMBER_OF_SLIDES = slides.length
   let startOn = 0
   let slidesToDisplay = 1
