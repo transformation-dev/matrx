@@ -1,12 +1,12 @@
-import Home from './routes/Home.svelte'
-import Name from './routes/Name.svelte'
-import Wild from './routes/Wild.svelte'
-import NotFound from './routes/NotFound.svelte'
-import Login from './routes/Login.svelte'
-import Poc from './routes/Poc.svelte'
-import TestJig from './routes/TestJig.svelte'
-import Morgan from './routes/Morgan.svelte'
-import Plan from './routes/Plan.svelte'
+import Home from './routes/Home'
+import Name from './routes/Name'
+import Wild from './routes/Wild'
+import NotFound from './routes/NotFound'
+import Login from './routes/Login'
+import Poc from './routes/Poc'
+import TestJig from './routes/TestJig'
+import Morgan from './routes/Morgan'
+import Plan from './routes/Plan'
 
 const routes = {
   '/': Home,

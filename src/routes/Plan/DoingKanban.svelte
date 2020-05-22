@@ -1,6 +1,6 @@
 <script>
 
-  import {formulation, plan, queueSwimlanes, drop} from '../stores'
+  import {formulation, plan, queueSwimlanes, drop} from '../../stores'
   import { onMount } from 'svelte'
   import KanbanCell from './KanbanCell'
 
