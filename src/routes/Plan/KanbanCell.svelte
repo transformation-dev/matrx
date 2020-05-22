@@ -3,7 +3,8 @@
   export let assessedLevel = ''
   export let queueSwimlaneID = ''
 
-  import {dragStart, dragEnd, dragEnter, dragOver, dragLeave, drop, addDragster} from '../../stores.js'
+  import {dragStart, dragEnd, dragEnter, dragOver, dragLeave, drop} from './helpers'
+  import {addDragster} from '../../stores'
 
 </script>
 

@@ -1,7 +1,8 @@
 <script>
   export let slideLabel = ''
 
-  import {formulation, plan, dragStart, dragEnd, dropPan, dragOver, dragLeave, dragEnter, addDragster} from '../../stores'
+  import {formulation, plan, addDragster} from '../../stores'
+  import {dragStart, dragEnd, dropPan, dragOver, dragLeave, dragEnter} from './helpers'
 
   let blankDisciplineIDs = {}
   $: {

@@ -8,7 +8,8 @@
   import {push, querystring} from 'svelte-spa-router'
 
   // Import local code
-  import {addDragster, dropPan, dragOver, dragEnter} from '../../stores.js'
+  import {addDragster} from '../../stores'
+  import {dropPan, dragOver, dragEnter} from './helpers'
 
   const slides = [
     {label: 'Todo'},

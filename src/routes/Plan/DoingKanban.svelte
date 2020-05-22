@@ -1,8 +1,7 @@
 <script>
-
-  import {formulation, plan, queueSwimlanes, drop} from '../../stores'
-  import { onMount } from 'svelte'
   import KanbanCell from './KanbanCell'
+  import {formulation, plan, queueSwimlanes} from '../../stores'
+  import {drop} from './helpers'
 
   const practicesIndex = {}
   $: {
