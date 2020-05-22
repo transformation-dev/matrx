@@ -5,7 +5,7 @@
   import {derived} from 'svelte/store'
   import {getClient} from '@matrx/svelte-realtime-store'
 
-  const debug = require('debug')('matrx:App.svelte')
+  const debug = require('debug')('matrx:App')
   const {NODE_ENV} = process.env
   if (!(NODE_ENV === 'production')) {
     require('whatwg-fetch')

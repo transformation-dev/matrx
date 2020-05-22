@@ -7,7 +7,7 @@
   import {getClient} from '@matrx/svelte-realtime-store'
   import {push, querystring} from 'svelte-spa-router'
   import {CSRFTokenAvailable} from '../stores'
-  const debug = require('debug')('matrx:Login.svelte')
+  const debug = require('debug')('matrx:Login')
 
   const origin = new URLSearchParams($querystring).get('origin')
   const realtimeClient = getClient()

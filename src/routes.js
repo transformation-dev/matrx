@@ -6,7 +6,7 @@ import Login from './routes/Login'
 import Poc from './routes/Poc'
 import TestJig from './routes/TestJig'
 import Morgan from './routes/Morgan'
-import Plan from './routes/Plan'
+import Plan from './routes/Plan/index'
 
 const routes = {
   '/': Home,

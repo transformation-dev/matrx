@@ -1,5 +1,5 @@
 <script>
-import SortableList from '../SortableList.svelte';
+import SortableList from '../SortableList';
 
 let list = ["First Item", "Second Item", "Third Item"];
 const sortList = ev => {list = ev.detail};
