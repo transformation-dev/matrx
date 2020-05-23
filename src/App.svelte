@@ -97,7 +97,7 @@
 
 <nav class="navbar ">
     <div class="navbar-brand">
-      <a class="navbar-item" href="#">
+      <a class="navbar-item" href="/#/">
         <img src="MatrXCloseWhite.png" alt="MatrX Logo">
       </a>
       <div class="navbar-burger burger" data-target="navMenuExample1">
@@ -108,7 +108,7 @@
     </div>
     <div id="navMenuExample1" class="navbar-menu">
       <div class="navbar-start">
-        <a class="navbar-item" href="#">
+        <a class="navbar-item" href="/#/">
           Home
         </a>
         <div class="navbar-item has-dropdown is-hoverable">
@@ -116,25 +116,25 @@
             Morgan
           </a>
           <div class="navbar-dropdown ">
-            <a class="navbar-item " href="#">
+            <a class="navbar-item " href="/#/">
               Overview
             </a>
-            <a class="navbar-item " href="#">
+            <a class="navbar-item " href="/#/">
               Modifiers
             </a>
-            <a class="navbar-item " href="#">
+            <a class="navbar-item " href="/#/">
               Grid
             </a>
-            <a class="navbar-item " href="#">
+            <a class="navbar-item " href="/#/">
               Form
             </a>
-            <a class="navbar-item " href="#">
+            <a class="navbar-item " href="/#/">
               Elements
             </a>
-            <a class="navbar-item is-active" href="#">
+            <a class="navbar-item is-active" href="/#/">
               Components
             </a>
-            <a class="navbar-item " href="#">
+            <a class="navbar-item " href="/#/">
               Layout
             </a>
             <hr class="navbar-divider">

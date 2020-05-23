@@ -1,7 +1,7 @@
 <script>
-  import KanbanCell from './KanbanCell'
+  import KanbanCell from './KanbanCell'  // TODO: Get rid of KanbanCell and merge it into this code if we want the crossfade (make it move) animation to work
   import {formulation, plan, queueSwimlanes} from '../../stores'
-  import {drop} from './helpers'
+  import {drop} from './plan-helpers'
 
   const practicesIndex = {}
   $: {

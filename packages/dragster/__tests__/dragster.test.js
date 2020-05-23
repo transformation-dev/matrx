@@ -1,7 +1,7 @@
 'use strict';
 
-const realtime = require('../svelte-realtime-store');
+const {Dragster} = require('../dragster');
 
-describe('@matrx/svelte-realtime-store', () => {
+describe('@matrx/dragster', () => {
     it('needs tests');
 });

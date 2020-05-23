@@ -2,7 +2,7 @@
   export let slideLabel = ''
 
   import {formulation, plan, addDragster} from '../../stores'
-  import {dragStart, dragEnd, dropPan, dragOver, dragLeave, dragEnter} from './helpers'
+  import {dragStart, dragEnd, dropPan, dragOver, dragLeave, dragEnter} from './plan-helpers'
 
   let blankDisciplineIDs = {}
   $: {

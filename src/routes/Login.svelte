@@ -1,6 +1,4 @@
 <script>
-  export let params = {}
-  
   import Icon from 'svelte-awesome'
   import { envelope, key } from 'svelte-awesome/icons'
   

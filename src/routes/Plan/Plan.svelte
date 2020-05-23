@@ -3,13 +3,14 @@
   import {slide, fade, fly} from 'svelte/transition'
   import {arrowCircleLeft, arrowCircleRight, spinner} from 'svelte-awesome/icons'
   import Icon from 'svelte-awesome'
-  import FormulationGrid from './FormulationGrid'
-  import DoingKanban from './DoingKanban'
   import {push, querystring} from 'svelte-spa-router'
+  import {onDestroy} from 'svelte'
 
   // Import local code
   import {addDragster} from '../../stores'
-  import {dropPan, dragOver, dragEnter} from './helpers'
+  import {dropPan, dragOver, dragEnter} from './plan-helpers'
+  import FormulationGrid from './FormulationGrid'
+  import DoingKanban from './DoingKanban'
 
   const slides = [
     {label: 'Todo'},
