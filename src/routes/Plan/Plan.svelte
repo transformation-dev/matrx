@@ -1,14 +1,13 @@
 <script>
   // Import packages
-  import {slide, fade, fly} from 'svelte/transition'
+  import {fly} from 'svelte/transition'
   import {arrowCircleLeft, arrowCircleRight, spinner} from 'svelte-awesome/icons'
   import Icon from 'svelte-awesome'
-  import {push, querystring} from 'svelte-spa-router'
-  import {onDestroy} from 'svelte'
+  import {ViewstateStore} from '@matrx/svelte-viewstate-store'
 
   // Import local code
   import {addDragster} from '../../stores'
-  import {dropPan, dragOver, dragEnter} from './plan-helpers'
+  import {dropPan, dragOver} from './plan-helpers'
   import FormulationGrid from './FormulationGrid'
   import DoingKanban from './DoingKanban'
 
@@ -18,30 +17,28 @@
     {label: 'Done'},
   ]
 
-  console.log(querystring)
-
   const NUMBER_OF_SLIDES = slides.length
-  let startOn = 0
-  let slidesToDisplay = 3
-  $: endOn = startOn + slidesToDisplay - 1
+  const startOn = new ViewstateStore({defaultValue: 0})
+  const slidesToDisplay = new ViewstateStore({defaultValue: 3})
+  $: endOn = $startOn + $slidesToDisplay - 1
 
   let panTimer = null
-	let inX = 1000
+  let inX = 1000
   let outX = -1000
   const duration = 125
 
   function panLeft() {
-    startOn = Math.max(0, startOn - 1)
+    startOn.update(value => Math.max(0, value - 1))
     panTimer = null
     inX = -1000
-		outX = 1000
+    outX = 1000
   }
 
   function panRight() {
-    startOn = Math.min(NUMBER_OF_SLIDES - 1, startOn + 1)
+    startOn.update(value => Math.min(NUMBER_OF_SLIDES - 1, value + 1))
     panTimer = null
     inX = 1000
-		outX = -1000
+    outX = -1000
   }
 
   function startPanTimer(event) {
@@ -75,30 +72,30 @@
 
 <div class="section">
   <div class="columns has-background-primary">
-    {#if startOn > 0}
+    {#if $startOn > 0}
       <div in:fly={{x: inX, duration}} out:fly={{x: outX, duration}} use:addDragster id="pan-left" class="column drop-zone is-narrow has-text-centered" on:click={panLeft} on:drop={dropLeft} on:dragster-enter={startPanTimer} on:dragster-leave={clearPanTimer} on:dragover={dragOver}>
         {#if panTimer}
           <Icon data={spinner} pulse scale="1.75" style="fill: white; padding: 5px"/>
         {:else}
           <Icon data={arrowCircleLeft} scale="1.75" style="fill: white; padding: 5px"/>
         {/if}
-        <div class="rotate-left has-text-centered has-text-white">{slides[startOn - 1].label}&nbsp;&nbsp;&nbsp;</div>
+        <div class="rotate-left has-text-centered has-text-white">{slides[$startOn - 1].label}&nbsp;&nbsp;&nbsp;</div>
       </div>
     {/if}
 
-    {#if startOn <= 0 &&  endOn >= 0}
+    {#if $startOn <= 0 &&  endOn >= 0}
       <div in:fly={{x: inX, duration}} out:fly={{x: outX, duration}} class="column has-text-centered has-background-info">
         <FormulationGrid slideLabel={slides[0].label} />
       </div>
     {/if}
 
-    {#if startOn <= 1 && endOn >= 1}
+    {#if $startOn <= 1 && endOn >= 1}
       <div in:fly={{x: inX, duration}} out:fly={{x: outX, duration}} class="column has-text-centered has-background-primary">
         <DoingKanban />
       </div>
     {/if}
 
-    {#if startOn <= 2 &&  endOn >= 2}
+    {#if $startOn <= 2 &&  endOn >= 2}
       <div in:fly={{x: inX, duration}} out:fly={{x: outX, duration}} class="column has-text-centered has-background-info">
         <FormulationGrid slideLabel={slides[2].label} />
       </div>
@@ -111,7 +108,7 @@
         {:else}
           <Icon data={arrowCircleRight} scale="1.75" style="fill: white; padding: 5px"/>
         {/if}
-        <div class="rotate-right has-text-centered has-text-white">&nbsp;&nbsp;&nbsp;{slides[startOn + 1].label}</div>
+        <div class="rotate-right has-text-centered has-text-white">&nbsp;&nbsp;&nbsp;{slides[$startOn + 1].label}</div>
       </div>
     {/if}
   </div>

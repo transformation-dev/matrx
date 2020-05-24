@@ -1,27 +1,33 @@
-# `@matrx/dragster`
+# `@matrx/view-state`
 
-`@matrx/dragster` is a port of [Ben Smithett's dragster](http://bensmithett.github.io/dragster) to ES6. 
-It wraps the native dragenter/dragleave to behave like mouse event when hovering over child DOM elements.
+One aspect of a great UI is that a user can cut and paste the URL and send it to someone
+else, and, assuming they have the right permissions, they will see exactly what the first user saw.
+This is partially achieved by pulling the data from a shared source like a database
+but that doesn't help for variables that the user manipulates to control his view.
+For example, if you have a report page where the user can specify a number of 
+filter parameters, I want the URL to contain the filter parameters. Or if you have
+a carosel over 3 different pictures, I want the URL to specify which picture is
+active.
 
-## Differences from the original
-  
-  * Has been converted from CoffeeScript to JavaScript
-  * Has had its events renamed to 'dragster-enter' and 
-    'dragster-leave'
-  * Uses ES6 Class
-  * Keeps track of its instances for later reference so your drop 
-    callback has a way to call `reset()`
-  * Provides a `destroy()` method that can be used as a callback to 
-    remove said instances. If you use this with Svelte's `use:` 
-    directive, then Svelte will automatically call `destroy()` as
-    something is removed from the DOM.
+Another aspect of a good UI is that when I return to a given page, unless I was
+sent there by a URL containing all the view state, I want the variables that control
+how the view looks to use smart defaults. I generally want them to default to the
+last value I personally set for that variable and then fallback to some global or
+heurisitically-determined default.
+
+`@matrx/view-state` helps with both of these. First, it gives you a place to
+store view-state variables and whenever those are updated, the local querystring
+is automatically updated. Second, for "required" view-state variables, it saves the 
+lastest value that was altered by the user to LocalStorage for restoration the next
+time the user is sent to this page without these required view-state variables like
+from a main menu.
 
 ## Usage
 
 To install with npm
 
 ```bash
-npm install --save @matrx/dragster
+npm install --save @matrx/view-state
 ```
 
 In a .svelte file

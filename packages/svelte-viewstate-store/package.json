@@ -1,0 +1,35 @@
+{
+  "name": "@matrx/svelte-viewstate-store",
+  "version": "0.6.0",
+  "description": "Drop-in replacement for Svelte's writable store that keeps the URL in sync with any variables that determine the view and saves/restores last view state from LocalStorage",
+  "keywords": [
+    "LocalStorage",
+    "svelte",
+    "svelte3",
+    "store"
+  ],
+  "author": "Larry Maccherone <Larry@Maccherone.com>",
+  "homepage": "https://github.com/matrx-transformation/matrx/tree/master/packages/svelte-viewstate-store#readme",
+  "license": "MIT",
+  "main": "svelte-viewstate-store.js",
+  "type": "module",
+  "directories": {
+    "test": "__tests__"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/matrx-transformation/matrx/tree/master/packages/svelte-viewstate-store"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "bugs": {
+    "url": "https://github.com/matrx-transformation/matrx/issues"
+  },
+  "devDependencies": {
+    "svelte": "^3.22.3"
+  }
+}

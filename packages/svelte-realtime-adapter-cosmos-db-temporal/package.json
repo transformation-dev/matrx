@@ -42,9 +42,5 @@
   "dependencies": {
     "@azure/cosmos": "^3.4.2",
     "tape": "^4.11.0"
-  },
-  "devDependencies": {
-    "@zeit/cosmosdb-server": "^0.3.1",
-    "tap-spec": "^5.0.0"
   }
 }

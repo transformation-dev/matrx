@@ -47,6 +47,9 @@ module.exports = {
                 ObjectExpression: 1
             }
         ],
+        "camelcase": [
+          'warn'
+        ],
         'linebreak-style': [
             'error',
             'unix'
@@ -82,14 +85,14 @@ module.exports = {
             'error',
             'always'
         ],
-        'space-before-function-paren': [
-            'error',
-            {
-                anonymous: 'never',
-                named: 'never',
-                asyncArrow: 'always'
-            }
-        ],
+        // 'space-before-function-paren': [
+        //     'error',
+        //     {
+        //         anonymous: 'never',
+        //         named: 'never',
+        //         asyncArrow: 'always'
+        //     }
+        // ],
         'keyword-spacing': [
             'error',
             {
