@@ -18,8 +18,8 @@
   ]
 
   const NUMBER_OF_SLIDES = slides.length
-  const startOn = new ViewstateStore({defaultValue: 0})
-  const slidesToDisplay = new ViewstateStore({defaultValue: 3})
+  const startOn = new ViewstateStore({identifier: 'startOn', type: 'Int', defaultValue: 0})
+  const slidesToDisplay = new ViewstateStore({identifier: 'slidesToDisplay', type: 'Int', defaultValue: 1})
   $: endOn = $startOn + $slidesToDisplay - 1
 
   let panTimer = null
@@ -58,12 +58,12 @@
 
   function dropLeft(event) {
     clearPanTimer(event)
-    dropPan(event, slides[startOn - 1].label)
+    dropPan(event, slides[$startOn - 1].label)
   }
 
   function dropRight(event) {
     clearPanTimer(event)
-    dropPan(event, slides[startOn + 1].label)
+    dropPan(event, slides[$startOn + 1].label)
   }
 
 </script>

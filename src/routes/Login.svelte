@@ -1,6 +1,6 @@
 <script>
   import Icon from 'svelte-awesome'
-  import { envelope, key } from 'svelte-awesome/icons'
+  import {envelope, key} from 'svelte-awesome/icons'
   
   import {getClient} from '@matrx/svelte-realtime-store'
   import {push, querystring} from 'svelte-spa-router'

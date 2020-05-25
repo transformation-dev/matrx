@@ -58,10 +58,10 @@ module.exports = {
             'error',
             'never'
         ],
-        'quote-props': [
-            'warn',
-            'as-needed'
-        ],
+        // 'quote-props': [
+        //     'warn',
+        //     'as-needed'
+        // ],
         'no-var': [
             'error'
         ],

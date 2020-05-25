@@ -1,108 +1,91 @@
-# `@matrx/view-state`
+# `@matrx/svelte-viewstate-store`
+
+`@matrx/svelte-viewstate-store` is a drop-in replacement for Svelte's writable store that 
+keeps the URL in sync with any variables that determine the view and saves/restores last 
+view state from LocalStorage. The store value, the variable in the querystring, and the
+value saved in LocalStorage will all stay in sync.
 
 One aspect of a great UI is that a user can cut and paste the URL and send it to someone
 else, and, assuming they have the right permissions, they will see exactly what the first user saw.
-This is partially achieved by pulling the data from a shared source like a database
-but that doesn't help for variables that the user manipulates to control his view.
+This is partially achieved by pulling the data from a database
+but that doesn't help for variables that the user manipulates to control their view.
 For example, if you have a report page where the user can specify a number of 
-filter parameters, I want the URL to contain the filter parameters. Or if you have
-a carosel over 3 different pictures, I want the URL to specify which picture is
-active.
+filter parameters, its desirable for the URL to contain the filter parameters. Another example
+might be if you have a carosel over 5 different pictures, you want the URL to specify which picture is
+active. Say `/carosel-page?activePicID=3`.
 
-Another aspect of a good UI is that when I return to a given page, unless I was
-sent there by a URL containing all the view state, I want the variables that control
-how the view looks to use smart defaults. I generally want them to default to the
-last value I personally set for that variable and then fallback to some global or
-heurisitically-determined default.
+Another aspect of a good UI is that when a user returns to a given page, they
+want the variables that control the view to generally default to the
+last values the user set (like a pan-right setting the activePicID to 4 in our carosel example) 
+and then fallback to some default... unless, of course, they got to the page
+with all the view variables in the URL as described in the prior paragraph.
 
-`@matrx/view-state` helps with both of these. First, it gives you a place to
+`@matrx/svelte-viewstate-store` helps with both of these. First, it gives you a place to
 store view-state variables and whenever those are updated, the local querystring
-is automatically updated. Second, for "required" view-state variables, it saves the 
-lastest value that was altered by the user to LocalStorage for restoration the next
-time the user is sent to this page without these required view-state variables like
-from a main menu.
+is automatically updated. Second, it saves the last user-set values
+(but not URL-set ones) to LocalStorage for restoration the next
+time the user is sent to this page without these view-state variables like
+from a main menu with `href="/carosel-page"`. In this case, it'll read from 
+LocalStorage that the last active pic ID was 4 and it'll update the URL to
+`/carosel-page?activePicID=4`.
 
-## Usage
+## Installation
 
 To install with npm
 
 ```bash
-npm install --save @matrx/view-state
+npm install --save @matrx/svelte-viewstate-store
 ```
 
-In a .svelte file
+## Usage
 
-```html
+Create a store on the page you want it scoped to. If you want a globally 
+scoped one, create it in `stores.js`and import it whereever you need it 
+to drive the view off of.
+
+```JavaScript
+const activePicID = new ViewstateStore({
+  identifier: 'activePicID',
+  defaultValue: 0,
+  type: 'Int',  // Also accepts 'Float'. Defaults to 'String'.
+  updateLocalStorageOnURLChange: true  // Defaults to false
+})
+```
+
+### `storeConfig`
+
+* `identifier` - It's usually best to have this equal the name of the 
+  variable, but you may want to prefix it with the page for large apps
+  or whenever there are other reasons to worry about conflict.
+* `defaultValue` - This is only used whenever the variable is not in the 
+  querystring nor LocalStorage, like when the first time this user ever 
+  visits the page from a menu.
+* `updateLocalStorageOnURLChange` - The default is to only update
+  LocalStorage when changed by your code which is usually in response
+  to some explicit user action in the UI. You can override this behavior and 
+  update LocalStorage even on URL change by setting this config item to 
+  `true`.
+
+activePicID can now be used as you would other Svelte writable store -- in
+reactive code like this:
+
+```JavaScript
+$: nextPic = $activePicID + 1
+```
+
+Or in a callback for a UI action like this:
+
+```HTML
 <script>
-  import {Dragster} from '@matrx/dragster'
-
-  function addDragster(node) {
-    return new Dragster(node)
+  function increment() {
+    activePicID.update(n => n + 1)
   }
 
-  let thingBeingDragged
-
-  function dragStart(event) {
-    thingBeingDragged = event.target.id
-    event.target.style.opacity = .5
-  }
-
-  function drop(event) {
-    const id = event.target.id
-    Dragster.reset(event.target)  // Very important!
-    console.log('id of drop zone', id)
-    console.log('id of thing being dragged', thingBeingDragged)
-  }
-
-  function enter(event) {
-    event.target.style.background = 'grey'
-  }
-
-  function leave(event) {
-    event.target.style.background = '' 
-  }
-
-  function over(event) {  
-    event.preventDefault()  // Very important!
-  }
-
-  function dragEnd(event) {
-    event.target.style.opacity = ""
+  function reset() {
+    $activePicID = 0
   }
 </script>
 
-<style>
-  .draggable {
-    width: 200px;
-    height: 20px;
-    text-align: center;
-    background: blue;
-  }
-
-  .dropzone {
-    width: 200px;
-    height: 20px;
-    text-align: center;
-    background: purple;
-  }
-</style>
-
-<div use:addDragster id="must-be-unique" class="dropzone" on:drop={drop} on:dragster-enter={enter} on:dragster-leave={leave} on:dragover={over}>
-  Drop something on me
-</div>
-
-<div id='must-also-be-unique' draggable='true' class="draggable" on:dragstart={dragStart} on:dragend={dragEnd}>
-  Drag me
-</div>
+<button on:click={increment}>Increment</button>
+<button on:click={reset}>Reset</button>
 ```
-
-React's JSX and I suspect Angular, Vue, etc. have a similar syntax to above. In JSX, it's `onDragster-start`. You may also have to
-create Dragster instances yourself if your UI tech doesn't have
-the equivalent to Svelte's `use:` and you should probably manually 
-call `destroy()`.
-
-Plain HTML/JavaScript is essentially the same except you'll specify 
-the event listeners with `addEventListener()` like in the 
-[MDN web docs example](https://developer.mozilla.org/en-US/docs/Web/API/Document/drag_event) except that you have to instantiate the
-Dragster instances yourself and you should probably manually call
-`destroy()`.

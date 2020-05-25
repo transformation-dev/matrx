@@ -30,6 +30,7 @@
     "url": "https://github.com/matrx-transformation/matrx/issues"
   },
   "devDependencies": {
-    "svelte": "^3.22.3"
+    "svelte": "^3.22.3",
+    "svelte-spa-router": "^1.3.0"
   }
 }
