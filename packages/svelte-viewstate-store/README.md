@@ -8,8 +8,10 @@ sync.
 
 One aspect of a great UI is that a user can cut and paste the URL and send it to 
 someone else, and, assuming they have the right permissions, they will see exactly 
-what the first user saw. This is partially achieved by pulling the data from a database but that doesn't help for variables that the user manipulates to control 
-their view. For example, if you have a report page where the user can specify a number of filter parameters, its desirable for the URL to contain the filter 
+what the first user saw. This is partially achieved by pulling the data from a 
+database but that doesn't help for variables that the user manipulates to control 
+their view. For example, if you have a report page where the user can specify a 
+number of filter parameters, its desirable for the URL to contain the filter 
 parameters. Another example might be if you have a carosel over 10 different 
 pictures, you want the URL to specify which picture is active. Say 
 `/carosel-page?activePicID=3`.

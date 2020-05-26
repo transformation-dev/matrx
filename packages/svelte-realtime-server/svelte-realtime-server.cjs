@@ -6,7 +6,9 @@ const cookieParser = require('cookie-parser')
 const DEFAULT_NAMESPACE = '/svelte-realtime'
 
 const {SESSION_SECRET} = process.env
-if (!SESSION_SECRET) throw new Error('Must set SESSION_SECRET environment variable')
+if (!SESSION_SECRET) {
+  throw new Error('Must set SESSION_SECRET environment variable')
+}
 
 function getServer(server, adapters, sessionStore, namespace = DEFAULT_NAMESPACE) {
   const io = socketIO(server)

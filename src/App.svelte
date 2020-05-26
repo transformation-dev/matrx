@@ -43,7 +43,7 @@
   const loginRoute = '/login'
 
   function redirect(authenticated) {
-    if (! authenticated) {
+    if (!authenticated) {
       if (!allowUnathenticated.has($location)) {
         // realtimeClient.logout()
         return push('/login?origin=' + $origin)

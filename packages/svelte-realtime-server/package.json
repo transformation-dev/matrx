@@ -15,7 +15,7 @@
   "author": "Larry Maccherone <Larry@Maccherone.com>",
   "homepage": "https://github.com/matrx-transformation/matrx/tree/master/packages/svelte-realtime-server#readme",
   "license": "MIT",
-  "main": "svelte-realtime-server.js",
+  "main": "svelte-realtime-server.cjs",
   "directories": {
     "test": "__tests__"
   },
