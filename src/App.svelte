@@ -1,22 +1,31 @@
 <script>
-  import Router from 'svelte-spa-router'
-  import {link, push, location, querystring} from 'svelte-spa-router'  // TODO: remove the ones I don't use
-  import active from 'svelte-spa-router/active'
-  import {derived} from 'svelte/store'
-  import {getClient} from '@matrx/svelte-realtime-store'
-
   const debug = require('debug')('matrx:App')
   const {NODE_ENV} = process.env
   if (!(NODE_ENV === 'production')) {
     require('whatwg-fetch')
   }
 
+  import Router from 'svelte-spa-router'
+  import {link, push, location, querystring} from 'svelte-spa-router'  // TODO: remove the ones I don't use
+  import active from 'svelte-spa-router/active'
+  import {derived} from 'svelte/store'
+  import Icon from 'svelte-awesome'
+  import {beer, refresh, comment, codeFork, camera, ban, signOut, envelope} from 'svelte-awesome/icons'
+
+  import {getClient} from '@matrx/svelte-realtime-store'
+  import {ViewstateStore} from '@matrx/svelte-viewstate-store'
+
   import routes from './routes'
   import {CSRFTokenAvailable} from './stores'
-  import Icon from 'svelte-awesome'
-  import { beer, refresh, comment, codeFork, camera, ban, signOut, envelope } from 'svelte-awesome/icons'
 
+  const teamID = new ViewstateStore({
+    identifier: 'teamID',
+    defaultValue: 'team1',
+    scope: '/'
+  })
+  
   function isActive(node, path) {
+    // TODO: Consider using svelte-spa-router's `use:active` directive
     return active(node, path, 'is-active')  // TODO: Change to 'is-active' when for Bulma
   }
 

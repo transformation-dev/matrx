@@ -13,7 +13,7 @@ export class ViewstateStore {
     this.start = start
     this.stop = null
     this.subscribers = []
-    this.firstLocation = null
+    this.scope = storeConfig.scope
 
     this._set(storeConfig.defaultValue)  // This is just so value is not undefined. It gets updated by the querystring or LocalStorage 
 
@@ -46,21 +46,22 @@ export class ViewstateStore {
   }
 
   onURLChange(newLoc) {
-    this.firstLocation = this.firstLocation || newLoc.location
+    this.scope = this.scope || newLoc.location
+    console.log(this.scope)
     this.location = newLoc.location
     this.querystring = newLoc.querystring
 
-    if (this.location !== this.firstLocation) {  // TODO: This needs to work for parent/child routes
+    if (!this.location.startsWith(this.scope)) {  // TODO: This needs to work for parent/child routes
       return
     }
 
     let {newValue, urlSearchParams} = this.getQuerystringParam()
     if (newValue != null) {
       if (this.storeConfig.updateLocalStorageOnURLChange) {
-        window.localStorage[this.storeConfig.identifier] = newValue
+        window.localStorage[this.scope + '.' + this.storeConfig.identifier] = newValue
       }
     } else {
-      newValue = window.localStorage[this.storeConfig.identifier] || this.storeConfig.defaultValue
+      newValue = window.localStorage[this.scope + '.' + this.storeConfig.identifier] || this.storeConfig.defaultValue
       this.setQueryStringParam(urlSearchParams, newValue)
     }
     this._set(newValue)
@@ -68,7 +69,7 @@ export class ViewstateStore {
   
   set(newValue) {
     this._set(newValue)
-    window.localStorage[this.storeConfig.identifier] = newValue
+    window.localStorage[this.scope + '.' + this.storeConfig.identifier] = newValue
     const {urlSearchParams} = this.getQuerystringParam()
     this.setQueryStringParam(urlSearchParams, newValue)
   }

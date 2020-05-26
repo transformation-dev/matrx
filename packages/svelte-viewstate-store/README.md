@@ -58,12 +58,40 @@ const activePicID = new ViewstateStore({
 ### `storeConfig`
 
 * `identifier` - It's usually best to have this equal the name of the 
-  variable, but you may want to prefix it with the page for large apps
-  or whenever there are other reasons to worry about conflict in 
-  LocalStorage.
+  variable. The scope (see below) is used to prefix this when 
+  saving/restoring to/from LocalStorage so there is minimal risk of 
+  conflicts.
+
 * `defaultValue` - This is only used whenever the variable is not in the 
   querystring nor LocalStorage, like when the first time this user ever 
   visits the page from a menu.
+
+* `type` - 'Int', 'Float', or 'Boolean'. Defaults to 'String'.
+
+* `scope` - By default, the current route as specified by 
+  svelte-spa-router's `location` store when the ViewstateStore is
+  instantiated is used to define the "scope" that this variable is
+  active. If you navigate away from this scope, the variables will
+  cease to update the URL even before the onDestroy callback has a
+  chance to remove the subscriptions. 
+  
+  This works fine for leaf node locations but
+  not for variables attached to the root of your app or parents in nested 
+  routes. Use this `scope` config option if you want to specify some other 
+  scope. For instance, let's say you have a global `teamID` variable
+  that is used in many pages. You want `#/?teamID=team1`, but you also want
+  `#/my-page?teamID=team1&someOtherVariable=10`. You accomplish this by
+  specifying `scope:'/'` in your storeConfig.
+
+  You may also choose to use this option if you want the querystring variables
+  to be stable across all possible values of parameterized routes like
+  `/posts/:author/:slug`. In this case, specify `scope:'/posts'` in
+  your storeConfig.
+
+  Note: the code uses a simple `string.startsWith()` to determine if the 
+  variable is still in scope or not. This would not work with any
+  regex routes.
+
 * `updateLocalStorageOnURLChange` - The default is to only update
   LocalStorage when changed by your code which is usually in response
   to some explicit user action in the UI. You can override this behavior and 
@@ -99,13 +127,19 @@ Or in a callback for a UI action like this:
 * `@matrx/svelte-viewstate-store` relies upon `svelte-spa-router` and it
   has only been tested with it. If you are using another router, it will
   probably not work.
+
+* At the moment, the `scope` storeConfig option uses `string.startsWith()` 
+  so it only works for string specified routes (e.g. '/pictures-page') but 
+  not regex routes. I have an idea on how to support this but I personally 
+  never use regex routes so it's hard to justify the work.
+
 * As the data and your app evolve, the values in LocalStorage and bookmarked 
-  URLs may become invalid. For instance, what if we've saved activePicID=10 in 
-  LocalStorage but there are now only 8 pictures. No telling how your page will 
-  act. So, it's a good idea to validate the values right after you instantiate
-  a ViewstateStore. The good news is that svelte stores update as soon as they 
-  are instantiated. So, you can validate and adjust them even before the
-  first render. So, for our example, you could do this:
+  URLs may become invalid. For instance, what if we've saved activePicID=10 
+  in LocalStorage but there are now only 8 pictures. No telling how your page 
+  will act. So, it's a good idea to validate the values right after you 
+  instantiate a ViewstateStore. The good news is that svelte stores update as 
+  soon as they are instantiated. So, you can validate and adjust them even 
+  before the first render. So, for our example, you could do this:
 
   ```JavaScript
   const activePicID = new ViewstateStore({
