@@ -2,7 +2,7 @@ import {writable} from 'svelte/store'
 
 import {getClient} from '@matrx/svelte-realtime-store'
 const realtimeClient = getClient()
-const connected = realtimeClient.connected
+export const connected = realtimeClient.connected
 
 import {Dragster} from '@matrx/dragster'
 

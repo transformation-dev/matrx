@@ -18,9 +18,22 @@
   ]
 
   const NUMBER_OF_SLIDES = slides.length
-  const startOn = new ViewstateStore({identifier: 'startOn', type: 'Int', defaultValue: 0})
-  const slidesToDisplay = new ViewstateStore({identifier: 'slidesToDisplay', type: 'Int', defaultValue: 1})
-  $: endOn = $startOn + $slidesToDisplay - 1
+  const startOn = new ViewstateStore({
+    identifier: 'startOn', 
+    type: 'Int', 
+    defaultValue: 0
+  })
+  const slidesToDisplay = new ViewstateStore({
+    identifier: 'slidesToDisplay', 
+    type: 'Int', 
+    defaultValue: 1, 
+    updateLocalStorageOnURLChange: true
+  })
+  let endOn
+  $: {
+    $startOn = Math.min($startOn, NUMBER_OF_SLIDES - $slidesToDisplay)
+    endOn = $startOn + $slidesToDisplay - 1
+  }
 
   let panTimer = null
   let inX = 1000

@@ -1,74 +1,67 @@
 import {onDestroy} from 'svelte'
-import {push} from 'svelte-spa-router'
+import {push, loc} from 'svelte-spa-router'
 
 const subscriberQueue = []
 function noop() {}
 function safeNotEqual(a, b) {
   return a != a ? b == b : a !== b || ((a && typeof a === 'object') || typeof a === 'function')
 }
-function getLocation() {
-  const hashPosition = window.location.href.indexOf('#/')
-  let location = (hashPosition > -1) ? window.location.href.substr(hashPosition + 1) : '/'
-  // Check if there's a querystring
-  const qsPosition = location.indexOf('?')
-  let querystring = ''
-  if (qsPosition > -1) {
-    querystring = location.substr(qsPosition + 1)
-    location = location.substr(0, qsPosition)
-  }
-  return {location, querystring}
-}
 
 export class ViewstateStore {
   constructor(storeConfig, start = noop) {
     this.storeConfig = storeConfig
     this.start = start
-    this.stop = noop
+    this.stop = null
     this.subscribers = []
+    this.firstLocation = null
 
-    // add onURLChange as eventListener for URL
-    this.onURLChange()  // TODO: Test that this is not already triggered by registering the eventListner above
+    this._set(storeConfig.defaultValue)  // This is just so value is not undefined. It gets updated by the querystring or LocalStorage 
 
-    onDestroy(() => {
-      console.log('got onDestroy()')
-      this.removeListeners()
-    })
+    this.onURLChange = this.onURLChange.bind(this)
+    const unsubscribe = loc.subscribe(this.onURLChange)
+
+    onDestroy(unsubscribe)
   }
-
-  // static readAndParseQuerystring() {
-  //   const querystringObject = new URLSearchParams($querystring).get('origin')
-  //   read URL
-  //   return parse URL 
-  // }
 
   getQuerystringParam() {
-    const location = getLocation()
-    const urlSearchParams = new URLSearchParams(location.querystring)
+    const urlSearchParams = new URLSearchParams(this.querystring)
     const valueString = urlSearchParams.get(this.storeConfig.identifier)
     if (valueString === null) {
-      return null
+      return {newValue: null, urlSearchParams}
     }
-    let value = valueString
+    let newValue = valueString
     if (this.storeConfig.type === 'Float') {
-      value = Number.parseFloat(valueString)
+      newValue = Number.parseFloat(valueString)
     } else if (this.storeConfig.type === 'Int') {
-      value = Number.parseInt(valueString)
+      newValue = Number.parseInt(valueString)
+    } else if (this.storeConfig.type === 'Boolean') {
+      newValue = (valueString == 'true')
     }
-    // TODO: Need to make this is a Float, Int, or String
-    return value
+    return {newValue, urlSearchParams}
   }
 
-  onURLChange() {
-    let newValue = this.getQuerystringParam()
-    console.log(this.storeConfig.identifier, 'in querystring is', newValue, typeof newValue)
+  setQueryStringParam(urlSearchParams, newValue) {
+    urlSearchParams.set(this.storeConfig.identifier, newValue)
+    push(this.location + '?' + urlSearchParams.toString())
+  }
+
+  onURLChange(newLoc) {
+    this.firstLocation = this.firstLocation || newLoc.location
+    this.location = newLoc.location
+    this.querystring = newLoc.querystring
+
+    if (this.location !== this.firstLocation) {  // TODO: This needs to work for parent/child routes
+      return
+    }
+
+    let {newValue, urlSearchParams} = this.getQuerystringParam()
     if (newValue != null) {
       if (this.storeConfig.updateLocalStorageOnURLChange) {
         window.localStorage[this.storeConfig.identifier] = newValue
       }
     } else {
       newValue = window.localStorage[this.storeConfig.identifier] || this.storeConfig.defaultValue
-      // querystringObject[identifier] = newValue
-      // push URL with querystringObject
+      this.setQueryStringParam(urlSearchParams, newValue)
     }
     this._set(newValue)
   }
@@ -76,11 +69,8 @@ export class ViewstateStore {
   set(newValue) {
     this._set(newValue)
     window.localStorage[this.storeConfig.identifier] = newValue
-    // querystringObject = readAndParseQuerystring()
-    // if (querystringObject[identifier] != newValue) {
-    //   querystringObject[identifier] = newValue
-    //   push URL with querystringObject
-    // }
+    const {urlSearchParams} = this.getQuerystringParam()
+    this.setQueryStringParam(urlSearchParams, newValue)
   }
   
   _set(newValue) {  // Call this to update subscribers when the URL changes w/o saving to LocalStorage
@@ -103,7 +93,6 @@ export class ViewstateStore {
     }
   }
 
-  // TODO: Do we need an _update?
   update(fn) {
     this.set(fn(this.value))
   }
@@ -112,24 +101,22 @@ export class ViewstateStore {
     const subscriber = [run, invalidate]
     this.subscribers.push(subscriber)
     if (this.subscribers.length === 1) {
-      this.stop = this.start(this.set) || noop
+      this.stop = this.start(this.set) || noop  // TODO: Should this be this._set
     }
     run(this.value)
-    return () => {
+
+    function unsubscribe () {
       const index = this.subscribers.indexOf(subscriber)
       if (index !== -1) {
         this.subscribers.splice(index, 1)
       }
       if (this.subscribers.length === 0) {
-        stop()
+        this.stop()
         this.stop = null
       }
     }
-  }
-
-  removeListeners() {
-    // this.el.removeEventListener("dragenter", this.dragenter, false)
-    // return this.el.removeEventListener("dragleave", this.dragleave, false)
+    this.unsubscribe = unsubscribe.bind(this)
+    return this.unsubscribe
   }
 
 }
