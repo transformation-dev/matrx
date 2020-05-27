@@ -89,7 +89,7 @@
     const response = await fetch('/logout', { 
       headers: {
         'Accept': 'application/json',
-        // 'CSRF-Token': localStorage.getItem('CSRFToken')
+        // 'CSRF-Token': localStorage.getItem('CSRFToken')  // TODO: Delete and remove from stores.js
       },
       credentials: 'same-origin', 
     })
@@ -109,7 +109,7 @@
       <a class="navbar-item" href="/#/">
         <img src="MatrXCloseWhite.png" alt="MatrX Logo">
       </a>
-      <div class="navbar-burger burger" data-target="navMenuExample1">
+      <div id="logout" on:click={handleLogout} class="navbar-burger burger navbar-dropdown" data-target="navMenuExample1">
         <span></span>
         <span></span>
         <span></span>
