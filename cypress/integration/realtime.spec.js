@@ -32,7 +32,7 @@ context('Realtime', () => {
 
   it('logs out and back in', () => {
     cy.get("#logout")
-    .click()
+      .click()
 
     cy.get("#login")
       .click()
