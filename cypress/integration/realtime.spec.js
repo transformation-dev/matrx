@@ -41,6 +41,7 @@ context('Realtime', () => {
       .click()
   })
 
+  // eslint-disable-next-line no-undef
   afterEach(() => {
     cy.get("#logout")
       .click()

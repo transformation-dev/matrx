@@ -152,17 +152,17 @@ class Coordinator {
 
     // Server-side latency compensation means we broadcast the operation to everyone but 
     // the original sender as specified by socketID
-    const socketLookup = namespace + '#' + socketSessionID
-    const socket = nsp.sockets[socketLookup]
+    const socketLookup = this._namespace + '#' + socketSessionID
+    const socket = this._nsp.sockets[socketLookup]
     for (const operation in operationsSpec) {
       // TODO: Check access control (cached?) before this latency compensation
       if (operation.operationType === 'delete') {
-
+        console.log('do something here')
       } else {  // operationType is 'create' or 'update'
         const value = operation.new
         const _entityID = value._entityID
         const storeID = JSON.stringify({_entityID})
-        const room = nsp.adapter.rooms[storeID]
+        const room = this._nsp.adapter.rooms[storeID]
         if (room) {
           room.cachedValue = value
           socket.to(storeID).emit('set', value)
@@ -177,12 +177,12 @@ class Coordinator {
     } catch { // If fail, send revert event to all subscribed
       for (const operation in operationsSpec) {
         if (operation.operationType === 'delete') {
-
+          console.log('do something here also')
         } else {  // operationType is 'create' or 'update'
           const value = operation.old
           const _entityID = value._entityID
           const storeID = JSON.stringify({_entityID})
-          const room = nsp.adapter.rooms[storeID]
+          const room = this._nsp.adapter.rooms[storeID]
           if (room) {
             room.cachedValue = value
             this._nsp.in(storeID).emit('revert', value)  // TODO: Maybe we can just call emit() on the already fetched room?
