@@ -9,23 +9,23 @@
   import {dragStart, dragEnd, dragEnter, dragOver, dragLeave, drop} from './plan-helpers'
   import {addDragster} from '../../stores'
 
-	// const [send, receive] = crossfade({
-	// 	duration: d => Math.sqrt(d * 200),
-	// 	fallback(node, params) {
+  // const [send, receive] = crossfade({
+  //   duration: d => Math.sqrt(d * 200),
+  //   fallback(node, params) {
   //     console.log('using fallback', node)
-	// 		const style = getComputedStyle(node)
-	// 		const transform = style.transform === 'none' ? '' : style.transform
+  //     const style = getComputedStyle(node)
+  //     const transform = style.transform === 'none' ? '' : style.transform
 
-	// 		return {
-	// 			duration: 600,
-	// 			easing: quintOut,
-	// 			css: t => `
-	// 				transform: ${transform} scale(${t})
-	// 				opacity: ${t}
-	// 			`
-	// 		}
-	// 	}
-	// })
+  //     return {
+  //       duration: 600,
+  //       easing: quintOut,
+  //       css: t => `
+  //         transform: ${transform} scale(${t})
+  //         opacity: ${t}
+  //       `
+  //     }
+  //   }
+  // })
 
 </script>
 

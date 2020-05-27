@@ -1,8 +1,10 @@
 <script>
-import SortableList from '../SortableList';
+import SortableList from '../SortableList'
 
-let list = ["First Item", "Second Item", "Third Item"];
-const sortList = ev => {list = ev.detail};
+let list = ["First Item", "Second Item", "Third Item"]
+const sortList = ev => {
+  list = ev.detail
+}
 </script>
 
 <h1> Hey, it's Morgan! </h1>

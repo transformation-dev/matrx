@@ -8,7 +8,7 @@ const uuidv4 = require('uuid/v4')
 const helmet = require('helmet')
 const cookieParser = require('cookie-parser')
 const csrf = require('csurf')
-const csrfProtection = csrf({ cookie: true })
+const csrfProtection = csrf({cookie: true})
 const debug = require('debug')('matrx:server.js')
 
 const passport = require('passport')
@@ -17,25 +17,25 @@ const expressSession = require('express-session')
 const FileStore = require('session-file-store')(expressSession)
 
 passport.use(new LocalStrategy(
-	function(username, password, done) {
+  ((username, password, done) => {
     debug('LocalStrategy callback called.  username: %s', username)
-		if (password === 'admin') {
-			return done(null, {id: 1, name: username})  // TODO: Upgrade this with the real information
-		} else {
-			return done(null, false)
-		}
-	}
+    if (password === 'admin') {
+      return done(null, {id: 1, name: username})  // TODO: Upgrade this with the real information
+    } else {
+      return done(null, false)
+    }
+  })
 ))
 
-passport.serializeUser(function(user, cb) {
+passport.serializeUser((user, cb) => {
   cb(null, user)  // TODO: Should probably just stick the userID into the session store
-	// cb(null, JSON.stringify(user))
+  // cb(null, JSON.stringify(user))
 })
 
-passport.deserializeUser(function(packet, cb) {
+passport.deserializeUser((packet, cb) => {
   // TODO: Lookup in database the user and return it instead of packet
   cb(null, packet)
-	// cb(null, JSON.parse(packet))
+  // cb(null, JSON.parse(packet))
 })
 
 const {getServer} = require('@matrx/svelte-realtime-server')
@@ -45,10 +45,14 @@ const adapters = {
 
 const PORT = process.env.PORT || 8080
 const {NODE_ENV, SESSION_SECRET, HOME} = process.env
-if (!SESSION_SECRET) throw new Error('Must set SESSION_SECRET environment variable')
+if (!SESSION_SECRET) {
+  throw new Error('Must set SESSION_SECRET environment variable')
+}
 const dev = !(NODE_ENV === 'production')
 const sessionPath = (HOME || '/home') + '/sessions'
-if (!fs.existsSync(sessionPath)) fs.mkdirSync(sessionPath)
+if (!fs.existsSync(sessionPath)) {
+  fs.mkdirSync(sessionPath)
+}
 fs.chmodSync(sessionPath, 0o755)
 
 const sessionStore = new FileStore({path: sessionPath})
@@ -62,7 +66,7 @@ app.use(expressSession({
   saveUninitialized: false,
   name: 'sessionID',
   store: sessionStore,
-  cookie: { maxAge: 1000 * 60 * 60 * 24 * 30 },  // 30 days
+  cookie: {maxAge: 1000 * 60 * 60 * 24 * 30},  // 30 days
 }))
 app.use(passport.initialize())
 app.use(passport.session())
@@ -95,17 +99,17 @@ app.use(
 app.use(cookieParser())  // lgtm [js/missing-token-validation]
 
 app.post('/login',
-  function(req, res, next) {
+  (req, res, next) => {
     debug('Got POST to /login')
     return next()
   },
   jsonParser,
-  function(req, res, next) {
+  (req, res, next) => {
     debug('Got POST to /login.  req.body: %O', req.body)
     return next()
   },
   passport.authenticate('local'),
-  function(req, res, next) {
+  (req, res, next) => {
     debug('Login succeeded', req.user)
     return res.status(200).json({authenticated: true})
   }
@@ -113,21 +117,21 @@ app.post('/login',
 
 app.get('/checkauth',
   csrfProtection,
-  function isAuthenticated(req, res, next) {
+  (req, res, next) => {
     if (req.user) {
       return next()
     } else {
       return res.status(200).json({authenticated: false})
     }
   }, 
-  function(req, res){
-   return res.status(200).json({authenticated: true})
+  (req, res) => {
+    return res.status(200).json({authenticated: true})
   }
 )
 
 app.get('/logout',
   csrfProtection,
-  function(req, res, next) {
+  (req, res, next) => {
     debug('Got GET to /logout.\nreq.user: %O\nreq.sessionID: %O', req.user, req.sessionID)
     req.session.destroy()
     svelteRealtimeServer.logout(req.sessionID)

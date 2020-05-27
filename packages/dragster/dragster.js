@@ -11,7 +11,9 @@ export class Dragster {
     if (!Dragster.dragsters) {
       Dragster.dragsters = {}
     }
-    if (Dragster.dragsters[this.el.id]) throw new Error('A Dragster for element with id "' + this.el.id + '" has already been instantiated')
+    if (Dragster.dragsters[this.el.id]) {
+      throw new Error('A Dragster for element with id "' + this.el.id + '" has already been instantiated')
+    }
     Dragster.dragsters[this.el.id] = this
   }
 
