@@ -15,7 +15,8 @@
     ]
   },
   "scripts": {
-    "build": "webpack",
+    "build": "npm run build:code & npm run css:build",
+    "build:code": "webpack",
     "dev": "nodemon & npm run css:watch & webpack -w",
     "start": "node src/server",
     "eslint": "npx eslint -c .eslintrc.js --ext .js,.svelte,.html .",

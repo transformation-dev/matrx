@@ -22,23 +22,12 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-
-    # - name: npm install and build
-    #   run: |
-    #     npm ci
-    #     npm run build --if-present
-    #     npm run css:build
-    #     npm test
-    #   env:
-    #     CI: true
-    #     SESSION_SECRET: ${{secrets.SESSION_SECRET}}
-
-    - name: Cypress run
-      uses: cypress-io/github-action@v1
-      with:
-        build: npm run build --if-present
-        start: npm start
-        wait-on: http://localhost:8080
+    - name: npm install, build, and test
+      run: |
+        npm ci
+        npm run build --if-present
+        npm run css:build
+        npm test
       env:
         CI: true
         SESSION_SECRET: ${{secrets.SESSION_SECRET}}
