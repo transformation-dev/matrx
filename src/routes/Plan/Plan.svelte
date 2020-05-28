@@ -86,7 +86,7 @@
 <div class="section">
   <div class="columns has-background-primary">
     {#if $startOn > 0}
-      <div in:fly={{x: inX, duration}} out:fly={{x: outX, duration}} use:addDragster id="pan-left" class="column drop-zone is-narrow has-text-centered" on:click={panLeft} on:drop={dropLeft} on:dragster-enter={startPanTimer} on:dragster-leave={clearPanTimer} on:dragover={dragOver}>
+      <div id="pan-left" use:addDragster in:fly={{x: inX, duration}} out:fly={{x: outX, duration}} class="column drop-zone is-narrow has-text-centered" on:click={panLeft} on:drop={dropLeft} on:dragster-enter={startPanTimer} on:dragster-leave={clearPanTimer} on:dragover={dragOver}>
         {#if panTimer}
           <Icon data={spinner} pulse scale="1.75" style="fill: white; padding: 5px"/>
         {:else}
@@ -115,7 +115,7 @@
     {/if}
 
     {#if endOn < NUMBER_OF_SLIDES - 1}
-      <div in:fly={{x: inX, duration}} out:fly={{x: outX, duration}} use:addDragster id="pan-right" on:click={panRight} on:drop={dropRight} on:dragster-enter={startPanTimer} on:dragster-leave={clearPanTimer} on:dragover={dragOver} class="column drop-zone is-narrow has-text-centered">
+      <div id="pan-right" use:addDragster in:fly={{x: inX, duration}} out:fly={{x: outX, duration}}  on:click={panRight} on:drop={dropRight} on:dragster-enter={startPanTimer} on:dragster-leave={clearPanTimer} on:dragover={dragOver} class="column drop-zone is-narrow has-text-centered">
         {#if panTimer}
           <Icon data={spinner} pulse scale="1.75" style="fill: white; padding: 5px"/>
         {:else}
