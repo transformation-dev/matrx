@@ -32,7 +32,7 @@
 <div id={"(" + queueSwimlaneID + ", " + assessedLevel + ")"} use:addDragster class="column drop-zone" {assessedLevel} {queueSwimlaneID} on:dragster-enter={dragEnter} on:dragster-leave={dragLeave} on:drop={drop} on:dragover={dragOver}>
   {#each kanbanCellContents as practice}
     <!-- <div id={practice.practice.id} in:receive="{{key: practice.practice.id}}" out:send="{{key: practice.practice.id}}" class="card has-badge-rounded" data-badge="8" draggable='true' on:dragstart={dragStart} on:dragend={dragEnd}> -->
-    <div id={practice.practice.id} class="card has-badge-rounded" data-badge="8" draggable='true' on:dragstart={dragStart} on:dragend={dragEnd}>
+    <div id={practice.practice.id} class="practice card has-badge-rounded" data-badge="8" draggable='true' on:dragstart={dragStart} on:dragend={dragEnd}>
       <div class="card-content">
         <div class="content">
           {practice.practice.label}
