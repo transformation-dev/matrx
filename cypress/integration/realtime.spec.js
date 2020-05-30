@@ -32,7 +32,7 @@ context('Realtime', () => {
 
   it('logs out and back in', () => {
     cy.get("#logout")
-    .click()
+      .click()
 
     cy.get("#login")
       .click()
@@ -41,6 +41,7 @@ context('Realtime', () => {
       .click()
   })
 
+  // eslint-disable-next-line no-undef
   afterEach(() => {
     cy.get("#logout")
       .click()

@@ -18,7 +18,7 @@ export function dragEnd(event) {
 
 export function dragEnter(event) {
   // event.preventDefault()
-  event.target.style.background = 'grey'
+  event.target.classList.add('has-background-grey-lighter')
 }
 
 export function dragOver(event) {
@@ -26,12 +26,12 @@ export function dragOver(event) {
 }
 
 export function dragLeave(event) {
-  event.target.style.background = '' 
+  event.target.classList.remove('has-background-grey-lighter') 
 }
 
 export function drop(event) {
   const dropZoneParent = findDropZoneParent(event.target)
-  dropZoneParent.style.background = ''
+  dropZoneParent.classList.remove('has-background-grey-lighter')
   const queueSwimlaneID = dropZoneParent.getAttribute('queueSwimlaneID')
   const assessedLevel = dropZoneParent.getAttribute('assessedLevel')
   if (queueSwimlaneID && assessedLevel) {
@@ -52,7 +52,7 @@ export function dropPan(event, newStatus) {
     queueSwimlanesCached = value
     return value
   })
-  dropZoneParent.style.background = ''
+  dropZoneParent.classList.remove('has-background-grey-lighter')
   plan.update((value) => {
     if (newStatus === "Doing") {
       value[practiceBeingDragged].queueSwimlaneID = Object.keys(queueSwimlanesCached)[0]

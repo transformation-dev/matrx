@@ -1,6 +1,6 @@
 
-const { default: cosmosServer } = require("@zeit/cosmosdb-server")
-const { CosmosClient } = require("@azure/cosmos")
+const {default: cosmosServer} = require("@zeit/cosmosdb-server")
+const {CosmosClient} = require("@azure/cosmos")
 const https = require("https")
 const test = require('tape')
 
@@ -15,18 +15,19 @@ async function runClient() {
     key: "dummy key",
     // disable SSL verification
     // since the server uses self-signed certificate
-    agent: https.Agent({ rejectUnauthorized: false })
+    agent: https.Agent({rejectUnauthorized: false})
   })
 
   // initialize databases since the server is always empty when it boots
-  const { database } = await client.databases.createIfNotExists({ id: 'test-db' });
-  const { container } = await database.containers.createIfNotExists({ id: 'test-container' });
+  const {database} = await client.databases.createIfNotExists({id: 'test-db'})
+  const {container} = await database.containers.createIfNotExists({id: 'test-container'})
 
   // use the client
   try {
     return await tests(container)
-  } catch(e) {
-    throw(e)
+  } catch (e) {
+    console.log('got error on tests')
+    throw (e)
   } finally {
     await server.close()
     // await new Promise((resolve) => {
@@ -37,11 +38,11 @@ async function runClient() {
 }
 
 async function tests(container) {
-  test('timing test', async function (t) {
+  test('timing test', async (t) => {
   
     t.equal(1, 1)
 
-    o = container.items.upsert({a: 1})
+    const o = container.items.upsert({a: 1})
     // const o = await container.items.upsert({a: 1})
     // t.deepEqual(o, {a: 1})
 
@@ -50,4 +51,4 @@ async function tests(container) {
   })
 }
 
-return
+// return
