@@ -1,39 +1,66 @@
 <script>
-  import {getClient} from '@matrx/svelte-realtime-store'
-  const realtimeClient = getClient()
-  const connected = realtimeClient.connected
-
-  const a = realtimeClient.realtime({_entityID: 'A'}, 2000)
-  const aPrime = realtimeClient.realtime({_entityID: 'A'}, 2000)
-  const b = realtimeClient.realtime({_entityID: 'B', debounceWait: 1000, forceEmitBack: true}, 4000)
-  const bPrime = realtimeClient.realtime({_entityID: 'B', ignoreLocalSet: true}, 4000)
-
-  function handleA(event) {
-    $a = $a + 1
-  }
-  
-  function handleAPrime(event) {
-    $aPrime++
-  }
-
-  function handleB(event) {
-    $b++
-  }
-
-  function handleBPrime(event) {
-    $b++
-  }
-  
+  console.log('got here')
+  let a = new Array(30)
+  console.log(a.length)
 </script>
 
-<h1>{$a}</h1>
-<button id="a" on:click={handleA} class="button" disabled="{!$connected}">a++</button>
+<h1>POC</h1>
 
-<h1>{$aPrime}</h1>
-<button id="a-prime" on:click={handleAPrime} class="button" disabled="{!$connected}">aPrime++</button>
+<div class="columns is-gapless">
+{#each a as column}
+  <div class="column has-background-primary with-border is-clipped">
+   <p>&nbsp;</p>
+  </div>
+{/each}
+</div>
 
-<h1>{$b}</h1>
-<button id="b" on:click={handleB} class="button" disabled="{!$connected}">b++</button>
+<div class="columns has-background-primary is-gapless has-text-centered is-vcentered">
+  <div class="column is-2 has-background-primary has-text-white">
+    <p>Architecture & Design</p>
+  </div>
+  <div class="column is-10 has-background-primary with-border">
+    <div class="columns is-gapless no-margin-bottom is-vcentered">
+      <div class="column has-background-primary no-overflow has-text-white">
+        <p>Orange Belt for Developers (aka Codebashing)</p>
+      </div>
+      <div class="column is-10 has-background-info">
+        <div class="columns is-gapless">
+          {#each a as column}
+            <div class="column has-background-info with-border is-clipped">
+              &nbsp;
+            </div>
+          {/each}
+        </div>
+      </div>
+    </div>
+    <div class="columns has-background-primary is-gapless with-border no-margin-bottom is-vcentered">
+      <div class="column is-2 has-background-primary no-overflow has-text-white">
+        <p class="pb-10">PIA</p>
+      </div>
+      <div class="column is-10 has-background-primary">
+        <div class="columns is-gapless">
+          {#each a as column}
+            <div class="column has-background-info with-border is-clipped">
+              &nbsp;
+            </div>
+          {/each}
+        </div>
+      </div>
+    </div>
 
-<h1>{$bPrime}</h1>
-<button id="b" on:click={handleBPrime} class="button" disabled="{!$connected}">bPrime++</button>
+  </div>
+</div>
+
+<style>
+  .with-border {
+    border-top: .25px solid;
+    border-right: .25px solid;
+    border-color: gray;
+  }
+  .no-margin-bottom {
+    margin-bottom: 0 !important;
+  }
+  .no-overflow {
+    overflow:  hidden;
+  }
+</style>
