@@ -74,6 +74,7 @@ context('Plan', () => {
     cy.url().should('include', 'startOn=1')
     cy.url().should('include', 'slidesToDisplay=1')
 
+
     cy.get('#practice5.card')
       .contains("Network Originated Scans")
       .trigger('dragstart')
