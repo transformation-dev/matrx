@@ -33,7 +33,7 @@ export class ViewstateStore {
     if (this.storeConfig.type === 'Float') {
       newValue = Number.parseFloat(valueString)
     } else if (this.storeConfig.type === 'Int') {
-      newValue = Number.parseInt(valueString)
+      newValue = +valueString  // Prefer over Number.parseInt(valueString, 10) because it returns NaN for "1 abc"
     } else if (this.storeConfig.type === 'Boolean') {
       newValue = (valueString == 'true')
     }
