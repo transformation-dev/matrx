@@ -16,12 +16,12 @@
 
 <div class="columns has-background-primary is-gapless has-text-centered is-vcentered">
   <div class="column is-2 has-background-primary has-text-white">
-    <p>Architecture & Design</p>
+    <p class="labels">Architecture & Design</p>
   </div>
-  <div class="column is-10 has-background-primary with-border">
-    <div class="columns is-gapless no-margin-bottom is-vcentered">
+  <div class="column is-10 has-background-primary">
+    <div class="columns practice is-gapless no-margin-bottom is-vcentered">
       <div class="column has-background-primary no-overflow has-text-white">
-        <p>Orange Belt for Developers (aka Codebashing)</p>
+        <p class="labels">Orange Belt for Developers (aka Codebashing)</p>
       </div>
       <div class="column is-10 has-background-info">
         <div class="columns is-gapless">
@@ -33,9 +33,9 @@
         </div>
       </div>
     </div>
-    <div class="columns has-background-primary is-gapless with-border no-margin-bottom is-vcentered">
+    <div class="columns practice is-gapless no-margin-bottom is-vcentered">
       <div class="column is-2 has-background-primary no-overflow has-text-white">
-        <p class="pb-10">PIA</p>
+        <p class="labels">PIA</p>
       </div>
       <div class="column is-10 has-background-primary">
         <div class="columns is-gapless">
@@ -62,5 +62,16 @@
   }
   .no-overflow {
     overflow:  hidden;
+  }
+  .labels {
+    padding: 7px;
+  }
+  .practice {
+    padding-right: 7px;
+    border-bottom: 1px solid;
+    border-color: white;
+  }
+  .practice:last-child {
+    border-bottom: none;
   }
 </style>
