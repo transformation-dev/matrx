@@ -68,6 +68,7 @@
     "whatwg-fetch": "^3.0.0"
   },
   "devDependencies": {
+    "@creativebulma/bulma-tooltip": "^1.2.0",
     "@cypress/code-coverage": "^1.14.0",
     "@matrx/dragster": "file:packages/dragster",
     "@matrx/svelte-realtime-store": "file:packages/svelte-realtime-store",
