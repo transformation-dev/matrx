@@ -63,13 +63,13 @@ context('Plan', () => {
       .contains("Network Originated Scans")
 
     cy.visit('localhost:8080/#/test-jig')
-    cy.wait(2000)
+    cy.wait(4000)
     cy.url().should('include', 'teamID=team1')
     cy.url().should('not.include', 'startOn')
     cy.url().should('not.include', 'slidesToDisplay')
 
     cy.visit('localhost:8080/#/plan')
-    cy.wait(2000)
+    cy.wait(4000)
     cy.url().should('include', 'teamID=team1')
     cy.url().should('include', 'startOn=1')
     cy.url().should('include', 'slidesToDisplay=1')
