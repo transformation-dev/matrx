@@ -44,7 +44,7 @@
         {/if}
         {#each discipline.practices as practice}
           {#if $plan[practice.id].status == slideLabel}
-            <div id={practice.id} class="column with-border" draggable="true" on:dragstart={dragStart} on:dragend={dragEnd}>
+            <div id={practice.id} class="practice column with-border" draggable="true" on:dragstart={dragStart} on:dragend={dragEnd}>
               {practice.label}
             </div>
           {/if}

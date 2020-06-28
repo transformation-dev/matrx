@@ -104,7 +104,7 @@
 
 </script>
 
-<nav class="navbar ">
+<nav class="navbar is-fixed-top">
     <div class="navbar-brand">
       <a class="navbar-item" href="/#/">
         <img src="MatrXCloseWhite.png" alt="MatrX Logo">
@@ -184,9 +184,9 @@
         <div class="navbar-item">
           <div class="field is-grouped">
             <p class="control">
-              <button id="logout" on:click={handleLogout} class="button is-rounded"> 
+              <button id="logout" on:click={handleLogout} class="button is-rounded is-small"> 
                 <Icon data={signOut}/>
-               Logout
+                Logout
               </button>
             </p>
           </div>

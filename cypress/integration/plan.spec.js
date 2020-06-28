@@ -63,18 +63,20 @@ context('Plan', () => {
       .contains("Network Originated Scans")
 
     cy.visit('localhost:8080/#/test-jig')
-    cy.wait(2000)
+    cy.wait(4000)
     cy.url().should('include', 'teamID=team1')
     cy.url().should('not.include', 'startOn')
     cy.url().should('not.include', 'slidesToDisplay')
 
     cy.visit('localhost:8080/#/plan')
-    cy.wait(2000)
+    cy.wait(4000)
     cy.url().should('include', 'teamID=team1')
     cy.url().should('include', 'startOn=1')
     cy.url().should('include', 'slidesToDisplay=1')
 
-    cy.get('#practice5')
+
+    cy.get('#practice5.card')
+      .contains("Network Originated Scans")
       .trigger('dragstart')
     
     cy.get(`#${CSS.escape('(queue1, Actions)')}`)
@@ -89,12 +91,12 @@ context('Plan', () => {
     cy.get(`#${CSS.escape('(queue1, Actions)')}`)
       .should('not.have.class', 'has-background-grey-lighter')
       
-    // cy.get(`#${CSS.escape('(queue1, Actions)')}`)
-    //   .trigger('dragenter')
-    //   .trigger('drop')
+    cy.get(`#${CSS.escape('(queue1, Actions)')}`)
+      .trigger('dragenter')
+      .trigger('drop')
 
-    // cy.get(`#${CSS.escape('(queue1, Actions)')}`)
-    //   .contains("Network Originated Scans")
+    cy.get(`#${CSS.escape('(queue1, Actions)')}`)
+      .contains("Network Originated Scans")
       
   })
 

@@ -33,22 +33,15 @@ export class ViewstateStore {
     if (this.storeConfig.type === 'Float') {
       newValue = Number.parseFloat(valueString)
     } else if (this.storeConfig.type === 'Int') {
-      newValue = Number.parseInt(valueString)
+      newValue = +valueString  // Prefer over Number.parseInt(valueString, 10) because it returns NaN for "1 abc"
     } else if (this.storeConfig.type === 'Boolean') {
       newValue = (valueString == 'true')
     }
     return {newValue, urlSearchParams}
   }
 
-  // setQueryStringParam(urlSearchParams, newValue) {
-  //   ViewstateStore.queueURLUpdate(this.storeConfig.identifier, newValue)
-  //   // urlSearchParams.set(this.storeConfig.identifier, newValue)
-  //   // push(this.location + '?' + urlSearchParams.toString())
-  // }
-
   onURLChange(newLoc) {
     this.scope = this.scope || newLoc.location
-    console.log(this.scope)
     this.location = newLoc.location
     this.querystring = newLoc.querystring
 
@@ -56,7 +49,7 @@ export class ViewstateStore {
       return
     }
 
-    let {newValue, urlSearchParams} = this.getQuerystringParam()
+    let {newValue} = this.getQuerystringParam()
     if (newValue != null) {
       if (this.storeConfig.updateLocalStorageOnURLChange) {
         window.localStorage[this.scope + '.' + this.storeConfig.identifier] = newValue
@@ -64,7 +57,6 @@ export class ViewstateStore {
     } else {
       newValue = window.localStorage[this.scope + '.' + this.storeConfig.identifier] || this.storeConfig.defaultValue
       ViewstateStore.queueURLUpdate(this.storeConfig.identifier, newValue)
-      // this.setQueryStringParam(urlSearchParams, newValue)
     }
     this._set(newValue)
   }
@@ -72,9 +64,7 @@ export class ViewstateStore {
   set(newValue) {
     this._set(newValue)
     window.localStorage[this.scope + '.' + this.storeConfig.identifier] = newValue
-    const {urlSearchParams} = this.getQuerystringParam()
     ViewstateStore.queueURLUpdate(this.storeConfig.identifier, newValue)
-    // this.setQueryStringParam(urlSearchParams, newValue)
   }
   
   _set(newValue) {  // Call this to update subscribers when the URL changes w/o saving to LocalStorage
@@ -154,7 +144,6 @@ ViewstateStore.queueURLUpdate = (key, value) => {
 ViewstateStore.processPendingURLUpdates = function() {
   const {urlSearchParams, location} = getLocation()
   const currentURLSearchString = urlSearchParams.toString()
-  console.log('location inside processPendingURLUpdates', location, urlSearchParams.toString())
   for (const [key, value] of Object.entries(ViewstateStore.pendingURLUpdates)) {
     urlSearchParams.set(key, value)
   }

@@ -5,10 +5,15 @@ function findDropZoneParent(target) {
   return target.classList.contains('drop-zone') ? target : findDropZoneParent(target.parentNode)
 }
 
+function findPracticeParent(target) {
+  return target.classList.contains('practice') ? target : findPracticeParent(target.parentNode)
+}
+
 let practiceBeingDragged = null
 
 export function dragStart(event) {
-  practiceBeingDragged = event.target.id
+  const practiceParent = findPracticeParent(event.target)
+  practiceBeingDragged = practiceParent.id
   event.target.style.opacity = .5
 }
 
