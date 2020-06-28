@@ -1,7 +1,7 @@
 <script>
   const debug = require('debug')('matrx:App')
   const {NODE_ENV} = process.env
-  if (!(NODE_ENV === 'production')) {
+  if (NODE_ENV !== 'production') {
     require('whatwg-fetch')
   }
 
@@ -10,7 +10,7 @@
   import active from 'svelte-spa-router/active'
   import {derived} from 'svelte/store'
   import Icon from 'svelte-awesome'
-  import {beer, refresh, comment, codeFork, camera, ban, signOut, envelope} from 'svelte-awesome/icons'
+  import {signOut} from 'svelte-awesome/icons'
 
   import {getClient} from '@matrx/svelte-realtime-store'
   import {ViewstateStore} from '@matrx/svelte-viewstate-store'
@@ -101,7 +101,6 @@
   }
 
   // checkAuthentication() 
-
 </script>
 
 <nav class="navbar is-fixed-top">
@@ -117,68 +116,14 @@
     </div>
     <div id="navMenuExample1" class="navbar-menu">
       <div class="navbar-start">
-        <a class="navbar-item" href="/#/">
-          Home
-        </a>
-        <div class="navbar-item has-dropdown is-hoverable">
-          <a class="navbar-link" href="/#/morgan">
-            Morgan
-          </a>
-          <div class="navbar-dropdown ">
-            <a class="navbar-item " href="/#/">
-              Overview
+        {#each Object.entries(routes) as [route, value]}
+          {#if value.userData && value.userData.navbarLabel}
+            <a class="navbar-item" href={"/#" + route}>
+              {value.userData.navbarLabel}
             </a>
-            <a class="navbar-item " href="/#/">
-              Modifiers
-            </a>
-            <a class="navbar-item " href="/#/">
-              Grid
-            </a>
-            <a class="navbar-item " href="/#/">
-              Form
-            </a>
-            <a class="navbar-item " href="/#/">
-              Elements
-            </a>
-            <a class="navbar-item is-active" href="/#/">
-              Components
-            </a>
-            <a class="navbar-item " href="/#/">
-              Layout
-            </a>
-            <hr class="navbar-divider">
-            <div class="navbar-item">
-              <div>version
-                <p class="has-text-info is-size-6-desktop">0.4.3</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="navbar-item is-hoverable">
-          <a class="navbar-link" href="/#/morgan">
-            Grid
-          </a>
-        </div>
-        <div class="navbar-item has-dropdown is-hoverable">
-          <div class="navbar-link">
-            More
-          </div>
-          <div id="moreDropdown" class="navbar-dropdown ">
-            <a class="navbar-item " href="#extensions/">
-              <div class="level is-mobile">
-                <div class="level-left">
-                  <div class="level-item">
-                    <p>
-                      <strong>Extensions</strong>
-                      <br>
-                      <small>Side projects to enhance Bulma</small>
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </a>
-          </div>
-        </div>
+          {/if}
+        {/each}
+
       </div>
       <div class="navbar-end">
         <div class="navbar-item">
@@ -194,6 +139,5 @@
       </div>
     </div>
   </nav>
-
 
 <Router {routes}/>
