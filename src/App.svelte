@@ -93,39 +93,39 @@
 </script>
 
 <nav class="navbar is-fixed-top">
-    <div class="navbar-brand">
-      <a class="navbar-item" href="/#/">
-        <img src="MatrXCloseWhite.png" alt="MatrX Logo">
-      </a>
-      <div id="logout" on:click={handleLogout} class="navbar-burger burger navbar-dropdown" data-target="navMenuExample1">
-        <span></span>
-        <span></span>
-        <span></span>
-      </div>
+  <div class="navbar-brand">
+    <a class="navbar-item" href="/#/">
+      <img src="MatrXCloseWhite.png" alt="MatrX Logo">
+    </a>
+    <div id="logout" on:click={handleLogout} class="navbar-burger burger navbar-dropdown" data-target="navMenuExample1">
+      <span></span>
+      <span></span>
+      <span></span>
     </div>
-    <div id="navMenuExample1" class="navbar-menu">
-      <div class="navbar-start">
-        {#each Object.entries(routes) as [route, value]}
-          {#if value.userData && value.userData.navbarLabel}
-            <a class="navbar-item" use:link class:is-active={$location === route} href={route}>
-              {value.userData.navbarLabel}
-            </a>
-          {/if}
-        {/each}
-      </div>
-      <div class="navbar-end">
-        <div class="navbar-item">
-          <div class="field is-grouped">
-            <p class="control">
-              <button id="logout" on:click={handleLogout} class="button is-rounded is-small"> 
-                <Icon data={signOut}/>
-                Logout
-              </button>
-            </p>
-          </div>
+  </div>
+  <div class="navbar-menu">
+    <div class="navbar-start">
+      {#each Object.entries(routes) as [route, value]}
+        {#if value.userData && value.userData.navbarLabel}
+          <a class="navbar-item" use:link class:is-active={$location === route} href={route}>
+            {value.userData.navbarLabel}
+          </a>
+        {/if}
+      {/each}
+    </div>
+    <div class="navbar-end">
+      <div class="navbar-item">
+        <div class="field is-grouped">
+          <p class="control">
+            <button id="logout" on:click={handleLogout} class="button is-rounded is-small"> 
+              <Icon data={signOut}/>
+              Logout
+            </button>
+          </p>
         </div>
       </div>
     </div>
-  </nav>
+  </div>
+</nav>
 
 <Router {routes}/>
