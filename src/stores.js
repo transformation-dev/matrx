@@ -7,8 +7,8 @@ export const connected = realtimeClient.connected
 
 import {Dragster} from '@matrx/dragster'
 
-export const openPractice = new ViewstateStore({
-  identifier: 'openPractice', 
+export const openPracticeID = new ViewstateStore({
+  identifier: 'openPracticeID', 
   defaultValue: '',
   scope: '/plan',
   isGlobal: true

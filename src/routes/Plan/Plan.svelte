@@ -6,10 +6,11 @@
   import {ViewstateStore} from '@matrx/svelte-viewstate-store'
 
   // Import local code
-  import {addDragster, openPractice} from '../../stores'
+  import {addDragster} from '../../stores'
   import {dropPan, dragOver} from './plan-helpers'
   import FormulationGrid from './FormulationGrid'
   import DoingKanban from './DoingKanban'
+  import PracticeEditor from './PracticeEditor'
 
   const slides = [
     {label: 'Todo'},
@@ -125,14 +126,7 @@
   </div>
 </div>
 
-<div id="practice-modal" class="modal" class:is-active={$openPractice !== ""}>
-  <div class="modal-background" on:click="{() => $openPractice = ""}"></div>
-  <div class="modal-card">
-    <section class="modal-card-body">
-      Hello
-    </section>
-  </div>
-</div>
+<PracticeEditor />
 
 <style>
   .rotate-left {
