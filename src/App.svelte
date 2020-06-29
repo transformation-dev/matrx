@@ -28,7 +28,7 @@
     return $location + ($querystring ? '?' + $querystring : '')
   })
   
-  const allowUnathenticated = new Set([  // TODO: Upgrade this to allow for route expressions using https://www.npmjs.com/package/regexparam
+  const allowUnathenticated = new Set([  // TODO: Move this functionality into routes.js
     '/login',
     '/wild/something'
   ])
@@ -97,11 +97,6 @@
     <a class="navbar-item" href="/#/">
       <img src="MatrXCloseWhite.png" alt="MatrX Logo">
     </a>
-    <div id="logout" on:click={handleLogout} class="navbar-burger burger navbar-dropdown" data-target="navMenuExample1">
-      <span></span>
-      <span></span>
-      <span></span>
-    </div>
   </div>
   <div class="navbar-menu">
     <div class="navbar-start">
