@@ -28,7 +28,7 @@
     return $location + ($querystring ? '?' + $querystring : '')
   })
   
-  const allowUnathenticated = new Set([  // TODO: Move this functionality into routes.js
+  const allowUnauthenticated = new Set([  // TODO: Move this functionality into routes.js
     '/login',
     '/wild/something'
   ])
@@ -36,9 +36,10 @@
   const loginRoute = '/login'
 
   function redirect(authenticated) {
+    debug('redirect() called with authenticated parameter: %O', authenticated)
     if (!authenticated) {
-      if (allowUnathenticated.has($location)) {
-      // if (routes[$location].userData && routes[$location].userData.allowUnathenticated) {
+      // if (allowUnauthenticated.has($location)) {
+      if (routes[$location].userData && routes[$location].userData.allowUnauthenticated) {
         // Just stay on this page
       } else {
         return push('/login?origin=' + $origin)
@@ -50,8 +51,8 @@
 
   async function checkAuthentication() {
     debug('checkAuthentication() called')
-    if ($location === loginRoute || !allowUnathenticated.has($location)) {
-    // if ($location === loginRoute || !(routes[$location].userData && routes[$location].userData.allowUnathenticated)) {
+    // if ($location === loginRoute || !allowUnauthenticated.has($location)) {
+    if ($location === loginRoute || !(routes[$location].userData && routes[$location].userData.allowUnauthenticated)) {
       const response = await fetch('/checkauth', { 
         headers: {
           'Accept': 'application/json'
@@ -62,12 +63,14 @@
       debug('Got response from /checkauth: %O', parsed)
       if (parsed.authenticated) {
         realtimeClient.restoreConnection(redirect)
+      } else {
+        redirect(false)
       }
-    }
+    } 
   }
 
-  origin.subscribe((originValue) => {
-    debug('origin store changed value to: %s', originValue)
+  location.subscribe((locationValue) => {
+    debug('location store changed value to: %s', locationValue)
     checkAuthentication()
   })
 

@@ -86,7 +86,9 @@ class Client {
 
     function emitSet() {
       debug('emitSet() called')
-      client.socket.emit('set', storeID, lastNewValue, forceEmitBack)
+      if (client.socket) {
+        client.socket.emit('set', storeID, lastNewValue, forceEmitBack)
+      }
     }
     const debouncedEmit = debounce(emitSet, debounceWait)
 
@@ -174,13 +176,12 @@ class Client {
 
 Client.DEFAULT_NAMESPACE = '/svelte-realtime'
 
+let client
 function getClient(namespace) {
   if (!client) {
     client = new Client(namespace)
   }
   return client
 }
-
-let client
 
 module.exports = {getClient}  // TODO: Eventually change this to export once supported

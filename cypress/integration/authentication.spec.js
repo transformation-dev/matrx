@@ -3,16 +3,15 @@
 context('Authentication', () => {
 
   it('should only be able to get to pages where allowUnauthenticated=true', () => {
+    cy.visit('localhost:8080/#/')
+
     cy.get("#logout")
       .click()
 
-    cy.get("#login")
-      .click()
-
     cy.visit("localhost:8080/#/test-jig")
+      
+    cy.get("#login")
 
-    cy.get('#a-button')
-      .click()
   })
 
   // eslint-disable-next-line no-undef

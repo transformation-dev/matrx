@@ -1,3 +1,6 @@
+const debug = require('debug')('matrx:routes')
+
+import {connected} from './stores'
 
 import {wrap} from 'svelte-spa-router'
 

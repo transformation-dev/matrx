@@ -1,7 +1,7 @@
 import {writable} from 'svelte/store'
 
-import {getClient} from '@matrx/svelte-realtime-store'
 import {ViewstateStore} from '@matrx/svelte-viewstate-store'
+import {getClient} from '@matrx/svelte-realtime-store'
 const realtimeClient = getClient()
 export const connected = realtimeClient.connected
 

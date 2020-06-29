@@ -22,7 +22,7 @@
     "eslint": "npx eslint -c .eslintrc.js --ext .js,.svelte,.html .",
     "lint": "npm run eslint",
     "cypress": "cypress run",
-    "cypress:active": "cypress run --spec cypress/integration/plan.spec.js",
+    "cypress:active": "cypress run --spec cypress/integration/authentication.spec.js",
     "test": "start-server-and-test start http://localhost:8080 cypress",
     "test:active": "start-server-and-test start http://localhost:8080 cypress:active",
     "css:build": "node-sass --omit-source-map-url src/matrx.scss dist/global.css",
