@@ -37,11 +37,11 @@
 
   function redirect(authenticated) {
     if (!authenticated) {
-      if (!allowUnathenticated.has($location)) {
-        // realtimeClient.logout()
-        return push('/login?origin=' + $origin)
-      } else {
+      if (allowUnathenticated.has($location)) {
+      // if (routes[$location].userData && routes[$location].userData.allowUnathenticated) {
         // Just stay on this page
+      } else {
+        return push('/login?origin=' + $origin)
       }
     } else {
       return push($origin)
@@ -51,6 +51,7 @@
   async function checkAuthentication() {
     debug('checkAuthentication() called')
     if ($location === loginRoute || !allowUnathenticated.has($location)) {
+    // if ($location === loginRoute || !(routes[$location].userData && routes[$location].userData.allowUnathenticated)) {
       const response = await fetch('/checkauth', { 
         headers: {
           'Accept': 'application/json'
@@ -79,13 +80,11 @@
     const response = await fetch('/logout', { 
       headers: {
         'Accept': 'application/json',
-        // 'CSRF-Token': localStorage.getItem('CSRFToken')  // TODO: Delete and remove from stores.js
       },
       credentials: 'same-origin', 
     })
     const parsed = await response.json()
     debug('Got response from /logout: %O', parsed)
-    // localStorage.setItem('CSRFToken', parsed.CSRFToken)
     redirect(parsed.authenticated)
   }
 

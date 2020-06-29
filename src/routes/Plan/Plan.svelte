@@ -6,7 +6,7 @@
   import {ViewstateStore} from '@matrx/svelte-viewstate-store'
 
   // Import local code
-  import {addDragster} from '../../stores'
+  import {addDragster, openPractice} from '../../stores'
   import {dropPan, dragOver} from './plan-helpers'
   import FormulationGrid from './FormulationGrid'
   import DoingKanban from './DoingKanban'
@@ -81,8 +81,6 @@
 
 </script>
 
-<h1>Plan</h1>
-
 <div class="section">
   <div class="columns has-background-primary">
     {#if $startOn > 0}
@@ -124,6 +122,15 @@
         <div class="rotate-right has-text-centered has-text-white">&nbsp;&nbsp;&nbsp;{slides[$startOn + 1].label}</div>
       </div>
     {/if}
+  </div>
+</div>
+
+<div id="practice-modal" class="modal" class:is-active={$openPractice !== ""}>
+  <div class="modal-background" on:click="{() => $openPractice = ""}"></div>
+  <div class="modal-card">
+    <section class="modal-card-body">
+      Hello
+    </section>
   </div>
 </div>
 

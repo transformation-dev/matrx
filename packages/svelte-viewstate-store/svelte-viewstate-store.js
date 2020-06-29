@@ -20,7 +20,9 @@ export class ViewstateStore {
     this.onURLChange = this.onURLChange.bind(this)
     const unsubscribe = loc.subscribe(this.onURLChange)
 
-    onDestroy(unsubscribe)
+    if (!this.storeConfig.isGlobal) {
+      onDestroy(unsubscribe)
+    }
   }
 
   getQuerystringParam() {

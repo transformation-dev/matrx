@@ -1,10 +1,18 @@
 import {writable} from 'svelte/store'
 
 import {getClient} from '@matrx/svelte-realtime-store'
+import {ViewstateStore} from '@matrx/svelte-viewstate-store'
 const realtimeClient = getClient()
 export const connected = realtimeClient.connected
 
 import {Dragster} from '@matrx/dragster'
+
+export const openPractice = new ViewstateStore({
+  identifier: 'openPractice', 
+  defaultValue: '',
+  scope: '/plan',
+  isGlobal: true
+})
 
 export const formulation = writable({
   label: 'Default formulation',

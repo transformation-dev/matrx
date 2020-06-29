@@ -21,7 +21,7 @@
 </script>
 
 <!-- Legend -->
-<div style="position: sticky; top: 3.5rem; padding-left: 30px; padding-right: 15px;" class="columns has-background-white">
+<div style="position: sticky; top: 3rem; padding-left: 30px; padding-right: 15px;" class="columns has-background-white">
   {#each levelConfig as level}
     <div class="column is-label">
       <div class="columns has-text-centered is-gapless is-vcentered">
@@ -36,9 +36,6 @@
     </div>
   {/each}
 </div>
-
-<!-- Spacer -->
-<div style="height: 0.5rem" />
 
 <!-- Org maturity visualization -->
 <div class="columns discipline has-background-primary is-gapless has-text-centered is-vcentered">

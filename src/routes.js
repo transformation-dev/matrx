@@ -19,8 +19,14 @@ import Morgan from './routes/Morgan'
 
 const routes = {
   // Real routes
-  '/': Home,
-  '/login': Login,
+  '/': wrap(
+    Home,
+    {allowUnauthenticated: true}
+  ),
+  '/login': wrap(
+    Login,
+    {allowUnauthenticated: true}
+  ),
   '/plan': wrap(
     Plan,
     {navbarLabel: 'Plan'}
