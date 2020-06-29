@@ -31,7 +31,7 @@ const routes = {
   ),
 
   // Don't delete. Required for Cypress testing
-  '/_test-jig': TestJig,
+  '/test-jig': TestJig,
 
   // TODO: Clean up below once we know have examples of all
   '/poc': Poc,

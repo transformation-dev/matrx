@@ -15,7 +15,6 @@
   import {ViewstateStore} from '@matrx/svelte-viewstate-store'
 
   import routes from './routes'
-  import {CSRFTokenAvailable} from './stores'
 
   const teamID = new ViewstateStore({
     identifier: 'teamID',
@@ -52,7 +51,6 @@
   async function checkAuthentication() {
     debug('checkAuthentication() called')
     if ($location === loginRoute || !allowUnathenticated.has($location)) {
-      $CSRFTokenAvailable = false
       const response = await fetch('/checkauth', { 
         headers: {
           'Accept': 'application/json'
@@ -61,7 +59,6 @@
       })
       const parsed = await response.json()
       debug('Got response from /checkauth: %O', parsed)
-      $CSRFTokenAvailable = true
       if (parsed.authenticated) {
         realtimeClient.restoreConnection(redirect)
       }
@@ -79,7 +76,6 @@
   // })
 
   async function handleLogout(event) {
-    $CSRFTokenAvailable = false
     const response = await fetch('/logout', { 
       headers: {
         'Accept': 'application/json',
@@ -90,7 +86,6 @@
     const parsed = await response.json()
     debug('Got response from /logout: %O', parsed)
     // localStorage.setItem('CSRFToken', parsed.CSRFToken)
-    $CSRFTokenAvailable = true
     redirect(parsed.authenticated)
   }
 

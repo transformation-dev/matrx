@@ -6,8 +6,6 @@ export const connected = realtimeClient.connected
 
 import {Dragster} from '@matrx/dragster'
 
-export const CSRFTokenAvailable = writable(false)
-
 export const formulation = writable({
   label: 'Default formulation',
   disciplines: [
