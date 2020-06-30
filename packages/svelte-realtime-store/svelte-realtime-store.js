@@ -1,5 +1,8 @@
 // const io = require('socket.io-client')  // This was not working with rollup for my SPA so I now load it from the server in my index.html
 
+// const socketManager = new io.Manager()
+// socketManager.reconnectionDelay(60000)
+
 const {writable, readable} = require('svelte/store')
 const {debounce} = require('lodash')
 const debug = require('debug')('matrx:svelte-realtime-store')
@@ -23,55 +26,67 @@ class Client {
   }
 
   afterAuthenticated(callback) {
-    debug('afterAutenticated() called')
-    this.socket.on('set', (storeID, value) => {
-      debug('set msg received. storeID: %s  value: %O', storeID, value)
-      client.stores[storeID].forEach((store) => {
-        store._set(value)
+    try {
+      debug('afterAutenticated() called')
+      this.socket.on('set', (storeID, value) => {
+        debug('set msg received. storeID: %s  value: %O', storeID, value)
+        client.stores[storeID].forEach((store) => {
+          store._set(value)
+        })
       })
-    })
-    this.socket.on('revert', (storeID, value) => {
-      debug('revert msg received. storeID: %s  value: %O', storeID, value)
-      client.stores[storeID].forEach((store) => {
-        store._set(value)
-        // TODO: Send "revert" event to each component
+      this.socket.on('revert', (storeID, value) => {
+        debug('revert msg received. storeID: %s  value: %O', storeID, value)
+        client.stores[storeID].forEach((store) => {
+          store._set(value)
+          // TODO: Send "revert" event to each component
+        })
       })
-    })
-    this.socket.on('saved', (storeID) => {
-      debug('set msg received. storeID: %s', storeID)
-      // TODO: Send "saved" event to each component
-    })
-    const storesReshaped = []
-    for (const storeID in client.stores) {
-      storesReshaped.push({storeID, value: client.stores[storeID][0].get()})
+      this.socket.on('saved', (storeID) => {
+        debug('set msg received. storeID: %s', storeID)
+        // TODO: Send "saved" event to each component
+      })
+      const storesReshaped = []
+      for (const storeID in client.stores) {
+        storesReshaped.push({storeID, value: client.stores[storeID][0].get()})
+      }
+      this.socket.emit('join', storesReshaped)
+      this.connected.set(true)
+      callback(true)
+    } catch (e) {
+      if (e instanceof RangeError) {
+        location.reload()
+      }
     }
-    this.socket.emit('join', storesReshaped)
-    this.connected.set(true)
-    callback(true)
   }
 
   restoreConnection(callback) { 
-    debug('restoreConnection() called')
-    if (this.socket) {
-      this.socket.removeAllListeners()
-      this.socket = null
-    }
-    this.socket = io(this._namespace)  
-    this.socket.on('connect', () => {
-      debug('connect msg received')
-      this.socket.on('disconnect', () => {
-        debug('disconnect msg received')
-        this.connected.set(false)
-        this.socket.removeAllListeners()  
-        this.socket.on('reconnect', () => {
-          debug('reconnect msg received')
-          this.restoreConnection(() => {
-            debug('Got response to call to restoreConnection() from inside reconnect event. Ignoring.')
+    try {
+      debug('restoreConnection() called')
+      if (this.socket) {
+        this.socket.removeAllListeners()
+        this.socket = null
+      }
+      this.socket = io(this._namespace)  
+      this.socket.on('connect', () => {
+        debug('connect msg received')
+        this.socket.on('disconnect', () => {
+          debug('disconnect msg received')
+          this.connected.set(false)
+          this.socket.removeAllListeners()  
+          this.socket.on('reconnect', () => {
+            debug('reconnect msg received')
+            this.restoreConnection(() => {
+              debug('Got response to call to restoreConnection() from inside reconnect event. Ignoring.')
+            })
           })
         })
+        this.afterAuthenticated(callback)
       })
-      this.afterAuthenticated(callback)
-    })
+    } catch (e) {
+      if (e instanceof RangeError) {
+        location.reload()
+      }
+    }
   }
 
   realtime(storeConfig, default_value, component = null, start = noop) {

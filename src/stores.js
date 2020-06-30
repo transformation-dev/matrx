@@ -7,12 +7,14 @@ export const connected = realtimeClient.connected
 
 import {Dragster} from '@matrx/dragster'
 
-export const openPracticeID = new ViewstateStore({
-  identifier: 'openPracticeID', 
-  defaultValue: '',
-  scope: '/plan',
-  isGlobal: true
-})
+// export const openPracticeID = new ViewstateStore({
+//   identifier: 'openPracticeID', 
+//   defaultValue: '',
+//   scope: '/plan',
+//   isGlobal: true
+// })
+
+export const openPracticeID = writable('')
 
 // export const formulation = writable({
 export const formulation = realtimeClient.realtime({_entityID: 'formulation'}, {
