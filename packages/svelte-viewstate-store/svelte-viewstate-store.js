@@ -3,7 +3,7 @@ const debug = require('debug')('matrx:svelte-viewstate-store')
 import {onDestroy} from 'svelte'
 import {push, loc} from 'svelte-spa-router'
 
-// const this.subscriberQueue = []
+const subscriberQueue = []
 function noop() {}
 function safeNotEqual(a, b) {
   return a != a ? b == b : a !== b || ((a && typeof a === 'object') || typeof a === 'function')
@@ -16,7 +16,6 @@ export class ViewstateStore {
     this.stop = null
     this.subscribers = []
     this.scope = storeConfig.scope
-    this.subscriberQueue = []
 
     // this._set(storeConfig.defaultValue)  // This is just so value is not undefined. It gets updated by the querystring or LocalStorage 
 
@@ -76,18 +75,18 @@ export class ViewstateStore {
     if (safeNotEqual(this.value, newValue)) {
       this.value = newValue
       if (this.stop) { // store is ready
-        const runQueue = !this.subscriberQueue.length
+        const runQueue = !subscriberQueue.length
         for (let i = 0; i < this.subscribers.length; i += 1) {
           const s = this.subscribers[i]
           s[1]()
-          this.subscriberQueue.push(s, this.value)
+          subscriberQueue.push(s, this.value)
         }
         if (runQueue) {
-          debug('in _set if (runQueue) suscriberQueue.length: %O', this.subscriberQueue.length)
-          for (let i = 0; i < this.subscriberQueue.length; i += 2) {
-            this.subscriberQueue[i][0](this.subscriberQueue[i + 1])
+          debug('in _set if (runQueue) suscriberQueue.length: %O', subscriberQueue.length)
+          for (let i = 0; i < subscriberQueue.length; i += 2) {
+            subscriberQueue[i][0](subscriberQueue[i + 1])
           }
-          this.subscriberQueue.length = 0
+          subscriberQueue.length = 0
         }
       }
     }
