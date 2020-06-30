@@ -41,6 +41,8 @@
   //   practiceMetaData = value
   // }
 
+  // $: descriptionHTML = getPracticeMetaData($openPracticeID) ? getPracticeMetaData($openPracticeID).description : ""  // TODO: Convert from markdown to html and use below
+  
 </script>
 
 {#if $openPracticeID}
@@ -50,14 +52,13 @@
     <div class="modal-card">
       <section class="modal-card-body">
         {getPracticePlan().practiceID}
-        {getPracticeMetaData($openPracticeID).description}
-      <div class="field">
-        <label class ="label has-text-centered">Practice Name</label>
-        <label style="font-weight: normal; font-size: 8pt" class="label has-text-centered">Discipline Name</label>
-        <label style="font-size: 8pt; font-weight: normal" class="label has-text-centered">Description</label>
-      </div>
-      <div class="field is-horizontal">
-        <label class ="label has-right-margin">Change Assessed Level</label>
+        <div class="field">
+          <label class ="label has-text-centered">{getPracticeMetaData($openPracticeID).label}</label>
+          <label style="font-weight: normal; font-size: 8pt" class="label has-text-centered">{getPracticeMetaData($openPracticeID).discipline.label}</label>
+          <label style="font-size: 8pt; font-weight: normal" class="label has-text-centered">{@html getPracticeMetaData($openPracticeID).description}</label>
+        </div>
+        <div class="field is-horizontal">
+          <label class ="label has-right-margin">Change Assessed Level</label>
           <div class="field-body has-text-centered">
             <div class="control">
               <div class="select">

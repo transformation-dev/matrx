@@ -28,7 +28,7 @@ export const formulation = realtimeClient.realtime({_entityID: 'formulation'}, {
         {
           id: 'practice1',
           label: 'Yellow Belt',
-          description: 'Something to say about **Yellow Belt** in Markdown',
+          description: 'Something to <strong>say</strong> about **Yellow Belt** in Markdown',
           documentation: 'Some _Markdown_ documentation'
         },
         {
