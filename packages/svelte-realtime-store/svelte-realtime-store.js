@@ -96,7 +96,11 @@ class Client {
       lastNewValue = new_value
       if (safe_not_equal(value, new_value)) {
         if (stop) { // store is ready
-          debouncedEmit()
+          if (debounceWait) {
+            debouncedEmit()
+          } else {
+            emitSet()
+          }
           client.stores[storeID].forEach((store) => {
             if (!store.ignoreLocalSet) {
               store._set(new_value)
@@ -112,7 +116,7 @@ class Client {
 
     function _set(new_value) {
       if (!new_value) {
-        debug('GOT NULL OR UNDEFINED new_value in _set() function')
+        debug('GOT NULL OR UNDEFINED new_value in _set() function. new_value: %O', new_value)
       }
       if (safe_not_equal(value, new_value)) {
         value = new_value

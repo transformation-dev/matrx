@@ -4,17 +4,19 @@
 
   const realtimeClient = getClient()
   const connected = realtimeClient.connected
-  const practicePlan = realtimeClient.realtime({storeID: 'something' + $openPracticeID}, {})  // TODO: Upgrade the storeID
-  $: practicePlan.set($plan[$openPracticeID])
+  // const practicePlan = realtimeClient.realtime({storeID: $openPracticeID}, {})  // TODO: Upgrade the storeID
+
+  function getPracticePlan() {
+    return $plan[$openPracticeID]
+  }
 
   function getPracticeMetaData(id) {
     let value
-    for (const discipline of $formulation.disciplines) {
+    for (const discipline of formulation.get().disciplines) {
       for (const practice of discipline.practices) {
         if (practice.id === id) {
           value = practice
           value.discipline = discipline
-          console.log('got here')
           return value
         }
       }
@@ -41,12 +43,13 @@
 
 </script>
 
-{#if $openPracticeID && $practicePlan}
+{#if $openPracticeID}
+<!-- {#if $openPracticeID && $practicePlan && getPracticeMetaData($openPracticeID)} -->
   <div id="practice-modal" class="modal" class:is-active={$openPracticeID !== ""}>
     <div class="modal-background" on:click="{() => $openPracticeID = ""}"></div>
     <div class="modal-card">
       <section class="modal-card-body">
-        {$practicePlan.practiceID}
+        {getPracticePlan().practiceID}
         {getPracticeMetaData($openPracticeID).description}
       <div class="field">
         <label class ="label has-text-centered">Practice Name</label>

@@ -14,7 +14,8 @@ export const openPracticeID = new ViewstateStore({
   isGlobal: true
 })
 
-export const formulation = writable({
+// export const formulation = writable({
+export const formulation = realtimeClient.realtime({_entityID: 'formulation'}, {
   label: 'Default formulation',
   disciplines: [
     {

@@ -1,3 +1,5 @@
+const debug = require('debug')('matrx:svelte-viewstate-store')
+
 import {onDestroy} from 'svelte'
 import {push, loc} from 'svelte-spa-router'
 
@@ -80,6 +82,7 @@ export class ViewstateStore {
           subscriberQueue.push(s, this.value)
         }
         if (runQueue) {
+          debug('in _set if (runQueue) suscriberQueue.length: %O', subscriberQueue.length)
           for (let i = 0; i < subscriberQueue.length; i += 2) {
             subscriberQueue[i][0](subscriberQueue[i + 1])
           }
