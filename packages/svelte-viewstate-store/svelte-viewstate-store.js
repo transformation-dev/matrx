@@ -1,23 +1,18 @@
 const debug = require('debug')('matrx:svelte-viewstate-store')
 
 import {onDestroy} from 'svelte'
+import {writable} from 'svelte/store'
 import {push, loc} from 'svelte-spa-router'
 
-const subscriberQueue = []
-function noop() {}
-function safeNotEqual(a, b) {
-  return a != a ? b == b : a !== b || ((a && typeof a === 'object') || typeof a === 'function')
-}
-
 export class ViewstateStore {
-  constructor(storeConfig, start = noop) {
+  constructor(storeConfig) {
     this.storeConfig = storeConfig
-    this.start = start
-    this.stop = null
-    this.subscribers = []
     this.scope = storeConfig.scope
 
-    // this._set(storeConfig.defaultValue)  // This is just so value is not undefined. It gets updated by the querystring or LocalStorage 
+    this.wrappedStore = writable(storeConfig.defaultValue)
+    this.subscribe = this.wrappedStore.subscribe
+
+    // this.wrappedStore.set(storeConfig.defaultValue)  // This is just so value is not undefined. It gets updated by the querystring or LocalStorage 
 
     this.onURLChange = this.onURLChange.bind(this)
     const unsubscribe = loc.subscribe(this.onURLChange)
@@ -38,6 +33,7 @@ export class ViewstateStore {
       newValue = Number.parseFloat(valueString)
     } else if (this.storeConfig.type === 'Int') {
       newValue = +valueString  // Prefer over Number.parseInt(valueString, 10) because it returns NaN for "1 abc"
+      // newValue = Number.parseInt(valueString, 10)
     } else if (this.storeConfig.type === 'Boolean') {
       newValue = (valueString == 'true')
     }
@@ -62,60 +58,21 @@ export class ViewstateStore {
       newValue = window.localStorage[this.scope + '.' + this.storeConfig.identifier] || this.storeConfig.defaultValue
       ViewstateStore.queueURLUpdate(this.storeConfig.identifier, newValue)
     }
-    this._set(newValue)
+    this.wrappedStore.set(newValue)
   }
   
   set(newValue) {
-    this._set(newValue)
+    this.wrappedStore.set(newValue)
     window.localStorage[this.scope + '.' + this.storeConfig.identifier] = newValue
     ViewstateStore.queueURLUpdate(this.storeConfig.identifier, newValue)
   }
-  
-  _set(newValue) {  // Call this to update subscribers when the URL changes w/o saving to LocalStorage
-    if (safeNotEqual(this.value, newValue)) {
-      this.value = newValue
-      if (this.stop) { // store is ready
-        const runQueue = !subscriberQueue.length
-        for (let i = 0; i < this.subscribers.length; i += 1) {
-          const s = this.subscribers[i]
-          s[1]()
-          subscriberQueue.push(s, this.value)
-        }
-        if (runQueue) {
-          debug('in _set if (runQueue) suscriberQueue.length: %O', subscriberQueue.length)
-          for (let i = 0; i < subscriberQueue.length; i += 2) {
-            subscriberQueue[i][0](subscriberQueue[i + 1])
-          }
-          subscriberQueue.length = 0
-        }
-      }
-    }
-  }
 
   update(fn) {
-    this.set(fn(this.value))
-  }
-
-  subscribe(run, invalidate = noop) {
-    const subscriber = [run, invalidate]
-    this.subscribers.push(subscriber)
-    if (this.subscribers.length === 1) {
-      this.stop = this.start(this._set) || noop  // TODO: Should this be this._set
-    }
-    run(this.value)
-
-    function unsubscribe () {
-      const index = this.subscribers.indexOf(subscriber)
-      if (index !== -1) {
-        this.subscribers.splice(index, 1)
-      }
-      if (this.subscribers.length === 0) {
-        this.stop()
-        this.stop = null
-      }
-    }
-    this.unsubscribe = unsubscribe.bind(this)
-    return this.unsubscribe
+    let newValue
+    this.wrappedStore.update((currentValue) => {
+      newValue = fn(currentValue)
+    })
+    this.set(newValue)
   }
 
 }
@@ -138,7 +95,8 @@ ViewstateStore.pendingURLUpdates = {}
 ViewstateStore.timer = null
 
 ViewstateStore.queueURLUpdate = (key, value) => {
-  if (ViewstateStore.timer) {
+  debug('in ViewstateStore.queueURLUpdate. key: value %O: %O', key, value)
+  if (ViewstateStore.timer !== null) {
     clearTimeout(ViewstateStore.timer)
     ViewstateStore.timer = null
   }
