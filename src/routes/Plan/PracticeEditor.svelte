@@ -57,20 +57,18 @@
           <label style="font-weight: normal; font-size: 8pt" class="label has-text-centered">{getPracticeMetaData($openPracticeID).discipline.label}</label>
           <label style="font-size: 8pt; font-weight: normal" class="label has-text-centered">{@html getPracticeMetaData($openPracticeID).description}</label>
         </div>
-        <div class="field is-horizontal">
+        <div style="align-items: center" class="field is-horizontal">
           <label class ="label has-right-margin">Change Assessed Level</label>
           <div class="field-body has-text-centered">
             <div class="control">
-              <div class="select">
-                <select>
-                  <option>Culture</option>
-                  <option>Actions</option>
-                  <option>Words</option>
-                  <option>Thoughts</option>
-                  <option>Unknown</option>
-                  <option>Trade-offs</option>
-                </select>
-              </div>
+              <label class="radio">
+                <input type="radio" name="foobar">
+                Foo
+              </label>
+              <label class="radio">
+                <input type="radio" name="foobar" checked>
+                Bar
+              </label>
             </div>
           </div>
         </div>
@@ -83,5 +81,4 @@
   .has-right-margin {
     margin-right: 20px !important;
   }
-
 </style>
