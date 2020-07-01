@@ -32,5 +32,8 @@
   },
   "bugs": {
     "url": "https://github.com/matrx-transformation/matrx/issues"
+  },
+  "dependencies": {
+    "lodash": "^4.17.15"
   }
 }

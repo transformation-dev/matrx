@@ -60,7 +60,7 @@ export class ViewstateStore {
     }
     this.wrappedStore.set(newValue)
   }
-  
+
   set(newValue) {
     this.wrappedStore.set(newValue)
     window.localStorage[this.scope + '.' + this.storeConfig.identifier] = newValue
@@ -71,9 +71,18 @@ export class ViewstateStore {
     let newValue
     this.wrappedStore.update((currentValue) => {
       newValue = fn(currentValue)
+      return newValue
     })
-    this.set(newValue)
+    window.localStorage[this.scope + '.' + this.storeConfig.identifier] = newValue
+    ViewstateStore.queueURLUpdate(this.storeConfig.identifier, newValue)
   }
+  // update(fn) {
+  //   let newValue
+  //   this.wrappedStore.update((currentValue) => {
+  //     newValue = fn(currentValue)
+  //   })
+  //   this.set(newValue)
+  // }
 
 }
 

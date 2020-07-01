@@ -6,6 +6,9 @@
 
   let blankDisciplineIDs = {}
   $: {
+
+    // if ($formulation && $plan) {
+
     blankDisciplineIDs = {}
     for (const discipline of $formulation.disciplines) {
       let count = 0
@@ -20,6 +23,9 @@
         blankDisciplineIDs[discipline.id] = true
       }
     }
+
+    // }
+
   }
 
   function localDrop(event) {
@@ -35,6 +41,7 @@
 
 <div class="columns">
   <div id={slideLabel} class="column drop-zone" use:addDragster on:dragster-enter={dragEnter} on:dragster-leave={dragLeave} on:drop={localDrop} on:dragover={dragOver}>
+    <!-- {#if $formulation && $plan} -->
     {#each $formulation.disciplines as discipline}
       <div class="columns">
         {#if slideLabel == 'Todo'}
@@ -59,6 +66,7 @@
         {/if}
       </div>
     {/each}
+    <!-- {/if} -->
   </div>
 </div>
 

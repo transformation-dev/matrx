@@ -1,14 +1,12 @@
 <script>
+  const debug = require('debug')('matrx:Login')
+
   import Icon from 'svelte-awesome'
   import {envelope, key} from 'svelte-awesome/icons'
   
-  import {getClient} from '@matrx/svelte-realtime-store'
   import {push, querystring} from 'svelte-spa-router'
-  import {CSRFTokenAvailable} from '../stores'
-  const debug = require('debug')('matrx:Login')
 
   const origin = new URLSearchParams($querystring).get('origin')
-  const realtimeClient = getClient()
 
   const credentials = {username: 'lmaccherone', password: 'admin'}
 

@@ -1,9 +1,12 @@
 import {writable} from 'svelte/store'
 
 import {ViewstateStore} from '@matrx/svelte-viewstate-store'
-import {getClient} from '@matrx/svelte-realtime-store'
-const realtimeClient = getClient()
-export const connected = realtimeClient.connected
+// import {getClient} from '@matrx/svelte-realtime-store'
+// const realtimeClient = getClient()
+// export const connected = realtimeClient.connected
+import {RealtimeStore} from '@matrx/svelte-realtime-store'
+export const connected = RealtimeStore.connected
+
 
 import {Dragster} from '@matrx/dragster'
 
@@ -15,8 +18,9 @@ export const openPracticeID = new ViewstateStore({
 })
 // export const openPracticeID = writable('')
 
-// export const formulation = writable({
-export const formulation = realtimeClient.realtime({_entityID: 'formulation'}, {
+export const formulation = writable({
+// export const formulation = realtimeClient.realtime({_entityID: 'formulation'}, {
+// export const formulation = new RealtimeStore({_entityID: 'formulation', defaultValue: {
   label: 'Default formulation',
   disciplines: [
     {
@@ -72,6 +76,7 @@ export const formulation = realtimeClient.realtime({_entityID: 'formulation'}, {
       ]
     }
   ]
+// }})
 })
 
 export const queueSwimlanes = writable({
@@ -85,7 +90,9 @@ export const queueSwimlanes = writable({
   }
 })
 
-export const plan = realtimeClient.realtime({_entityID: 'plan'}, {
+// export const plan = realtimeClient.realtime({_entityID: 'plan'}, {
+export const plan = new RealtimeStore({_entityID: 'plan', defaultValue: {
+// export const plan = writable({
   practice1: {
     practiceID: 'practice1',
     formulationID: 'formulation1',
@@ -146,7 +153,7 @@ export const plan = realtimeClient.realtime({_entityID: 'plan'}, {
     notes: 'Some note again',
     status: 'Todo'
   }
-})
+}})
 
 export function addDragster(node) {
   return new Dragster(node)

@@ -1,9 +1,9 @@
 <script>
-  import {getClient} from '@matrx/svelte-realtime-store'
-  import {formulation, plan, openPracticeID} from '../../stores'
+  // import {getClient} from '@matrx/svelte-realtime-store'
+  import {formulation, plan, openPracticeID, connected} from '../../stores'
 
-  const realtimeClient = getClient()
-  const connected = realtimeClient.connected
+  // const realtimeClient = getClient()
+  // const connected = realtimeClient.connected
   // const practicePlan = realtimeClient.realtime({storeID: $openPracticeID}, {})  // TODO: Upgrade the storeID
 
   function getPracticePlan() {
@@ -12,7 +12,7 @@
 
   function getPracticeMetaData(id) {
     let value
-    for (const discipline of formulation.get().disciplines) {
+    for (const discipline of $formulation.disciplines) {
       for (const practice of discipline.practices) {
         if (practice.id === id) {
           value = practice

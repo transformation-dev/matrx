@@ -11,7 +11,7 @@
   import Icon from 'svelte-awesome'
   import {signOut} from 'svelte-awesome/icons'
 
-  import {getClient} from '@matrx/svelte-realtime-store'
+  import {RealtimeStore} from '@matrx/svelte-realtime-store'
   import {ViewstateStore} from '@matrx/svelte-viewstate-store'
 
   import routes from './routes'
@@ -21,8 +21,6 @@
     defaultValue: 'team1',
     scope: '/'
   })
-
-  const realtimeClient = getClient()
 
   const origin = derived([location, querystring], ([$location, $querystring]) => {
     return $location + ($querystring ? '?' + $querystring : '')
@@ -62,7 +60,7 @@
       const parsed = await response.json()
       debug('Got response from /checkauth: %O', parsed)
       if (parsed.authenticated) {
-        realtimeClient.restoreConnection(redirect)
+        RealtimeStore.restoreConnection(redirect)
       } else {
         redirect(false)
       }
@@ -74,7 +72,7 @@
     checkAuthentication()
   })
 
-  // realtimeClient.connected.subscribe((value) => {
+  // RealtimeStore.connected.subscribe((value) => {
   //   debug('connected store changed value to: %O', value)
   //   checkAuthentication()
   // })
