@@ -1,3 +1,5 @@
+const debug = require('debug')('matrx:dragster')
+
 export class Dragster {
   constructor(el) {
     this.dragenter = this.dragenter.bind(this)
@@ -12,7 +14,7 @@ export class Dragster {
       Dragster.dragsters = {}
     }
     if (Dragster.dragsters[this.el.id]) {
-      throw new Error('A Dragster for element with id "' + this.el.id + '" has already been instantiated')
+      debug('WARNING: A Dragster for element with id "%O" has already been instantiated. This replaces that.', this.el.id)
     }
     Dragster.dragsters[this.el.id] = this
   }

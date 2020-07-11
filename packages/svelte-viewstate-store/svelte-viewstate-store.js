@@ -22,14 +22,14 @@ export class ViewstateStore {
     }
   }
 
-  getQuerystringParam() {
-    const urlSearchParams = new URLSearchParams(this.querystring)
+  getQuerystringParam(querystring) {
+    const urlSearchParams = new URLSearchParams(querystring)
     const valueString = urlSearchParams.get(this.storeConfig.identifier)
     if (valueString === null) {
       return {newValue: null, urlSearchParams}
     }
     let newValue = valueString
-    if (this.storeConfig.type === 'Float') {
+    if (this.storeConfig.type === 'Float') {  // TODO: Support arrays of values
       newValue = Number.parseFloat(valueString)
     } else if (this.storeConfig.type === 'Int') {
       newValue = +valueString  // Prefer over Number.parseInt(valueString, 10) because it returns NaN for "1 abc"
@@ -43,13 +43,12 @@ export class ViewstateStore {
   onURLChange(newLoc) {
     this.scope = this.scope || newLoc.location
     this.location = newLoc.location
-    this.querystring = newLoc.querystring
 
     if (!this.location.startsWith(this.scope)) {  // TODO: This needs to work for parent/child routes
       return
     }
 
-    let {newValue} = this.getQuerystringParam()
+    let {newValue} = this.getQuerystringParam(newLoc.querystring)
     if (newValue != null) {
       if (this.storeConfig.updateLocalStorageOnURLChange) {
         window.localStorage[this.scope + '.' + this.storeConfig.identifier] = newValue

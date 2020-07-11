@@ -1,7 +1,7 @@
 const debug = require('debug')('matrx:svelte-realtime-store')
 const {debounce} = require('lodash')
 
-import {onDestroy} from 'svelte'
+import {onDestroy} from 'svelte'  // TODO: Either use this or remove it
 import {writable} from 'svelte/store'
 
 debug('svelte-realtime-store loads and initializes')
@@ -22,11 +22,11 @@ export class RealtimeStore {
 
     this.lastNewValue = null
 
-    this.wrappedStore = writable(storeConfig.defaultValue)
+    this.wrappedStore = writable(this.defaultValue)
     this.subscribe = this.wrappedStore.subscribe
 
-    // this._emitSet = this._emitSet.bind(this)
-    // this._debouncedEmit = debounce(this._emitSet, this.debounceWait).bind(this)
+    this._emitSet = this._emitSet.bind(this)
+    this._debouncedEmit = debounce(this._emitSet, this.debounceWait).bind(this)
 
     if (this.component) {
       components[this.storeID] = this.component
@@ -46,7 +46,7 @@ export class RealtimeStore {
     }
   }
 
-  _debouncedEmit() {
+  _debouncedEmit() {  // TODO: Need to really debounce
     this._emitSet()
   }
   
@@ -114,8 +114,8 @@ RealtimeStore.afterAuthenticated = function(callback) {  // TODO: Does this need
     callback(true)
   } catch (e) {
     if (e instanceof RangeError) {
-      // location.reload()
-      throw e
+      location.reload()
+      // throw e
     }
   }
 }
@@ -145,8 +145,8 @@ RealtimeStore.restoreConnection = function(callback) {  // TODO: Does this need 
     })
   } catch (e) {
     if (e instanceof RangeError) {
-      // location.reload()
-      throw e
+      location.reload()
+      // throw e
     }
   }
 }

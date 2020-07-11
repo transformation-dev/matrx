@@ -5,16 +5,14 @@
     require('whatwg-fetch')
   }
 
-  import Router from 'svelte-spa-router'
-  import {link, push, location, querystring} from 'svelte-spa-router'  // TODO: remove the ones I don't use
-  import {derived} from 'svelte/store'
+  import {link, location} from 'svelte-spa-router'  // TODO: Move these to svelte-viewstate-store 
   import Icon from 'svelte-awesome'
   import {signOut} from 'svelte-awesome/icons'
 
-  import {RealtimeStore} from '@matrx/svelte-realtime-store'
   import {ViewstateStore} from '@matrx/svelte-viewstate-store'
 
-  import routes from './routes'
+  import {routes, activeComponent} from './router'
+  import {authenticated} from './stores'
 
   const teamID = new ViewstateStore({
     identifier: 'teamID',
@@ -22,62 +20,8 @@
     scope: '/'
   })
 
-  const origin = derived([location, querystring], ([$location, $querystring]) => {
-    return $location + ($querystring ? '?' + $querystring : '')
-  })
-  
-  const allowUnauthenticated = new Set([  // TODO: Move this functionality into routes.js
-    '/login',
-    '/wild/something'
-  ])
-
-  const loginRoute = '/login'
-
-  function redirect(authenticated) {
-    debug('redirect() called with authenticated parameter: %O', authenticated)
-    if (!authenticated) {
-      // if (allowUnauthenticated.has($location)) {
-      if (routes[$location].userData && routes[$location].userData.allowUnauthenticated) {
-        // Just stay on this page
-      } else {
-        return push('/login?origin=' + $origin)
-      }
-    } else {
-      return push($origin)
-    }
-  }
-
-  async function checkAuthentication() {
-    debug('checkAuthentication() called')
-    // if ($location === loginRoute || !allowUnauthenticated.has($location)) {
-    if ($location === loginRoute || !(routes[$location].userData && routes[$location].userData.allowUnauthenticated)) {
-      const response = await fetch('/checkauth', { 
-        headers: {
-          'Accept': 'application/json'
-        },
-        credentials: 'same-origin', 
-      })
-      const parsed = await response.json()
-      debug('Got response from /checkauth: %O', parsed)
-      if (parsed.authenticated) {
-        RealtimeStore.restoreConnection(redirect)
-      } else {
-        redirect(false)
-      }
-    } 
-  }
-
-  location.subscribe((locationValue) => {
-    debug('location store changed value to: %s', locationValue)
-    checkAuthentication()
-  })
-
-  // RealtimeStore.connected.subscribe((value) => {
-  //   debug('connected store changed value to: %O', value)
-  //   checkAuthentication()
-  // })
-
   async function handleLogout(event) {
+    $authenticated = false
     const response = await fetch('/logout', { 
       headers: {
         'Accept': 'application/json',
@@ -86,11 +30,14 @@
     })
     const parsed = await response.json()
     debug('Got response from /logout: %O', parsed)
-    redirect(parsed.authenticated)
+    $authenticated = parsed.authenticated
   }
-
-  // checkAuthentication() 
 </script>
+
+<svelte:head>
+  <title>MatrX{$location}</title>
+  <link rel="icon" href="MatrXCloseWhite.png">
+</svelte:head>
 
 <nav class="navbar is-fixed-top">
   <div class="navbar-brand">
@@ -101,7 +48,7 @@
   <div class="navbar-menu">
     <div class="navbar-start">
       {#each Object.entries(routes) as [route, value]}
-        {#if value.userData && value.userData.navbarLabel}
+        {#if value.navbarLabel}
           <a class="navbar-item" use:link class:is-active={$location === route} href={route}>
             {value.userData.navbarLabel}
           </a>
@@ -123,4 +70,4 @@
   </div>
 </nav>
 
-<Router {routes}/>
+<svelte:component this={$activeComponent} />
