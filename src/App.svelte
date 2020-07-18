@@ -36,7 +36,7 @@
 
 <svelte:head>
   <title>MatrX{$location}</title>
-  <link rel="icon" href="MatrXCloseWhite.png">
+  <link rel="icon" href="matrx-favicon.png">
 </svelte:head>
 
 <nav class="navbar is-fixed-top">

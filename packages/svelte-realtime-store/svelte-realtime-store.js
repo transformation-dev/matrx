@@ -35,8 +35,6 @@ export class RealtimeStore {
       stores[this.storeID] = []
     }
     stores[this.storeID].push(this)
-
-    // this.set(this.defaultValue)
   }
 
   _emitSet() {  // TODO: This may need .bind(this) in constructor
@@ -49,10 +47,6 @@ export class RealtimeStore {
   _debouncedEmit() {  // TODO: Need to really debounce
     this._emitSet()
   }
-  
-  // set(newValue) {
-  //   this.wrappedStore.set(newValue)
-  // }
 
   set(newValue) {
     debug('inside set(). this.storeID: %O', this.storeID)
