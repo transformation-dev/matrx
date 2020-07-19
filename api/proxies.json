@@ -17,7 +17,7 @@
         ],
         "route": "/{*restOfPath}"
       },
-      "backendUri": "http://localhost:7071/api/dist?file={restOfPath}"
+      "backendUri": "http://localhost:7071/api/dist-proxy?file={restOfPath}"
     },
     "root-index": {
       "matchCondition": {
@@ -26,7 +26,7 @@
         ],
         "route": "/"
       },
-      "backendUri": "http://localhost:7071/api/dist?file=index.html"
+      "backendUri": "http://localhost:7071/api/dist-proxy?file=index.html"
     }
   }
 }
