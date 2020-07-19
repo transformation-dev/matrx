@@ -6,13 +6,12 @@ module.exports = async function (context, req) {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: { name }
-    };
-  }
-  else {
+      body: {name}
+    }
+  } else {
     context.res = {
       status: 400,
       body: "Please pass a name on the query string for GET or in the request body as a POST"
-    };
+    }
   }
 }
