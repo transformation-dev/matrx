@@ -11,7 +11,8 @@ if (!SESSION_SECRET) {
 }
 
 function getServer(server, adapters, sessionStore, namespace = DEFAULT_NAMESPACE) {
-  const io = socketIO(server)
+  const io = socketIO(server, {pingTimeout: 30000, pingInterval: 20000})
+  // const io = socketIO(server)
   const nsp = io.of(namespace)
   const lookupSocketsBySessionID = new Map()  // {sessionID: [socket]}
 

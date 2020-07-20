@@ -1,15 +1,17 @@
 <script>
+  const debug = require('debug')('matrx:Plan')
   // Import packages
   import {fly} from 'svelte/transition'
   import {arrowCircleLeft, arrowCircleRight, spinner} from 'svelte-awesome/icons'
   import Icon from 'svelte-awesome'
-  import {ViewstateStore} from '@matrx/svelte-viewstate-store'
+  import {ViewstateStore} from '@matrx/svelte-viewstate-store' 
 
   // Import local code
   import {addDragster} from '../../stores'
   import {dropPan, dragOver} from './plan-helpers'
   import FormulationGrid from './FormulationGrid'
   import DoingKanban from './DoingKanban'
+  import PracticeEditor from './PracticeEditor'
 
   const slides = [
     {label: 'Todo'},
@@ -41,14 +43,25 @@
   const duration = 125
 
   function panLeft() {
-    startOn.update(value => Math.max(0, value - 1))
+    startOn.update((value) => {  // Leaving as an update to exercise ViewstateStore.update
+      debug('panLeft update. value: %O', value)
+      const newValue = Math.max(0, value - 1)
+      debug('panLeft update. newValue: %O', newValue)
+      return newValue
+    })
     panTimer = null
     inX = -1000
     outX = 1000
   }
 
   function panRight() {
-    startOn.update(value => Math.min(NUMBER_OF_SLIDES - 1, value + 1))
+    // startOn.update((value) => {  // More readable version below
+    //   debug('panRight update. value: %O', value)
+    //   const newValue = Math.min(NUMBER_OF_SLIDES - 1, value + 1)
+    //   debug('panRight update. newValue: %O', newValue)
+    //   return newValue
+    // })
+    $startOn = Math.min(NUMBER_OF_SLIDES - 1, $startOn + 1)  // More readable version
     panTimer = null
     inX = 1000
     outX = -1000
@@ -80,8 +93,6 @@
   }
 
 </script>
-
-<h1>Plan</h1>
 
 <div class="section">
   <div class="columns has-background-primary">
@@ -126,6 +137,8 @@
     {/if}
   </div>
 </div>
+
+<PracticeEditor />
 
 <style>
   .rotate-left {

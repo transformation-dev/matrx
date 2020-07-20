@@ -1,11 +1,14 @@
 <script>
   export let slideLabel = ''
 
-  import {formulation, plan, addDragster} from '../../stores'
+  import {formulation, plan, addDragster, openPracticeID} from '../../stores'
   import {dragStart, dragEnd, dropPan, dragOver, dragLeave, dragEnter} from './plan-helpers'
 
   let blankDisciplineIDs = {}
   $: {
+
+    // if ($formulation && $plan) {
+
     blankDisciplineIDs = {}
     for (const discipline of $formulation.disciplines) {
       let count = 0
@@ -20,6 +23,9 @@
         blankDisciplineIDs[discipline.id] = true
       }
     }
+
+    // }
+
   }
 
   function localDrop(event) {
@@ -35,6 +41,7 @@
 
 <div class="columns">
   <div id={slideLabel} class="column drop-zone" use:addDragster on:dragster-enter={dragEnter} on:dragster-leave={dragLeave} on:drop={localDrop} on:dragover={dragOver}>
+    <!-- {#if $formulation && $plan} -->
     {#each $formulation.disciplines as discipline}
       <div class="columns">
         {#if slideLabel == 'Todo'}
@@ -44,7 +51,7 @@
         {/if}
         {#each discipline.practices as practice}
           {#if $plan[practice.id].status == slideLabel}
-            <div id={practice.id} class="practice column with-border" draggable="true" on:dragstart={dragStart} on:dragend={dragEnd}>
+            <div id={practice.id} class="practice column with-border" draggable="true" on:click={() => $openPracticeID = practice.id} on:dragstart={dragStart} on:dragend={dragEnd}>
               {practice.label}
             </div>
           {/if}
@@ -59,6 +66,7 @@
         {/if}
       </div>
     {/each}
+    <!-- {/if} -->
   </div>
 </div>
 

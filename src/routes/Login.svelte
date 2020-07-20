@@ -1,16 +1,34 @@
 <script>
-  import Icon from 'svelte-awesome'
-  import {envelope, key} from 'svelte-awesome/icons'
-  
-  import {getClient} from '@matrx/svelte-realtime-store'
-  import {push, querystring} from 'svelte-spa-router'
-  import {CSRFTokenAvailable} from '../stores'
   const debug = require('debug')('matrx:Login')
 
-  const origin = new URLSearchParams($querystring).get('origin')
-  const realtimeClient = getClient()
+  import Icon from 'svelte-awesome'
+  import {envelope, key} from 'svelte-awesome/icons'
+  import {onMount} from 'svelte'
 
-  const credentials = {username: 'lmaccherone', password: 'admin'}
+  import {RealtimeStore} from '@matrx/svelte-realtime-store'
+
+  import {authenticated} from '../stores'
+
+  const credentials = {username: 'lmaccherone', password: 'admin'}  // TODO: Get from fields
+
+  async function checkAuthentication() {
+    debug('checkAuthentication() called')
+    const response = await fetch('/checkauth', { 
+      headers: {
+        'Accept': 'application/json'
+      },
+      credentials: 'same-origin', 
+    })
+    const parsed = await response.json()
+    debug('Got response from /checkauth: %O', parsed)
+    if (parsed.authenticated) {
+      $authenticated = true
+      RealtimeStore.restoreConnection((connected) => {
+        debug('Callback from restoreConnection. connected: %O', connected)
+      })
+    }
+  }
+  onMount(checkAuthentication)
 
   async function handleLogin(event) {
     const response = await fetch('/login', {
@@ -22,16 +40,12 @@
       credentials: 'same-origin', 
       body: JSON.stringify(credentials)
     })
-    pushOrigin(response.ok)
-  }
-
-  function pushOrigin(ok) {
-    if (ok) {
-      if (origin) {
-        push(origin)
-      } else {
-        push('/')
-      }
+    debug('In handleLogin after login attempt. response: %O', response)
+    if (response.ok) {
+      $authenticated = true
+      RealtimeStore.restoreConnection((connected) => {
+        debug('Callback from restoreConnection. connected: %O', connected)
+      })
     }
   }
   

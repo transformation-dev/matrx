@@ -11,6 +11,7 @@ $grey-lighter: lighten($grey, 30%);
 
 // adjusts height of nav-bar (must happen before importing bulma)
 $navbar-height: 3rem;
+$navbar-breakpoint: 0px;
 $box-padding: 5rem; 
 $box-radius: 10px;
 

@@ -1,186 +1,146 @@
-// const io = require('socket.io-client')  // This was not working with rollup for my SPA so I now load it from the server in my index.html
-
-const {writable, readable} = require('svelte/store')
-const {debounce} = require('lodash')
 const debug = require('debug')('matrx:svelte-realtime-store')
+const {debounce} = require('lodash')
 
-// From svelte
-const subscriber_queue = []
-function noop() {}
-function safe_not_equal(a, b) {
-  return a != a ? b == b : a !== b || ((a && typeof a === 'object') || typeof a === 'function')
-}
+import {onDestroy} from 'svelte'  // TODO: Either use this or remove it
+import {writable} from 'svelte/store'
 
-class Client { 
+debug('svelte-realtime-store loads and initializes')
+const namespace = '/svelte-realtime'
+let socket = null
+const stores = {}  // {storeID: [store]}
+const components = {}  // {storeID: component}  // TODO: Need to upgrade this to an array like stores
 
-  constructor(namespace = Client.DEFAULT_NAMESPACE) {
-    debug('Client.constructor() called')
-    this._namespace = namespace
-    this.connected = writable(false)
-    this.socket = null
-    this.stores = {}  // {storeID: [store]}
-    this.components = {}  // {storeID: component}  // TODO: Need to upgrade this to an array like stores
+export class RealtimeStore {
+  constructor(storeConfig) {
+    this.storeConfig = storeConfig || {}
+    this.storeID = storeConfig.storeID || storeConfig._entityID || JSON.stringify(storeConfig)
+    this.component = storeConfig.component || null
+    this.debounceWait = storeConfig.debounceWait || 0
+    this.forceEmitBack = storeConfig.forceEmitBack || false  // added to enable single-page testing
+    this.ignoreLocalSet = storeConfig.ignoreLocalSet || false  // added to enable single-page testing
+    this.defaultValue = storeConfig.defaultValue || null
+
+    this.lastNewValue = null
+
+    this.wrappedStore = writable(this.defaultValue)
+    this.subscribe = this.wrappedStore.subscribe
+
+    this._emitSet = this._emitSet.bind(this)
+    this._debouncedEmit = debounce(this._emitSet, this.debounceWait).bind(this)
+
+    if (this.component) {
+      components[this.storeID] = this.component
+    }
+    if (!stores[this.storeID]) {
+      stores[this.storeID] = []
+    }
+    stores[this.storeID].push(this)
   }
 
-  afterAuthenticated(callback) {
+  _emitSet() {  // TODO: This may need .bind(this) in constructor
+    debug('emitSet() called. storeID: %O, lastNewValue: %O, forceEmitBack: %O', this.storeID, this.lastNewValue, this.forceEmitBack)
+    if (socket) {
+      socket.emit('set', this.storeID, this.lastNewValue, this.forceEmitBack)
+    }
+  }
+
+  _debouncedEmit() {  // TODO: Need to really debounce
+    this._emitSet()
+  }
+
+  set(newValue) {
+    debug('inside set(). this.storeID: %O', this.storeID)
+    debug('inside set(). newValue: %O', newValue)
+    this.lastNewValue = newValue
+    if (this.debounceWait) {
+      this._debouncedEmit()
+    } else {
+      this._emitSet()
+    }
+    stores[this.storeID].forEach((store) => {
+      if (!store.ignoreLocalSet) {
+        store.wrappedStore.set(newValue)
+      }
+    })
+  }
+
+  update(fn) {
+    let newValue
+    this.wrappedStore.update((currentValue) => {
+      newValue = fn(currentValue)
+      return newValue
+    })
+    this.set(newValue)
+  }
+
+}
+
+RealtimeStore.connected = writable(false)
+
+RealtimeStore.afterAuthenticated = function(callback) {  // TODO: Does this need to be an => function?
+  try {
     debug('afterAutenticated() called')
-    this.socket.on('set', (storeID, value) => {
+    socket.on('set', (storeID, value) => {
       debug('set msg received. storeID: %s  value: %O', storeID, value)
-      client.stores[storeID].forEach((store) => {
-        store._set(value)
+      stores[storeID].forEach((store) => {
+        store.wrappedStore.set(value)
       })
     })
-    this.socket.on('revert', (storeID, value) => {
+    socket.on('revert', (storeID, value) => {
       debug('revert msg received. storeID: %s  value: %O', storeID, value)
-      client.stores[storeID].forEach((store) => {
-        store._set(value)
+      stores[storeID].forEach((store) => {
+        store.wrappedStore.set(value)
         // TODO: Send "revert" event to each component
       })
     })
-    this.socket.on('saved', (storeID) => {
+    socket.on('saved', (storeID) => {
       debug('set msg received. storeID: %s', storeID)
       // TODO: Send "saved" event to each component
     })
     const storesReshaped = []
-    for (const storeID in client.stores) {
-      storesReshaped.push({storeID, value: client.stores[storeID][0].get()})
+    for (const storeID in stores) {
+      stores[storeID][0].wrappedStore.update((value) => {
+        storesReshaped.push({storeID, value})
+      })
     }
-    this.socket.emit('join', storesReshaped)
-    this.connected.set(true)
+    socket.emit('join', storesReshaped)
+    RealtimeStore.connected.set(true)
     callback(true)
-  }
-
-  restoreConnection(callback) { 
-    debug('restoreConnection() called')
-    if (this.socket) {
-      this.socket.removeAllListeners()
-      this.socket = null
+  } catch (e) {
+    if (e instanceof RangeError) {
+      location.reload()
+      // throw e
     }
-    this.socket = io(this._namespace)  
-    this.socket.on('connect', () => {
+  }
+}
+
+RealtimeStore.restoreConnection = function(callback) {  // TODO: Does this need to be an => function?
+  try {
+    debug('restoreConnection() called')
+    if (socket) {
+      socket.removeAllListeners()
+      socket = null
+    }
+    socket = io(namespace)  
+    socket.on('connect', () => {
       debug('connect msg received')
-      this.socket.on('disconnect', () => {
+      socket.on('disconnect', () => {
         debug('disconnect msg received')
-        this.connected.set(false)
-        this.socket.removeAllListeners()  
-        this.socket.on('reconnect', () => {
+        RealtimeStore.connected.set(false)
+        socket.removeAllListeners()  
+        socket.on('reconnect', () => {
           debug('reconnect msg received')
-          this.restoreConnection(() => {
+          RealtimeStore.restoreConnection(() => {
             debug('Got response to call to restoreConnection() from inside reconnect event. Ignoring.')
           })
         })
       })
-      this.afterAuthenticated(callback)
+      RealtimeStore.afterAuthenticated(callback)
     })
+  } catch (e) {
+    if (e instanceof RangeError) {
+      location.reload()
+      // throw e
+    }
   }
-
-  realtime(storeConfig, default_value, component = null, start = noop) {
-    const storeID = storeConfig.storeID || storeConfig._entityID || JSON.stringify(storeConfig)
-    const debounceWait = storeConfig.debounceWait || 0
-    const forceEmitBack = storeConfig.forceEmitBack || false  // added to enable single-page testing
-    const ignoreLocalSet = storeConfig.ignoreLocalSet || false  // added to enable single-page testing
-    let value
-    let stop
-    const subscribers = []
-    let lastNewValue
-
-    function emitSet() {
-      debug('emitSet() called')
-      client.socket.emit('set', storeID, lastNewValue, forceEmitBack)
-    }
-    const debouncedEmit = debounce(emitSet, debounceWait)
-
-    function set(new_value) {
-      lastNewValue = new_value
-      if (safe_not_equal(value, new_value)) {
-        if (stop) { // store is ready
-          debouncedEmit()
-          client.stores[storeID].forEach((store) => {
-            if (!store.ignoreLocalSet) {
-              store._set(new_value)
-            }
-          })
-        }
-      }
-    }
-
-    function get() {
-      return value
-    }
-
-    function _set(new_value) {
-      if (!new_value) {
-        debug('GOT NULL OR UNDEFINED new_value in _set() function')
-      }
-      if (safe_not_equal(value, new_value)) {
-        value = new_value
-        if (stop) { // store is ready
-          const run_queue = !subscriber_queue.length
-          for (let i = 0; i < subscribers.length; i += 1) {
-            const s = subscribers[i]
-            s[1]()
-            subscriber_queue.push(s, value)
-          }
-          if (run_queue) {
-            for (let i = 0; i < subscriber_queue.length; i += 2) {
-              subscriber_queue[i][0](subscriber_queue[i + 1])
-            }
-            subscriber_queue.length = 0
-          }
-        }
-      }
-    }
-  
-    function update(fn) {
-      set(fn(value))
-    }
-  
-    function subscribe(run, invalidate = noop) {
-      const subscriber = [run, invalidate]
-      subscribers.push(subscriber)
-      if (subscribers.length === 1) {
-        stop = start(set) || noop
-      }
-
-      if (!value) {
-        value = default_value
-      }
-
-      run(value)
-      
-      return () => {
-        const index = subscribers.indexOf(subscriber)
-        if (index !== -1) {
-          subscribers.splice(index, 1)
-        }
-        if (subscribers.length === 0) {
-          stop()
-          stop = null
-        }
-      }
-    }
-  
-    if (component) {
-      client.components[storeID] = component
-    }
-    if (!client.stores[storeID]) {
-      client.stores[storeID] = []
-    }
-    client.stores[storeID].push({get, set, _set, update, subscribe, forceEmitBack, ignoreLocalSet})
-    return {get, set, update, subscribe}
-  }
-
 }
-
-Client.DEFAULT_NAMESPACE = '/svelte-realtime'
-
-function getClient(namespace) {
-  if (!client) {
-    client = new Client(namespace)
-  }
-  return client
-}
-
-let client
-
-module.exports = {getClient}  // TODO: Eventually change this to export once supported

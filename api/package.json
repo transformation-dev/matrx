@@ -1,0 +1,14 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "start": "func start",
+    "test": "echo \"No tests yet...\""
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "azure-functions-core-tools": "^3.0.2630",
+    "mime-types": "^2.1.27"
+  }
+}

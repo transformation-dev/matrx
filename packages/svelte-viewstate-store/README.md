@@ -53,7 +53,8 @@ const activePicID = new ViewstateStore({
   identifier: 'activePicID',
   defaultValue: 0,
   type: 'Int',  // Also accepts 'Float' and 'Boolean'. Defaults to 'String'.
-  updateLocalStorageOnURLChange: true  // Defaults to false
+  updateLocalStorageOnURLChange: true,  // Defaults to false
+  isGlobal: true  // Defaults to false
 })
 ```
 
@@ -99,6 +100,13 @@ const activePicID = new ViewstateStore({
   to some explicit user action in the UI. You can override this behavior and 
   update LocalStorage even on URL change by setting this config item to 
   `true`.
+
+* `isGlobal` - Normally, we create these stores inside components.
+  However, if you use the Svelte `stores.js` convention, then you should
+  set this to `true`. For now, the only thing this does is supress the
+  onDestroy behavior. This is a potential memory leak but if you are 
+  instantiating things in a global stores.js, you have a bit of memory inefficiency
+  already.
 
 activePicID can now be used as you would other Svelte writable store -- in
 reactive code like this:

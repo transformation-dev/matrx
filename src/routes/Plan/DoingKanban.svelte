@@ -22,12 +22,14 @@
         Culture: []
       }
     }
-    for (const [practiceID, practice] of Object.entries($plan)) {
-      if (practice.status === 'Doing') {
-        practice.practice = practicesIndex[practiceID]
-        if (practice.queueSwimlaneID && practice.assessedLevel) {
-          kanbanRestructured[practice.queueSwimlaneID][practice.assessedLevel].push(practice)
-        } 
+    if ($plan) {
+      for (const [practiceID, practice] of Object.entries($plan)) {
+        if (practice.status === 'Doing') {
+          practice.practice = practicesIndex[practiceID]
+          if (practice.queueSwimlaneID && practice.assessedLevel) {
+            kanbanRestructured[practice.queueSwimlaneID][practice.assessedLevel].push(practice)
+          } 
+        }
       }
     }
   }
