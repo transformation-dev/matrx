@@ -30,7 +30,7 @@ jobs:
           npm ci
           npm run build
         env:
-          SESSION_SECRET: ${{secrets.SESSION_SECRET}}
+          SESSION_SECRET: ${{secrets.SESSION_SECRET}}  # TODO: Remove when no longer needed
 
       - name: Deploy
         id: builddeploy
