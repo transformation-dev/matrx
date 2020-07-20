@@ -4,13 +4,15 @@ const path = require('path')
 const mode = process.env.NODE_ENV || 'development'
 const prod = mode === 'production'
 
+const sveltePath = path.resolve('node_modules', 'svelte')
+
 module.exports = {
   entry: {
     bundle: ['./src/main.js']
   },
   resolve: {
     alias: {
-      svelte: path.resolve('node_modules', 'svelte')
+      svelte: sveltePath
     },
     extensions: ['.mjs', '.js', '.svelte'],
     mainFields: ['svelte', 'browser', 'module', 'main']
@@ -28,7 +30,8 @@ module.exports = {
           loader: 'svelte-loader',
           options: {
             emitCss: true,
-            hotReload: true
+            hotReload: true,
+            preprocess: require('./svelte.config.js').preprocess
           }
         }
       },

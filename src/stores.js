@@ -4,7 +4,7 @@ import {writable, derived} from 'svelte/store'
 
 import {Dragster} from '@matrx/dragster'
 
-// import {ViewstateStore} from '@matrx/svelte-viewstate-store'
+import {ViewstateStore} from '@matrx/svelte-viewstate-store'
 import {RealtimeStore} from '@matrx/svelte-realtime-store'
 export const connected = RealtimeStore.connected
 export const authenticated = writable(false)
@@ -24,12 +24,12 @@ export const readyToGo = derived(  // 'getting ready', 'ready'
   'not ready'
 )
 
-// export const openPracticeID = new ViewstateStore({
-//   identifier: 'openPracticeID', 
-//   defaultValue: '',
-//   scope: '/plan',
-//   isGlobal: true
-// })
+export const openPracticeID = new ViewstateStore({
+  identifier: 'openPracticeID', 
+  defaultValue: '',
+  scope: '/plan',
+  isGlobal: true
+})
 // export const openPracticeID = writable('')
 
 // export const formulation = writable({

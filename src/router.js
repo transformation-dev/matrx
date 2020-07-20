@@ -29,7 +29,7 @@ export const routes = new Map(Object.entries({
   '/test-jig': TestJig,
 
   // TODO: Clean up below once we know have examples of all
-  '/poc': Poc,
+  '/poc': {component: Poc, allowUnauthenticated: true},
   '/morgan': Morgan,
 
   // Don't delete
