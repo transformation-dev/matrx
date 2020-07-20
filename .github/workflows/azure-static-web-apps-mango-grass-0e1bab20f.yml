@@ -25,12 +25,12 @@ jobs:
         with:
           node-version: '12'
 
-      - name: Build
-        run: |
-          npm ci
-          npm run build
-        env:
-          SESSION_SECRET: ${{secrets.SESSION_SECRET}}  # TODO: Remove when no longer needed
+      # - name: Build
+      #   run: |
+      #     npm ci
+      #     npm run build
+      #   env:
+      #     SESSION_SECRET: ${{secrets.SESSION_SECRET}}  # TODO: Remove when no longer needed
 
       - name: Deploy
         id: builddeploy
@@ -44,6 +44,8 @@ jobs:
           app_location: "dist" # App source code path
           api_location: "api" # Api source code path - optional
           # app_artifact_location: "dist" # Built app content directory - optional
+          app_build_command: npm run build  # optional
+          # api_build_command: npm run build:api  # optional
           ###### End of Repository/Build Configurations ######
 
   close_pull_request_job:
