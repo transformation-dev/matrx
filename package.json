@@ -16,7 +16,7 @@
   },
   "scripts": {
     "build": "webpack",
-    "dev": "nodemon & webpack -w",
+    "dev": "webpack -w",
     "start": "node src/server",
     "eslint": "npx eslint -c .eslintrc.js --ext .js,.svelte,.html .",
     "lint": "npm run eslint",
@@ -96,6 +96,7 @@
     "node-sass": "^4.14.1",
     "nodemon": "^1.19.4",
     "nyc": "^14.1.1",
+    "pusher-js": "^6.0.3",
     "sass-loader": "^9.0.2",
     "standardx": "^5.0.0",
     "start-server-and-test": "^1.11.0",

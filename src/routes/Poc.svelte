@@ -1,5 +1,6 @@
 <script>
-  console.log('POC page')
+  import Pusher from 'pusher-js/with-encryption'
+  console.log(Pusher)
 </script>
 
 <!-- Spacer -->
