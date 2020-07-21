@@ -1,5 +1,7 @@
 {
-    "routes": [],
+    "routes": [
+      {"route": "/api/context", "allowedRoles": ["authenticated"]}
+    ],
     "defaultHeaders": {
       "content-security-policy": "script-src 'self'; object-src 'none'; base-uri 'self'"
     }
