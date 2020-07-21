@@ -1,4 +1,6 @@
-![](https://github.com/matrx-transformation/matrx/workflows/Cypress%20tests/badge.svg?style=flat-square)
+![](https://img.shields.io/github/workflow/status/matrx-transformation/matrx/Deploy%20and%20Test%20in%20Staging?label=Cypress%20Tests%20in%20PR%20Staging&style=for-the-badge)
+
+![](https://img.shields.io/github/workflow/status/matrx-transformation/matrx/Lint?label=Lint&style=for-the-badge)
 
 ![Codecov](https://img.shields.io/codecov/c/github/matrx-transformation/matrx?style=for-the-badge)
 
