@@ -6,7 +6,8 @@ module.exports = async function (context, req) {
     headers: {
       'Content-Type': 'application/json'
     },
-    body: {nodeEnv: process.env.NODE_ENV, serverEnvironment}
+    // body: {nodeEnv: process.env.NODE_ENV, serverEnvironment}
+    body: {a: 1}
   }
 
   // const name = req.query.name || (req.body && req.body.name)
