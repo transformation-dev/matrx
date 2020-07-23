@@ -1,4 +1,4 @@
-![Azure Static Web App GitHub Actions Workflow](https://img.shields.io/github/workflow/status/matrx-transformation/matrx/Deploy%20and%20Test%20in%20Staging?label=Cypress%20Tests%20in%20PR%20Staging&style=for-the-badge)
+![Azure Static Web App GitHub Actions Workflow](https://img.shields.io/github/workflow/status/matrx-transformation/matrx/Build%20Deploy%20and%20Test?label=Build%20Deploy%20and%20Test&style=for-the-badge)
 
 ![](https://img.shields.io/github/workflow/status/matrx-transformation/matrx/Lint?label=Lint&style=for-the-badge)
 
