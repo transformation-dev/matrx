@@ -1,5 +1,13 @@
 module.exports = async function (context, req) {
   const serverEnvironment = process.env.NODE_ENV
+  let nodeEnv
+  if (serverEnvironment === 'production') {
+    nodeEnv = 'produciton'
+  } else if (serverEnvironment === 'staging') {
+    nodeEnv = 'staging'
+  } else {
+    nodeEnv = 'development'
+  }
 
   context.res = {
     // status: 200, /* Defaults to 200 */
@@ -7,7 +15,7 @@ module.exports = async function (context, req) {
       'Content-Type': 'application/json'
     },
     // body: {nodeEnv: process.env.NODE_ENV, serverEnvironment}
-    body: {a: 1}
+    body: {nodeEnv}
   }
 
   // const name = req.query.name || (req.body && req.body.name)
