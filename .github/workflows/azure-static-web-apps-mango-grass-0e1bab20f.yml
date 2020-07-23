@@ -1,4 +1,4 @@
-name: Deploy and Test in Staging
+name: Build Deploy and Test
 
 on:
   push:
@@ -46,10 +46,13 @@ jobs:
           # app_artifact_location: "dist" # Built app content directory - optional
           ###### End of Repository/Build Configurations ######
 
+  # e_to_e_test_in_staging_job:
+  #   if: github.event_name == 'pull_request' && github.event.action != 'closed'
       # To get this working, I'll need the location of the staged site, which is always
-      # https://<SUBDOMAIN>-<PULL_REQUEST_ID>.<AZURE_REGION>.azurestaticapps.net
+      # https://<SUBDOMAIN>-<PULL_REQUEST_ID>.<AZURE_REGION>.azurestaticapps.net 
+      # or the location of the production site which is currently https://mango-grass-0e1bab20f.azurestaticapps.net
       # where:
-      #   <SUBDOMAIN> for MatrX is currently 0e1bab20f
+      #   <SUBDOMAIN> for MatrX is currently mango-grass-0e1bab20f
       #   <PULL_REQUEST_ID> get from the environment variable GITHUB_REF as described here: https://github.com/actions/checkout/issues/58
       #   <AZURE_REGION> is eastus2
       # Build the host base URL inside of the cypress tests themselves. Fall back to localhost:7071 if no GITHUB_REF
@@ -63,6 +66,9 @@ jobs:
       #     browser: chrome  # or firefox or edge with runs-on: windows-latest
       #     env:
       #       CYPRESS_GITHUB_REF: ${{github.ref}}  # I think this will do the trick
+
+  # smoke_test_in_prod_job:
+  #   if: github.event_name == 'pull_request' && github.event.action == 'closed'
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
