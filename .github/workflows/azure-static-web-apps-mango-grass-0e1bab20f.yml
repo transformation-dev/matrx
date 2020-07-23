@@ -1,4 +1,4 @@
-name: Azure Static Web Apps CI/CD
+name: Deploy and Test in Staging
 
 on:
   push:
@@ -30,7 +30,7 @@ jobs:
           npm ci
           npm run build
         env:
-          SESSION_SECRET: ${{secrets.SESSION_SECRET}}
+          SESSION_SECRET: ${{secrets.SESSION_SECRET}}  # TODO: Remove when no longer needed
 
       - name: Deploy
         id: builddeploy
@@ -45,6 +45,24 @@ jobs:
           api_location: "api" # Api source code path - optional
           # app_artifact_location: "dist" # Built app content directory - optional
           ###### End of Repository/Build Configurations ######
+
+      # To get this working, I'll need the location of the staged site, which is always
+      # https://<SUBDOMAIN>-<PULL_REQUEST_ID>.<AZURE_REGION>.azurestaticapps.net
+      # where:
+      #   <SUBDOMAIN> for MatrX is currently 0e1bab20f
+      #   <PULL_REQUEST_ID> get from the environment variable GITHUB_REF as described here: https://github.com/actions/checkout/issues/58
+      #   <AZURE_REGION> is eastus2
+      # Build the host base URL inside of the cypress tests themselves. Fall back to localhost:7071 if no GITHUB_REF
+      # 
+      # - name: Cypress run
+      #   uses: cypress-io/github-action@v2
+      #   with:
+      #     build: npm run build --if-present
+      #     start: npm start
+      #     wait-on: http://localhost:8080
+      #     browser: chrome  # or firefox or edge with runs-on: windows-latest
+      #     env:
+      #       CYPRESS_GITHUB_REF: ${{github.ref}}  # I think this will do the trick
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'

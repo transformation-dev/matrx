@@ -11,7 +11,7 @@ module.exports = async function (context, req) {
   } else {
     context.res = {
       status: 400,
-      body: "Please pass a name on the query string for GET or in the request body as a POST"
+      body: {error: "Please pass a name on the query string for GET or in the request body as a POST"}
     }
   }
 }

@@ -8,7 +8,8 @@ const sveltePath = path.resolve('node_modules', 'svelte')
 
 module.exports = {
   entry: {
-    bundle: ['./src/main.js']
+    bundle: ['./src/main.js', './src/matrx.scss']
+    // bundle: ['./src/main.js']
   },
   resolve: {
     alias: {
@@ -34,6 +35,22 @@ module.exports = {
             preprocess: require('./svelte.config.js').preprocess
           }
         }
+      },
+      {
+        test: /\.s[ac]ss$/i,
+        use: [
+          {
+            loader: MiniCssExtractPlugin.loader,
+            options: {
+              // you can specify a publicPath here
+              // by default it uses publicPath in webpackOptions.output
+              publicPath: '../dist',
+              hmr: process.env.NODE_ENV === 'development',
+            },
+          },
+          'css-loader',
+          'sass-loader',
+        ],
       },
       {
         test: /\.css$/,
