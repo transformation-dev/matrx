@@ -1,6 +1,9 @@
 <script>
   import Pusher from 'pusher-js/with-encryption'
   console.log(Pusher)
+  const o = {a: {b: 10}}
+  // eslint-disable-next-line ParseError
+  console.log(a?.b)
 </script>
 
 <!-- Spacer -->

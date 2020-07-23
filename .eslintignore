@@ -6,3 +6,6 @@ node_modules
 
 # tests
 __tests__/
+
+# others
+coverage
