@@ -1,5 +1,17 @@
+const { includes } = require("lodash")
+
 module.exports = async function (context, req) {
-  const serverEnvironment = process.env
+  const assigneeID = process.env.WEBSITE_STATICWEBAPP_FUNCTION_ASSIGNEEID
+  let environment
+  if (assigneeID) {
+    if (assigneeID.includes('app/master')) {
+      environment = 'production'
+    } else {
+      environment = 'staging'
+    }
+  } else {
+    environment = 'development'
+  }
 
   context.res = {
     // status: 200, /* Defaults to 200 */
@@ -7,7 +19,7 @@ module.exports = async function (context, req) {
       'Content-Type': 'application/json'
     },
     // body: {nodeEnv: process.env.NODE_ENV, serverEnvironment}
-    body: {serverEnvironment, requestObject: context.req}
+    body: {environment, requestObject: context.req}
   }
 
   // const name = req.query.name || (req.body && req.body.name)
