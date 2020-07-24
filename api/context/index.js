@@ -1,5 +1,3 @@
-const { includes } = require("lodash")
-
 module.exports = async function (context, req) {
   const assigneeID = process.env.WEBSITE_STATICWEBAPP_FUNCTION_ASSIGNEEID
   let environment
