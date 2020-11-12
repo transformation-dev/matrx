@@ -97,7 +97,7 @@
     "nodemon": "^1.19.4",
     "nyc": "^14.1.1",
     "pusher-js": "^6.0.3",
-    "sass-loader": "^9.0.2",
+    "sass-loader": "^10.1.0",
     "standardx": "^5.0.0",
     "start-server-and-test": "^1.11.0",
     "style-loader": "^1.2.1",
